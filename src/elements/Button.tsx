@@ -7,8 +7,8 @@ type ButtonProps<C extends React.ElementType> = {
 } & React.ComponentPropsWithoutRef<C>;
 
 const classes = {
-    "fill": "cursor-pointer px-6 py-3 bg-yellow-400 text-black rounded-lg",
-    "outline": "cursor-pointer px-6 py-3 border-1 border-yellow-400 text-yellow-400 rounded-lg"
+    "fill": "cursor-pointer px-6 py-3 bg-primary text-foreground2 rounded-lg",
+    "outline": "cursor-pointer px-6 py-3 border-1 border-primary text-yellow-400 rounded-lg"
 }
 
 export const Button = <C extends React.ElementType = 'button'>({component, kind, className, ...restProps}: ButtonProps<C>) => {
