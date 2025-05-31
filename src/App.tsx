@@ -6,7 +6,7 @@ import { Signup } from './pages/Signup.tsx';
 import { Cart } from './pages/Cart.tsx';
 import { Battle } from './pages/Battle.tsx';
 import { Admin } from './pages/Admin.tsx';
-import { Header } from './components/Header.tsx';
+import { Header } from './components/Header/Header.tsx';
 import { Inventory } from "./pages/Inventory.tsx";
 import { UserProvider } from "./UserProvider.tsx";
 import { useUser } from "./UserContext.tsx";

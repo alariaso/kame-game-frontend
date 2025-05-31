@@ -1,0 +1,3 @@
+header nav a.active {
+    color: var(--color-primary)
+}
