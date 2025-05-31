@@ -7,7 +7,6 @@ type UserProviderProps = React.PropsWithChildren;
 
 export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
     const [user, setUser] = useState<User | null>(null);
-    const value = useMemo(() => ({ user, login, logout }), [user])
 
     useEffect(() => {
         const savedUserJson = sessionStorage.getItem("user")
@@ -39,5 +38,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
         }
     }
 
+    const value = useMemo(() => ({ user, login, logout }), [user])
     return <UserContext value={value}>{children}</UserContext>
 }
