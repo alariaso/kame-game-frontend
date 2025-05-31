@@ -1,20 +1,18 @@
-import { useNavigate } from "react-router";
+import { Navigate } from "react-router";
 import { useUser } from "../UserContext"
 import { useState, type FormEvent } from "react";
 
 export const Login: React.FC = () => {
     const { user, login } = useUser();
-    const navigate = useNavigate();
     const [username, setUsername] = useState("");
 
-    const handleSubmit: React.EventHandler<FormEvent> = (event) => {
+    const handleSubmit: React.EventHandler<FormEvent> = async (event) => {
         event.preventDefault()
-        login({ username, isAdmin: false, yugiPesos: 10000 })
+        await login({ username, password: "" })
     }
 
     if (user !== null) {
-        navigate("/")
-        return <></>
+        return <Navigate to="/" />
     }
 
     return (

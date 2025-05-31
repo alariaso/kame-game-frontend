@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import type { User } from "./api";
+import type { LoginParams, User } from "./api";
 import { UserContext } from "./UserContext";
+import { login as apiLogin } from "./api";
 
 type UserProviderProps = React.PropsWithChildren;
 
@@ -15,12 +16,20 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
         }
     }, [])
 
-    const login = (user: User) => {
-        setUser(user)
-        sessionStorage.setItem("user", JSON.stringify(user))
+    const login = async (loginParams: LoginParams) => {
+        const res = await apiLogin(loginParams)
+        if (res.user !== null) {
+            setUser(res.user)
+            sessionStorage.setItem("user", JSON.stringify(res.user))
+        }
+        if (res.error !== null) {
+            setUser(null)
+            sessionStorage.removeItem("user")
+            // FIXME: handle error
+        }
     }
 
-    const logout = () => {
+    const logout = async () => {
         setUser(null)
         sessionStorage.removeItem("user")
     }

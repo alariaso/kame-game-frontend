@@ -1,11 +1,11 @@
 import { createContext, useContext } from "react";
-import type { User } from "./api";
+import type { LoginParams, User } from "./api";
 import { useNavigate } from "react-router";
 
 type UserContextType = {
     user: User | null;
-    login: (user: User) => void;
-    logout: () => void;
+    login: (loginParams: LoginParams) => Promise<void>;
+    logout: () => Promise<void>;
 };
 
 export const UserContext = createContext<UserContextType>(null!);
