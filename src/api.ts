@@ -1,3 +1,5 @@
+import cards from './assets/some-cards.json'
+
 export type User = {
     username: string;
     isAdmin: boolean;
@@ -69,7 +71,7 @@ export type GetCardsParams = {
 // GET /cards
 export const getCards = async (params: GetCardsParams): Promise<Card[]> => {
     console.log(params) // para que eslint no se queje de no estar utilizando `params`
-    return [];
+    return cards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
 }
 
 export type GetPacksParams = {
