@@ -11,7 +11,7 @@ export const Header: React.FC = () => {
     }
 
     return (
-        <nav className="bg-black text-white flex justify-between p-10 items-center">
+        <nav className="bg-black text-white flex justify-between p-9 items-center">
             <Link to="/" className="text-yellow-400 font-bold text-xl">Kame Game</Link>
             <ul className="flex gap-5 items-center">
                 <li><Link to="/tienda">Tienda</Link></li>
