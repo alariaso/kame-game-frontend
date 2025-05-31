@@ -107,5 +107,5 @@ export const removeFromCart = async (params: RemoveFromCartParams): Promise<void
 
 // GET /inventory
 export const getInventory = async (): Promise<Card[]> => {
-    return [];
+    return cards.slice(0, 8) as Card[]
 }
