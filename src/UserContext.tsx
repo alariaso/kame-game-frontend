@@ -10,7 +10,14 @@ type UserContextType = {
 export const UserContext = createContext<UserContextType>(null!);
 
 export const useUser = () => {
-    const user = use(UserContext);
+    const userContext = use(UserContext);
 
-    return user;
+    return userContext;
+}
+
+// only use in routes that are children of RequireAuth in App.tsx
+export const useAuthenticatedUser = () => {
+    const { user } = use(UserContext);
+
+    return user!;
 }
