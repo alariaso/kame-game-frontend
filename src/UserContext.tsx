@@ -16,7 +16,7 @@ export const useUser = () => {
     return user;
 }
 
-export const useUserRequired = () => {
+export const useAuthenticatedUser = () => {
     const user = useUser();
     const navigate = useNavigate();
 
