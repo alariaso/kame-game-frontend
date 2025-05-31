@@ -17,12 +17,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
     }, [])
 
     const login = async (loginParams: LoginParams) => {
-        const res = await apiLogin(loginParams)
-        if (res.user !== null) {
-            setUser(res.user)
-            sessionStorage.setItem("user", JSON.stringify(res.user))
-        }
-        if (res.error !== null) {
+        try {
+            const user = await apiLogin(loginParams)
+            setUser(user)
+            sessionStorage.setItem("user", JSON.stringify(user))
+        } catch {
             setUser(null)
             sessionStorage.removeItem("user")
             // FIXME: handle error
