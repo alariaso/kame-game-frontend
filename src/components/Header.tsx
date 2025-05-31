@@ -24,12 +24,12 @@ export const Header: React.FC = () => {
             <ul className="flex gap-5 items-center">
                 {user === null ? <>
                     <li className="p-2"><Link to="/login">Iniciar Sesión</Link></li>
-                    <li className="p-2"><Link to="/registro">Crear Cuenta</Link></li>
+                    <li className="p-2 bg-yellow-400 text-black rounded-lg"><Link to="/registro">Crear Cuenta</Link></li>
                 </> : <>
                     <li className="text-yellow-400 p-2"><Wallet className="inline-block align-text-bottom" size={20} /> {user.yugiPesos} YP</li>
                     <li><Link to="/carrito" className="border-1 border-yellow-400 text-yellow-400 p-2 rounded-sm block"><ShoppingCart size={20} /></Link></li>
                     <li className="p-2">Hola, {user.username}</li>
-                    <li onClick={handleLogout} className="cursor-pointer text-yellow-400 border-yellow-400 border-1 p-2 px-4 rounded-sm"><LogOut size={20} className="inline-block align-text-bottom" /> Salir</li>
+                    <li onClick={handleLogout} className="cursor-pointer text-yellow-400 border-yellow-400 border-1 p-2 px-4 rounded-lg"><LogOut size={20} className="inline-block align-text-bottom" /> Salir</li>
                 </>}
             </ul>
         </nav>
