@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router";
+import { Routes, Route, Navigate, useLocation } from "react-router";
 import { Home } from './pages/Home.tsx';
 import { Store } from './pages/Store.tsx';
 import { Login } from './pages/Login.tsx';
@@ -30,9 +30,16 @@ export const App: React.FC = () => {
 }
 
 const RequireAuth: React.FC<React.PropsWithChildren> = ({children}) => {
-  const { user } = useUser();
-  if (user === null) {
-    return <Navigate to="/login" />
+  const { user, loading } = useUser();
+  const location = useLocation();
+
+  if (loading) {
+    return <p>Loading...</p>
   }
+
+  if (user === null) {
+    return <Navigate to="/login" state={{"prevLocation": location}} />
+  }
+
   return <>{children}</>;
 }

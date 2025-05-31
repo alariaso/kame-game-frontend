@@ -3,6 +3,7 @@ import type { LoginParams, User } from "./api";
 
 type UserContextType = {
     user: User | null;
+    loading: boolean;
     login: (loginParams: LoginParams) => Promise<void>;
     logout: () => Promise<void>;
 };

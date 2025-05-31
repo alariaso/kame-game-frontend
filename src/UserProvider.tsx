@@ -7,6 +7,7 @@ type UserProviderProps = React.PropsWithChildren;
 
 export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
     const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const savedUserJson = sessionStorage.getItem("user")
@@ -14,9 +15,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
             const savedUser = JSON.parse(savedUserJson);
             setUser(savedUser)
         }
+        setLoading(false)
     }, [])
 
     const login = async (loginParams: LoginParams) => {
+        setLoading(true)
         try {
             const user = await apiLogin(loginParams)
             setUser(user)
@@ -26,9 +29,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
             sessionStorage.removeItem("user")
             // FIXME: handle error
         }
+        setLoading(false)
     }
 
     const logout = async () => {
+        setLoading(true)
         try {
             await apiLogout();
             setUser(null)
@@ -36,8 +41,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
         } catch {
             console.error("error") // FIXME: handle error
         }
+        setLoading(false)
     }
 
-    const value = useMemo(() => ({ user, login, logout }), [user])
+    const value = useMemo(() => ({ user, loading, login, logout }), [user, loading])
     return <UserContext value={value}>{children}</UserContext>
 }
