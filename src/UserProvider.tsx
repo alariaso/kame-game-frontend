@@ -10,7 +10,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const savedUserJson = sessionStorage.getItem("user")
+        const savedUserJson = localStorage.getItem("user")
         if (savedUserJson !== null) {
             const savedUser = JSON.parse(savedUserJson);
             setUser(savedUser)
@@ -23,10 +23,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
         try {
             const user = await apiLogin(loginParams)
             setUser(user)
-            sessionStorage.setItem("user", JSON.stringify(user))
+            localStorage.setItem("user", JSON.stringify(user))
         } catch {
             setUser(null)
-            sessionStorage.removeItem("user")
+            localStorage.removeItem("user")
             // FIXME: handle error
         }
         setLoading(false)
@@ -37,7 +37,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
         try {
             await apiLogout();
             setUser(null)
-            sessionStorage.removeItem("user")
+            localStorage.removeItem("user")
         } catch {
             console.error("error") // FIXME: handle error
         }
