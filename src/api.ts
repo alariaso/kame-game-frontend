@@ -70,7 +70,6 @@ export type GetCardsParams = {
 
 // GET /cards
 export const getCards = async (params: GetCardsParams): Promise<Card[]> => {
-    console.log(params) // para que eslint no se queje de no estar utilizando `params`
     return cards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
 }
 
@@ -85,6 +84,17 @@ export type GetPacksParams = {
 export const getPacks = async (params: GetPacksParams): Promise<Pack[]> => {
     console.log(params) // para que eslint no se queje de no estar utilizando `params`
     return [];
+}
+
+export type GetInventoryParams = {
+    page: number;
+    itemsPerPage: number;
+};
+
+// GET /inventory
+export const getInventory = async (params: GetInventoryParams): Promise<Card[]> => {
+    const c = cards.slice(0, 24);
+    return c.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
 }
 
 export type AddToCartParams = {
@@ -103,9 +113,4 @@ export type RemoveFromCartParams = {
 // POST /cart/remove
 export const removeFromCart = async (params: RemoveFromCartParams): Promise<void> => {
     console.log(params) // para que eslint no se queje de no estar utilizando `params`
-}
-
-// GET /inventory
-export const getInventory = async (): Promise<Card[]> => {
-    return cards.slice(0, 8) as Card[]
 }
