@@ -7,8 +7,8 @@ import { Button } from "../elements/Button";
 export const Header: React.FC = () => {
     const { user, logout } = useUser();
 
-    const handleLogout = () => {
-        logout()
+    const handleLogout = async () => {
+        await logout()
     }
 
     return (
