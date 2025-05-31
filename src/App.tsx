@@ -9,7 +9,7 @@ import { Admin } from './pages/Admin.tsx';
 import { Header } from './components/Header.tsx';
 import { Inventory } from "./pages/Inventory.tsx";
 
-function App() {
+export const App: React.FC = () => {
   return (
     <>
       <Header />
@@ -26,5 +26,3 @@ function App() {
     </>
   )
 }
-
-export default App
