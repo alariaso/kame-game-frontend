@@ -2,6 +2,7 @@ import type React from "react";
 import { Link } from "react-router";
 import { useUser } from "../UserContext";
 import { LogOut, ShoppingCart, Wallet } from "lucide-react";
+import { Button } from "../elements/Button";
 
 export const Header: React.FC = () => {
     const { user, logout } = useUser();
@@ -24,7 +25,7 @@ export const Header: React.FC = () => {
             <ul className="flex gap-5 items-center">
                 {user === null ? <>
                     <li className="p-2"><Link to="/login">Iniciar Sesión</Link></li>
-                    <li className="p-2 bg-yellow-400 text-black rounded-lg"><Link to="/registro">Crear Cuenta</Link></li>
+                    <li><Button component={Link} to="/registro">Crear Cuenta</Button></li>
                 </> : <>
                     <li className="text-yellow-400 p-2"><Wallet className="inline-block align-text-bottom" size={20} /> {user.yugiPesos} YP</li>
                     <li><Link to="/carrito" className="border-1 border-yellow-400 text-yellow-400 p-2 rounded-sm block"><ShoppingCart size={20} /></Link></li>
