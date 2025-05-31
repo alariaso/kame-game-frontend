@@ -4,11 +4,6 @@ export type User = {
     yugiPesos: number;
 };
 
-export type LoginParams = {
-    username: string;
-    password: string;
-}
-
 export type CardKind = "DARK" | "DIVINE" | "EARTH" | "FIRE" | "LIGHT" | "WATER" | "WIND";
 
 export type Card = {
@@ -31,6 +26,11 @@ export type Pack = {
     image_url: string;
 };
 
+export type LoginParams = {
+    username: string;
+    password: string;
+}
+
 // POST /login
 export const login = async (params: LoginParams): Promise<User> => {
     const user = {
@@ -45,6 +45,20 @@ export const login = async (params: LoginParams): Promise<User> => {
 export const logout = async (): Promise<void> => {
 }
 
+export type SignupParams = {
+    username: string;
+    password: string;
+}
+
+export const signup = async (params: SignupParams): Promise<User> => {
+    const user = {
+        username: params.username,
+        isAdmin: false,
+        yugiPesos: 10000
+    }
+    return user;
+}
+
 export type GetCardsParams = {
     page: number;
     itemsPerPage: number;
@@ -54,7 +68,7 @@ export type GetCardsParams = {
 
 // GET /cards
 export const getCards = async (params: GetCardsParams): Promise<Card[]> => {
-    console.log(params) // para que typescript no se queje de no estar utilizando `params`
+    console.log(params) // para que eslint no se queje de no estar utilizando `params`
     return [];
 }
 
@@ -67,6 +81,29 @@ export type GetPacksParams = {
 
 // GET /packs
 export const getPacks = async (params: GetPacksParams): Promise<Pack[]> => {
-    console.log(params) // para que typescript no se queje de no estar utilizando `params`
+    console.log(params) // para que eslint no se queje de no estar utilizando `params`
+    return [];
+}
+
+export type AddToCartParams = {
+    productId: number;
+};
+
+// POST /cart/add
+export const addToCart = async (params: AddToCartParams): Promise<void> => {
+    console.log(params) // para que eslint no se queje de no estar utilizando `params`
+}
+
+export type RemoveFromCartParams = {
+    productId: number;
+};
+
+// POST /cart/remove
+export const removeFromCart = async (params: RemoveFromCartParams): Promise<void> => {
+    console.log(params) // para que eslint no se queje de no estar utilizando `params`
+}
+
+// GET /inventory
+export const getInvetory = async (): Promise<Card[]> => {
     return [];
 }
