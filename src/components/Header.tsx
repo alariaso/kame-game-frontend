@@ -3,7 +3,11 @@ import { Link } from "react-router";
 import { useUser } from "../UserContext";
 
 export const Header: React.FC = () => {
-    const { user } = useUser();
+    const { user, logout } = useUser();
+
+    const handleLogout = () => {
+        logout()
+    }
 
     return (
         <nav className="bg-black text-white flex justify-between">
@@ -24,7 +28,7 @@ export const Header: React.FC = () => {
                     <li>{user.yugiPesos} YP</li>
                     <li><Link to="/carrito">Carrito</Link></li>
                     <li>Hola, {user.username}</li>
-                    <li><Link to="/salir">Salir</Link></li>
+                    <li onClick={handleLogout}><button>Salir</button></li>
                 </>}
             </ul>
         </nav>
