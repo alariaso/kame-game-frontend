@@ -2,7 +2,7 @@ import type React from "react";
 import { NavLink } from "react-router";
 import { useUser } from "../../UserContext";
 import { LogOut, ShoppingCart, Wallet } from "lucide-react";
-import { Button } from "../../elements/Button";
+import { Button } from "@/components/ui/button";
 import "./Header.css";
 
 export const Header: React.FC = () => {
@@ -27,12 +27,20 @@ export const Header: React.FC = () => {
                 <ul className="flex gap-5 items-center">
                     {user === null ? <>
                         <li className="p-3"><NavLink to="/login">Iniciar Sesión</NavLink></li>
-                        <li><Button component={NavLink} to="/registro">Crear Cuenta</Button></li>
+                        <li>
+                            <Button asChild>
+                                <NavLink to="/registro">Crear Cuenta</NavLink>
+                            </Button>
+                        </li>
                     </> : <>
-                        <li className="text-primary p-2"><Wallet className="inline-block align-text-bottom" size={20} /> {user.yugiPesos} YP</li>
+                        <li>
+                            <Button variant="ghost" className="cursor-pointer text-primary">
+                                    <Wallet size={20} /> {user.yugiPesos} YP
+                            </Button>
+                        </li>
                         <li><NavLink to="/carrito" className="border-1 border-primary text-yellow-400 p-3 rounded-sm block"><ShoppingCart size={20} /></NavLink></li>
                         <li className="p-2">Hola, {user.username}</li>
-                        <li onClick={handleLogout}><Button kind="outline"><LogOut size={20} className="inline-block align-text-bottom" /> Salir</Button></li>
+                        <li onClick={handleLogout}><Button variant="outline" className="cursor-pointer"><LogOut size={20} /> Salir</Button></li>
                     </>}
                 </ul>
             </nav>
