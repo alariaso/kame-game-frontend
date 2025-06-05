@@ -1,49 +1,123 @@
-import type React from "react";
 import { NavLink } from "react-router";
 import { useUser } from "../../UserContext";
 import { LogOut, ShoppingCart, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import "./Header.css";
 
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu"
+import { Fragment, useEffect, useState } from "react";
+
+type WindowSizeState = {
+    width: number;
+    height: number;
+}
+
 export const Header: React.FC = () => {
     const { user, logout } = useUser();
+    const [windowSize, setWindowSize] = useState<WindowSizeState>(() => ({width: window.innerWidth, height: window.innerHeight}));
 
     const handleLogout = async () => {
         await logout()
     }
 
-    return (
-        <header>
-            <nav className="bg-background text-foreground flex justify-between p-9 items-center">
-                <NavLink to="/" className="text-primary font-bold text-xl">Kame Game</NavLink>
-                <ul className="flex gap-5 items-center">
-                    <li><NavLink to="/tienda">Tienda</NavLink></li>
-                    { user !== null && <>
-                        <li><NavLink to="/inventario">Inventario</NavLink></li>
-                        <li><NavLink to="/batalla">Batalla</NavLink></li>
-                    </>}
-                    { user?.isAdmin && <li><NavLink to="/admin">Administración</NavLink></li>}
-                </ul>
-                <ul className="flex gap-5 items-center">
-                    {user === null ? <>
-                        <li className="p-3"><NavLink to="/login">Iniciar Sesión</NavLink></li>
-                        <li>
+    useEffect(() => {
+        window.addEventListener("resize", () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight })
+        })
+    }, [])
+
+    const inSmallScreen = windowSize.width < 960;
+
+    const otherLinks = (
+        <>
+            <NavigationMenuList>
+                <NavigationMenuItem>
+                    <NavigationMenuLink asChild>
+                        <NavLink to="/tienda">Tienda</NavLink>
+                    </NavigationMenuLink>
+                </NavigationMenuItem>
+                { user != null && <>
+                    <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
+                            <NavLink to="/inventario">Inventario</NavLink>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
+                            <NavLink to="/batalla">Batalla</NavLink>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                </>}
+                { user?.isAdmin && <NavigationMenuItem>
+                    <NavigationMenuLink asChild>
+                        <NavLink to="/admin">Administración</NavLink>
+                    </NavigationMenuLink>
+                </NavigationMenuItem>}
+            </NavigationMenuList>
+
+            <NavigationMenuList>
+                { user === null ? <>
+                    <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
+                            <NavLink to="/login">Iniciar Sesión</NavLink>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
                             <Button asChild>
                                 <NavLink to="/registro">Crear Cuenta</NavLink>
                             </Button>
-                        </li>
-                    </> : <>
-                        <li>
-                            <Button variant="ghost" className="cursor-pointer text-primary">
-                                    <Wallet size={20} /> {user.yugiPesos} YP
-                            </Button>
-                        </li>
-                        <li><NavLink to="/carrito" className="border-1 border-primary text-yellow-400 p-3 rounded-sm block cart-navlink"><ShoppingCart size={20} /></NavLink></li>
-                        <li className="p-2">Hola, {user.username}</li>
-                        <li onClick={handleLogout}><Button variant="outline" className="cursor-pointer"><LogOut size={20} /> Salir</Button></li>
-                    </>}
-                </ul>
-            </nav>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                </> : <>
+                    <NavigationMenuItem>
+                        <Button variant="ghost" className="cursor-pointer text-primary">
+                            <Wallet /> {user.yugiPesos} YP
+                        </Button>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
+                            <NavLink to="/carrito" className="border-1 border-primary p-3 rounded-sm block cart-navlink">
+                                <ShoppingCart className="text-primary" />
+                            </NavLink>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                        Hola, {user.username}
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                        <Button onClick={handleLogout} variant="outline" className="cursor-pointer"><LogOut size={20} /> Salir</Button>
+                    </NavigationMenuItem>
+                </>}
+            </NavigationMenuList>
+        </>
+    );
+
+    return (
+        <header>
+            <NavigationMenu className="p-9 data-[orientation=horizontal]:max-w-full justify-between" orientation={inSmallScreen ? "vertical" : "horizontal"}>
+                <NavigationMenuList data-orientation="horizontal">
+                    <NavigationMenuItem>
+                        <NavigationMenuLink asChild>
+                            <NavLink to="/" className="text-primary font-bold text-xl hover:text-primary">Kame Game</NavLink>
+                        </NavigationMenuLink>
+                    </NavigationMenuItem>
+                    {inSmallScreen && <NavigationMenuItem>
+                            <NavigationMenuTrigger>Menu</NavigationMenuTrigger>
+                            <NavigationMenuContent className="w-dvw">{otherLinks}</NavigationMenuContent>
+                    </NavigationMenuItem>}
+                </NavigationMenuList>
+
+                {!inSmallScreen && otherLinks}
+            </NavigationMenu>
         </header>
     )
 };

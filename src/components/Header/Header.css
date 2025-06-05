@@ -3,6 +3,9 @@ header nav a.active {
 
     &.cart-navlink {
         background-color: var(--color-primary);
-        color: var(--color-primary-foreground)
+
+        & svg {
+            color: var(--color-primary-foreground)
+        }
     }
 }
