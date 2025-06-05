@@ -38,7 +38,7 @@ export const Header: React.FC = () => {
                                     <Wallet size={20} /> {user.yugiPesos} YP
                             </Button>
                         </li>
-                        <li><NavLink to="/carrito" className="border-1 border-primary text-yellow-400 p-3 rounded-sm block"><ShoppingCart size={20} /></NavLink></li>
+                        <li><NavLink to="/carrito" className="border-1 border-primary text-yellow-400 p-3 rounded-sm block cart-navlink"><ShoppingCart size={20} /></NavLink></li>
                         <li className="p-2">Hola, {user.username}</li>
                         <li onClick={handleLogout}><Button variant="outline" className="cursor-pointer"><LogOut size={20} /> Salir</Button></li>
                     </>}

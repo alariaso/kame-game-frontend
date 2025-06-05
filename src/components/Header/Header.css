@@ -1,3 +1,8 @@
 header nav a.active {
-    color: var(--color-primary)
+    color: var(--color-primary);
+
+    &.cart-navlink {
+        background-color: var(--color-primary);
+        color: var(--color-primary-foreground)
+    }
 }
