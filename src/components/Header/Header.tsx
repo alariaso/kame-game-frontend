@@ -11,9 +11,8 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 type WindowSizeState = {
     width: number;
