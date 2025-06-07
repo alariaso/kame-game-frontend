@@ -15,16 +15,18 @@ export const App: React.FC = () => {
   return (
     <UserProvider>
       <Header />
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="/tienda" element={<Store />} />
-        <Route path="/inventario" element={<RequireAuth><Inventory /></RequireAuth>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/registro" element={<Signup />} />
-        <Route path="/carrito" element={<RequireAuth><Cart /></RequireAuth>} />
-        <Route path="/batalla" element={<RequireAuth><Battle /></RequireAuth>} />
-        <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
-      </Routes>
+      <main className="mx-14">
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path="/tienda" element={<Store />} />
+          <Route path="/inventario" element={<RequireAuth><Inventory /></RequireAuth>} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<Signup />} />
+          <Route path="/carrito" element={<RequireAuth><Cart /></RequireAuth>} />
+          <Route path="/batalla" element={<RequireAuth><Battle /></RequireAuth>} />
+          <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+        </Routes>
+      </main>
     </UserProvider>
   )
 }

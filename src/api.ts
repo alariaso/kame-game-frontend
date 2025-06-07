@@ -68,8 +68,13 @@ export type GetCardsParams = {
     cardKind?: CardKind; // TODO agregar en el enunciado que se puede filtrar por tipo de carta
 };
 
+const sleep = (seconds: number): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+};
+
 // GET /cards
 export const getCards = async (params: GetCardsParams): Promise<Card[]> => {
+    await sleep(2); // simulate api call time
     return cards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
 }
 
@@ -82,6 +87,7 @@ export type GetPacksParams = {
 
 // GET /packs
 export const getPacks = async (params: GetPacksParams): Promise<Pack[]> => {
+    await sleep(2);
     console.log(params) // para que eslint no se queje de no estar utilizando `params`
     return [];
 }
