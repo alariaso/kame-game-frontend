@@ -2,6 +2,7 @@ import { NavLink } from "react-router";
 import { useUser } from "../../UserContext";
 import { LogOut, ShoppingCart, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Popup } from "../Popup";
 import "./Header.css";
 
 import {
@@ -78,9 +79,21 @@ export const Header: React.FC = () => {
                     </NavigationMenuItem>
                 </> : <>
                     <NavigationMenuItem>
+                    <Popup trigger={
                         <Button variant="ghost" className="cursor-pointer text-primary">
                             <Wallet /> {user.yugiPesos} YP
-                        </Button>
+                        </Button>}
+                        title="Recargar Yugi Pesos"
+                        description="Ingresa la cantidad que deseas recargar a tu cuenta"
+                        input={{id: "amount",
+                            placeholder: "Cantidad a recargar"}}
+                        actionButton={
+                            {button: {},
+                            text: "Recargar",
+                        }}
+                    >
+                    </Popup>
+                    
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink asChild>
