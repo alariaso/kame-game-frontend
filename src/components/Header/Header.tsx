@@ -21,11 +21,34 @@ type WindowSizeState = {
 }
 
 export const Header: React.FC = () => {
-    const { user, logout } = useUser();
+    const { user, logout, update } = useUser();
     const [windowSize, setWindowSize] = useState<WindowSizeState>(() => ({width: window.innerWidth, height: window.innerHeight}));
+    // popup states, estan aca para que el popup sea reutilizable
+    // se pueden mover al popup si se ve necesario
+    const [error, setError] = useState("")
+    const [amount, setAmount] = useState<string | undefined>();
 
     const handleLogout = async () => {
         await logout()
+    }
+
+    const handleAddFunds = async () => {
+        // validate input
+        if (user) {
+            const funds = Number(amount);
+            if (!amount || isNaN(funds)) {
+                // TODO: handle
+                return;
+            }
+
+            try {
+                await update({...user, yugiPesos: user.yugiPesos + funds})
+            } catch {
+                // TODO: handle error
+            } finally {
+                setAmount("");
+            }
+        }
     }
 
     useEffect(() => {
@@ -85,10 +108,13 @@ export const Header: React.FC = () => {
                         </Button>}
                         title="Recargar Yugi Pesos"
                         description="Ingresa la cantidad que deseas recargar a tu cuenta"
-                        input={{id: "amount",
+                        input={{className: "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+                            value: amount,
+                            type: "number",
+                            onChange: (e) => setAmount(e.target.value), // to control and update the state
                             placeholder: "Cantidad a recargar"}}
                         actionButton={
-                            {button: {},
+                            {button: { onClick: handleAddFunds },
                             text: "Recargar",
                         }}
                     >

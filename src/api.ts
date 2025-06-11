@@ -61,6 +61,24 @@ export const signup = async (params: SignupParams): Promise<User> => {
     return user;
 }
 
+export type UpdateParams = {
+    username: string;
+    isAdmin: boolean;
+    yugiPesos: number;
+}
+
+// PUT /update
+export const update = async (params: UpdateParams): Promise<User> => {
+    await sleep(1);
+    const updatedUser = {
+        username: params.username,
+        isAdmin: params.isAdmin,
+        yugiPesos: params.yugiPesos
+    }
+
+    return updatedUser;
+}
+
 export type GetCardsParams = {
     page: number;
     itemsPerPage: number;

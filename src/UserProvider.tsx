@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import type { LoginParams, User } from "./api";
+import type { LoginParams, User, UpdateParams } from "./api";
 import { UserContext } from "./UserContext";
-import { login as apiLogin, logout as apiLogout } from "./api";
+import { login as apiLogin, logout as apiLogout, update as apiUpdate } from "./api";
 
 type UserProviderProps = React.PropsWithChildren;
 
@@ -44,6 +44,18 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
         setLoading(false)
     }
 
-    const value = useMemo(() => ({ user, loading, login, logout }), [user, loading])
+    const update = async (updateParams: UpdateParams) => {
+        setLoading(true);
+        try {
+            const updatedUser = await apiUpdate(updateParams);
+            setUser(updatedUser);
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+        } catch {
+            // TODO: handle error
+        }
+        setLoading(false);
+    }
+
+    const value = useMemo(() => ({ user, loading, login, logout, update }), [user, loading])
     return <UserContext value={value}>{children}</UserContext>
 }

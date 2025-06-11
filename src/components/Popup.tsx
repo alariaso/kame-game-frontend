@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
@@ -21,7 +21,6 @@ type Props = {
         button: React.ComponentProps<typeof Button>;
         text: string;
     }
-
 }
 
 export const Popup: React.FC<Props> = ({

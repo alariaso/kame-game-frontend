@@ -1,11 +1,12 @@
 import { createContext, use } from "react";
-import type { LoginParams, User } from "./api";
+import type { LoginParams, UpdateParams, User } from "./api";
 
 type UserContextType = {
     user: User | null;
     loading: boolean;
     login: (loginParams: LoginParams) => Promise<void>;
     logout: () => Promise<void>;
+    update: (updateParams: UpdateParams) => Promise<void>;
 };
 
 export const UserContext = createContext<UserContextType>(null!);
