@@ -15,12 +15,13 @@ type Props = {
     trigger: ReactNode;
     title: string;
     description: string;
-    buttonText?: string;
     input?: React.ComponentProps<typeof Input>;
     actionButton?: {
-        button: React.ComponentProps<typeof Button>;
+        buttonProps: React.ComponentProps<typeof Button>;
         text: string;
     }
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
 export const Popup: React.FC<Props> = ({
@@ -29,9 +30,11 @@ export const Popup: React.FC<Props> = ({
     description,
     input,
     actionButton,
+    open,
+    onOpenChange
 }) => {
     return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogTrigger asChild>
             {trigger}
         </DialogTrigger>
@@ -45,7 +48,7 @@ export const Popup: React.FC<Props> = ({
             {input && <Input {...input}></Input>}
             {actionButton && (
             <DialogFooter>
-                <Button {...actionButton.button}>
+                <Button {...actionButton.buttonProps}>
                     {actionButton.text}
                 </Button>
             </DialogFooter>
