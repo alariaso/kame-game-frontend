@@ -83,11 +83,8 @@ export const Store: React.FC = () => {
       {error.length > 0 && <p>Ha ocurrido un error inesperado: {error}</p>}
 
       <div className="flex flex-wrap mt-10 gap-17">
-        { loading && productCategory == "Cartas Individuales" && Array.from({length: 10}, (_, idx: number) => (
+        { loading && Array.from({length: 10}, (_, idx: number) => (
           <Product key={idx} />
-        )) }
-        { loading && productCategory == "Paquetes" && Array.from({length: 10}, (_, idx: number) => (
-          <Pack key={idx} />
         )) }
         { !loading && products.map(product => <Product key={product.id} product={product} />) }
         { !loading && error.length == 0 && products.length == 0 && <p>No se encontraron {productCategory}</p>}
