@@ -27,6 +27,9 @@ export const Store: React.FC = () => {
   const [ searchParams ] = useSearchParams();
 
   const handleProductCategoryChange = (option: ProductCategory) => {
+    if (option != productCategory) {
+      setLoading(true)
+    }
     setProductCategory(option)
   }
 
