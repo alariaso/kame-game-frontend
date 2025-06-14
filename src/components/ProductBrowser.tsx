@@ -102,6 +102,17 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
     loadProducts()
   }, [categories, productCategoryIdx, page, debouncedSearchValue])
 
+  const createPageLink = (targetPage: number) => {
+    let s = `?page=${targetPage}`
+    if (debouncedSearchValue) {
+      s += `&q=${debouncedSearchValue}`
+    }
+    if (productCategoryIdx > 0) {
+      s += `&category=${productCategoryIdx}`
+    }
+    return s
+  };
+
   const ProductComponent = productComponent;
 
   return (
@@ -123,37 +134,36 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
         <PaginationContent>
           { page > 1 &&
             <PaginationItem>
-              <PaginationPrevious to={`?page=${page-1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`} />
+              <PaginationPrevious to={createPageLink(page-1)} />
             </PaginationItem>
           }
           { page > 2 &&
             <PaginationItem>
-              <PaginationLink to={`?page=${page-2}&q=${debouncedSearchValue}&category=${productCategoryIdx}`}>{page-2}</PaginationLink>
+              <PaginationLink to={createPageLink(page-2)}>{page-2}</PaginationLink>
             </PaginationItem>
           }
           { page > 1 &&
             <PaginationItem>
-              <PaginationLink to={`?page=${page-1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`}>{page-1}</PaginationLink>
+              <PaginationLink to={createPageLink(page-1)}>{page-1}</PaginationLink>
             </PaginationItem>
           }
           <PaginationItem>
-            <PaginationLink to={`?page=${page}&q=${debouncedSearchValue}&category=${productCategoryIdx}`} className="text-primary">{page}</PaginationLink>
+            <PaginationLink to={createPageLink(page)} className="text-primary">{page}</PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink to={`?page=${page+1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`}>{page+1}</PaginationLink>
+            <PaginationLink to={createPageLink(page+1)}>{page+1}</PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink to={`?page=${page+1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`}>{page+2}</PaginationLink>
+            <PaginationLink to={createPageLink(page+2)}>{page+2}</PaginationLink>
           </PaginationItem>
           <PaginationItem>
             <PaginationEllipsis />
           </PaginationItem>
           <PaginationItem>
-            <PaginationNext to={`?page=${page+1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`} />
+            <PaginationNext to={createPageLink(page+1)} />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
     </>
   );
 }
-
