@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState, type JSX } from "react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
+import { useUser } from "@/context/UserContext";
+import { useLocation, useNavigate } from "react-router";
 
 type Props = {
   product?: ApiProduct;
@@ -18,10 +20,20 @@ type Props = {
 
 export const Product: React.FC<Props> = ({ product }) => {
   const { cart, loading: cartLoading, addToCart, removeFromCart } = useCart();
+  const { user } = useUser();
   const [addRemoveLoading, setAddRemoveLoading] = useState(false);
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  console.log(location)
 
   const handleButton = async () => {
     if (!product) return;
+
+    if (!user) {
+      await navigate("/login", {state: {"prevLocation": location}})
+      return;
+    }
 
     setAddRemoveLoading(true)
     if (cart.includes(product.id)) {
@@ -38,7 +50,7 @@ export const Product: React.FC<Props> = ({ product }) => {
   let priceAndStock: JSX.Element = <Skeleton className="" />
 
   if (product) {
-    inCart = cart.includes(product.id);
+    inCart = user ? cart.includes(product.id) : false;
     title = product.name;
     img = <img src={product.image_url} className="w-[15rem] h-[22rem]" />;
     priceAndStock = (<div className="flex mt-4">
