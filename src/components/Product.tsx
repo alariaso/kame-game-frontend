@@ -40,7 +40,7 @@ export const Product: React.FC<Props> = ({ product }) => {
   if (product) {
     inCart = cart.includes(product.id);
     title = product.name;
-    img = <img src={product.image_url} className="w-[15rem]" />;
+    img = <img src={product.image_url} className="w-[15rem] h-[22rem]" />;
     priceAndStock = (<div className="flex mt-4">
       <span className="text-primary">${product.price}</span>
       {product.category === "card" && <span className="ml-auto">Stock: {product.stock}</span>}
