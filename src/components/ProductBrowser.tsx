@@ -112,7 +112,7 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
       {error.length > 0 && <p>Ha ocurrido un error inesperado: {error}</p>}
 
       <div className="flex flex-wrap mt-10 gap-17 justify-around">
-        { loading && Array.from({length: 10}, (_, idx: number) => (
+        { loading && Array.from({length: 20}, (_, idx: number) => (
           <ProductComponent key={idx} />
         )) }
         { !loading && products.map(product => <ProductComponent key={product.id} product={product} />) }
@@ -126,6 +126,11 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
               <PaginationPrevious to={`?page=${page-1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`} />
             </PaginationItem>
           }
+          { page > 2 &&
+            <PaginationItem>
+              <PaginationLink to={`?page=${page-2}&q=${debouncedSearchValue}&category=${productCategoryIdx}`}>{page-2}</PaginationLink>
+            </PaginationItem>
+          }
           { page > 1 &&
             <PaginationItem>
               <PaginationLink to={`?page=${page-1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`}>{page-1}</PaginationLink>
@@ -136,6 +141,9 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
           </PaginationItem>
           <PaginationItem>
             <PaginationLink to={`?page=${page+1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`}>{page+1}</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink to={`?page=${page+1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`}>{page+2}</PaginationLink>
           </PaginationItem>
           <PaginationItem>
             <PaginationEllipsis />
