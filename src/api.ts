@@ -97,7 +97,12 @@ const sleep = (seconds: number): Promise<void> => {
 // GET /cards
 export const getCards = async (params: GetCardsParams): Promise<Card[]> => {
     await sleep(2); // simulate api call time
-    return cards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
+    let filteredCards = cards;
+    if (params.cardName) {
+        const name = params.cardName.toLowerCase()
+        filteredCards = cards.filter(card => card.name.toLowerCase().includes(name))
+    }
+    return filteredCards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
 }
 
 export type GetPacksParams = {

@@ -25,6 +25,8 @@ export const Store: React.FC = () => {
   const [ error, setError ] = useState("");
   const [ page, setPage ] = useState(1);
   const [ searchParams, setSearchParams ] = useSearchParams();
+  const [ searchValue, setSearchValue ] = useState("");
+  const [ debouncedSearchValue, setDebouncedSearchValue ] = useState("")
 
   const handleProductCategoryChange = (option: ProductCategory) => {
     if (option != productCategory || page != 1) {
@@ -33,6 +35,13 @@ export const Store: React.FC = () => {
     setSearchParams({"page": "1"})
     setProductCategory(option)
   }
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearchValue(searchValue)
+    }, 300)
+    return () => clearTimeout(timeout);
+  }, [searchValue])
 
   useEffect(() => {
     const page = searchParams.get("page");
@@ -46,7 +55,7 @@ export const Store: React.FC = () => {
 
     async function loadCards() {
       try {
-        const cards = await getCards({ page, itemsPerPage: 20 })
+        const cards = await getCards({ page, cardName: debouncedSearchValue, itemsPerPage: 20 })
         setProducts(cards)
         setError("")
       } catch (err) {
@@ -59,7 +68,7 @@ export const Store: React.FC = () => {
 
     async function loadPacks() {
       try {
-        const packs = await getPacks({ page, itemsPerPage: 20 });
+        const packs = await getPacks({ page, packName: debouncedSearchValue, itemsPerPage: 20 });
         setProducts(packs)
         setError("")
       } catch (err) {
@@ -75,13 +84,13 @@ export const Store: React.FC = () => {
     } else {
       loadPacks()
     }
-  }, [productCategory, page])
+  }, [productCategory, page, debouncedSearchValue])
 
   return (
     <>
       <H1>Tienda de cartas</H1>
       <P className="text-center">Explora nuestra colección de cartas místicas y poderosas. Encuentra las piezas perfectas para tu estrategia.</P>
-      <Search placeholder="Buscar cartas o paquetes" className="w-xs mt-8" />
+      <Search placeholder="Buscar cartas o paquetes" className="w-xs mt-8" value={searchValue} onChange={e => setSearchValue(e.target.value)} />
       <ButtonGroup options={["Cartas Individuales", "Paquetes"]} selected={productCategory} onSelect={handleProductCategoryChange} className="mt-7" />
 
       {error.length > 0 && <p>Ha ocurrido un error inesperado: {error}</p>}
