@@ -1,9 +1,8 @@
-import type { Card as ApiCard } from "@/api"
+import type { Product as ApiProduct } from "@/api"
 import {
-  Card as SCard,
+  Card,
   CardAction,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -13,25 +12,25 @@ import type { JSX } from "react";
 import { Button } from "@/components/ui/button";
 
 type Props = {
-  card?: ApiCard;
+  product?: ApiProduct;
 }
 
-export const Card: React.FC<Props> = ({ card }) => {
+export const Product: React.FC<Props> = ({ product }) => {
     let title: string | JSX.Element = <Skeleton className="h-4 w-[15rem] rounded-none bg-secondary" />;
     let img: JSX.Element = <Skeleton className="h-[22rem] w-[15rem] rounded-md bg-secondary" />;
     let priceAndStock: JSX.Element = <Skeleton className="" />
 
-    if (card) {
-      title = card.name;
-      img = <img src={card.image_url} className="w-[15rem]" />;
+    if (product) {
+      title = product.name;
+      img = <img src={product.image_url} className="w-[15rem]" />;
       priceAndStock = (<div className="flex mt-4">
-        <span className="text-primary">${card.price}</span>
-        <span className="ml-auto">Stock: {card.stock}</span>
+        <span className="text-primary">${product.price}</span>
+        {product.category === "card" && <span className="ml-auto">Stock: {product.stock}</span>}
       </div>)
     }
 
     return (
-      <SCard>
+      <Card>
         <CardHeader>
           <CardTitle>{title}</CardTitle>
         </CardHeader>
@@ -44,6 +43,6 @@ export const Card: React.FC<Props> = ({ card }) => {
             <Button className="w-full">Agregar al carrito</Button>
           </CardAction>
         </CardFooter>
-      </SCard>
+      </Card>
     )
 }

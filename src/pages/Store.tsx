@@ -1,7 +1,5 @@
-import { getCards, getPacks, type Card as ApiCard, type Pack as ApiPack } from "@/api";
-import { Card } from "@/components/Card";
-import { Pack } from "@/components/Pack";
-import { Input } from "@/components/ui/input";
+import { getCards, getPacks, type Product as ApiProduct } from "@/api";
+import { Product } from "@/components/Product";
 import {
   Pagination,
   PaginationContent,
@@ -11,7 +9,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { Skeleton } from "@/components/ui/skeleton";
 import { ButtonGroup } from "@/elements/ButtonGroup";
 import { H1 } from "@/elements/H1";
 import { P } from "@/elements/P";
@@ -23,8 +20,7 @@ type ProductCategory = "Cartas Individuales" | "Paquetes";
 
 export const Store: React.FC = () => {
   const [ productCategory, setProductCategory ] = useState<ProductCategory>("Cartas Individuales");
-  const [ cards, setCards ] = useState<ApiCard[]>([]);
-  const [ packs, setPacks ] = useState<ApiPack[]>([]);
+  const [ products, setProducts ] = useState<ApiProduct[]>([]);
   const [ loading, setLoading ] = useState(true);
   const [ error, setError ] = useState("");
   const [ page, setPage ] = useState(1);
@@ -47,10 +43,10 @@ export const Store: React.FC = () => {
     async function loadCards() {
       try {
         const cards = await getCards({ page, itemsPerPage: 20 })
-        setCards(cards)
+        setProducts(cards)
         setError("")
       } catch (err) {
-        setCards([])
+        setProducts([])
         const errorMessage = err instanceof Error ? err.message : String(err);
         setError(errorMessage)
       }
@@ -60,9 +56,10 @@ export const Store: React.FC = () => {
     async function loadPacks() {
       try {
         const packs = await getPacks({ page, itemsPerPage: 20 });
-        setPacks(packs)
+        setProducts(packs)
+        setError("")
       } catch (err) {
-        setPacks([])
+        setProducts([])
         const errorMessage = err instanceof Error ? err.message : String(err);
         setError(errorMessage)
       }
@@ -76,22 +73,6 @@ export const Store: React.FC = () => {
     }
   }, [productCategory, page])
 
-  let content;
-
-  if (productCategory == "Cartas Individuales") {
-    content = cards.map(card => (
-      <Card key={card.id} card={card} />
-    ))
-  } else {
-    content = packs.map(pack => (
-      <Pack key={pack.id} pack={pack} />
-    ))
-  }
-
-  if (error.length == 0 && content.length == 0) {
-    content.push(<p>No se encontraron {productCategory}</p>)
-  }
-
   return (
     <>
       <H1>Tienda de cartas</H1>
@@ -103,12 +84,13 @@ export const Store: React.FC = () => {
 
       <div className="flex flex-wrap mt-10 gap-17">
         { loading && productCategory == "Cartas Individuales" && Array.from({length: 10}, (_, idx: number) => (
-          <Card key={idx} />
+          <Product key={idx} />
         )) }
         { loading && productCategory == "Paquetes" && Array.from({length: 10}, (_, idx: number) => (
           <Pack key={idx} />
         )) }
-        { !loading && content }
+        { !loading && products.map(product => <Product key={product.id} product={product} />) }
+        { !loading && error.length == 0 && products.length == 0 && <p>No se encontraron {productCategory}</p>}
       </div>
 
       <Pagination className="my-10">

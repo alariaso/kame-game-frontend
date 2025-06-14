@@ -6,26 +6,30 @@ export type User = {
     yugiPesos: number;
 };
 
+export type Product = Card | Pack;
+
 export type CardKind = "DARK" | "DIVINE" | "EARTH" | "FIRE" | "LIGHT" | "WATER" | "WIND";
 
 export type Card = {
+    category: "card";
     id: number;
     name: string;
-    kind: CardKind;
     price: number;
+    image_url: string;
+    kind: CardKind;
     stock: number;
     attack: number;
-    image_url: string;
 }
 
 export type PackRarity = "COMMON" | "RARE" | "SUPER RARE" | "ULTRA RARE"
 
 export type Pack = {
+    category: "pack";
     id: number;
     name: string;
     price: number;
-    rarity: PackRarity;
     image_url: string;
+    rarity: PackRarity;
 };
 
 export type LoginParams = {
