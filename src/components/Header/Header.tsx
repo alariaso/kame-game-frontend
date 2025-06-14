@@ -105,10 +105,7 @@ export const Header: React.FC = () => {
                     </NavigationMenuItem>
                 </> : <>
                     <NavigationMenuItem>
-                    <Popup trigger={
-                        <Button variant="ghost" className="cursor-pointer text-primary">
-                            <Wallet /> {user.yugiPesos} YP
-                        </Button>}
+                    <Popup 
                         title="Recargar Yugi Pesos"
                         description="Ingresa la cantidad que deseas recargar a tu cuenta"
                         input={{className: "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
@@ -128,6 +125,9 @@ export const Header: React.FC = () => {
                         open={isPopupOpen}
                         onOpenChange={setIsPopupOpen}
                     >
+                        <Button variant="ghost" className="cursor-pointer text-primary">
+                            <Wallet /> {user.yugiPesos} YP
+                        </Button>
                     </Popup>
 
                     </NavigationMenuItem>

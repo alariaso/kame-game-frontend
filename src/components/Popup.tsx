@@ -1,6 +1,6 @@
-import { type ReactNode } from "react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import React, { type ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
     Dialog,
     DialogContent,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 
 type Props = {
-    trigger: ReactNode;
+    children?: ReactNode;
     title: string;
     description: string;
     input?: React.ComponentProps<typeof Input>;
@@ -24,9 +24,9 @@ type Props = {
     onOpenChange?: (open: boolean) => void;
 }
 
-export const Popup: React.FC<Props> = ({
-    trigger, 
-    title, 
+export const Popup: React.FC<React.PropsWithChildren<Props>> = ({
+    children,
+    title,
     description,
     input,
     actionButton,
@@ -36,13 +36,13 @@ export const Popup: React.FC<Props> = ({
     return (
     <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogTrigger asChild>
-            {trigger}
+            {children}
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
             <DialogHeader>
-                <DialogTitle className="text-primary text-2xl font-extrabold">{title}</DialogTitle>
-                <DialogDescription className="text-foreground font-extrabold">
-                {description}
+                <DialogTitle className="text-primary text-lg font-semibold">{title}</DialogTitle>
+                <DialogDescription className="text-foreground text-sm leading-none font-medium">
+                    {description}
                 </DialogDescription>
             </DialogHeader>
             {input && <Input {...input}></Input>}
