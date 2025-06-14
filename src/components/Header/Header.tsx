@@ -14,6 +14,7 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
 import { useEffect, useState } from "react";
+import { useCart } from "@/context/CartContext";
 
 type WindowSizeState = {
     width: number;
@@ -119,12 +120,12 @@ export const Header: React.FC = () => {
                         }}
                     >
                     </Popup>
-                    
+
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink asChild>
                             <NavLink to="/carrito" className="border-1 border-primary p-3 rounded-sm block cart-navlink">
-                                <ShoppingCart className="text-primary" />
+                                <CartButton />
                             </NavLink>
                         </NavigationMenuLink>
                     </NavigationMenuItem>
@@ -159,3 +160,14 @@ export const Header: React.FC = () => {
         </header>
     )
 };
+
+const CartButton: React.FC = () => {
+    const { cart } = useCart();
+
+    return (
+      <div className="relative">
+        <ShoppingCart className="text-primary" />
+        {cart.length > 0 && <span className="absolute -top-4 -right-5 text-xs bg-primary w-5 h-5 leading-5 text-center align-middle content-center rounded-full block">{cart.length}</span>}
+      </div>
+    )
+}
