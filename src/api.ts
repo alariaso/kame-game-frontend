@@ -131,6 +131,7 @@ export type GetInventoryParams = {
 
 // GET /inventory
 export const getInventory = async (params: GetInventoryParams): Promise<InventoryCard[]> => {
+    await sleep(2);
     const c = cards.slice(11, 34).map(a => ({...a, amount: 1}));
     let filteredCards = c;
     if (params.cardName) {
