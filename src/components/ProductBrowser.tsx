@@ -29,13 +29,10 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
 
   const page = useMemo(() => parseInt(searchParams.get("page") || "1"), [searchParams])
   const searchValue = useMemo(() => searchParams.get("q") || "", [searchParams])
-  const productCategory = useMemo(() => {
-    const idx = parseInt(searchParams.get("category") || "0")
-    return categories[idx]
-  }, [searchParams, categories])
+  const productCategoryIdx = useMemo(() => parseInt(searchParams.get("category") || "0"), [searchParams])
 
   const handleProductCategoryChange = (option: ProductCategory) => {
-    if (option != productCategory || page != 1 || !!searchValue) {
+    if (option != categories[productCategoryIdx] || page != 1 || !!searchValue) {
       setLoading(true)
     }
     setDebouncedSearchValue("")
@@ -77,7 +74,7 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
       setLoading(true)
       let f;
 
-      switch (productCategory) {
+      switch (categories[productCategoryIdx]) {
         case "Cartas Individuales":
           f = getCards({ page, itemsPerPage: 20, cardName: debouncedSearchValue });
           break;
@@ -103,14 +100,14 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
     }
 
     loadProducts()
-  }, [productCategory, page, debouncedSearchValue])
+  }, [categories, productCategoryIdx, page, debouncedSearchValue])
 
   const ProductComponent = productComponent;
 
   return (
     <>
       <Search placeholder={categories.includes("Paquetes") ? "Buscar cartas o paquetes" : "Buscar cartas"} className="w-xs mt-8" value={searchValue} onChange={handleSearchChange} />
-      {categories.length > 1 && <ButtonGroup options={categories} selected={productCategory} onSelect={handleProductCategoryChange} className="mt-7" /> }
+      {categories.length > 1 && <ButtonGroup options={categories} selected={productCategoryIdx} onSelect={handleProductCategoryChange} className="mt-7" /> }
 
       {error.length > 0 && <p>Ha ocurrido un error inesperado: {error}</p>}
 
@@ -119,32 +116,32 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
           <ProductComponent key={idx} />
         )) }
         { !loading && products.map(product => <ProductComponent key={product.id} product={product} />) }
-        { !loading && error.length === 0 && products.length == 0 && <p>No se encontraron {productCategory}</p>}
+        { !loading && error.length === 0 && products.length == 0 && <p>No se encontraron {categories[productCategoryIdx]}</p>}
       </div>
 
       <Pagination className="my-10">
         <PaginationContent>
           { page > 1 &&
             <PaginationItem>
-              <PaginationPrevious to={`?page=${page-1}&q=${debouncedSearchValue}`} />
+              <PaginationPrevious to={`?page=${page-1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`} />
             </PaginationItem>
           }
           { page > 1 &&
             <PaginationItem>
-              <PaginationLink to={`?page=${page-1}&q=${debouncedSearchValue}`}>{page-1}</PaginationLink>
+              <PaginationLink to={`?page=${page-1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`}>{page-1}</PaginationLink>
             </PaginationItem>
           }
           <PaginationItem>
-            <PaginationLink to={`?page=${page}&q=${debouncedSearchValue}`} className="text-primary">{page}</PaginationLink>
+            <PaginationLink to={`?page=${page}&q=${debouncedSearchValue}&category=${productCategoryIdx}`} className="text-primary">{page}</PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink to={`?page=${page+1}&q=${debouncedSearchValue}`}>{page+1}</PaginationLink>
+            <PaginationLink to={`?page=${page+1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`}>{page+1}</PaginationLink>
           </PaginationItem>
           <PaginationItem>
             <PaginationEllipsis />
           </PaginationItem>
           <PaginationItem>
-            <PaginationNext to={`?page=${page+1}&q=${debouncedSearchValue}`} />
+            <PaginationNext to={`?page=${page+1}&q=${debouncedSearchValue}&category=${productCategoryIdx}`} />
           </PaginationItem>
         </PaginationContent>
       </Pagination>

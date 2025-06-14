@@ -12,7 +12,7 @@ const calcRounded = (idx: number, n: number) => {
 
 type Props<T> = Omit<React.ComponentProps<"div">, "onSelect"> & {
     options: T[];
-    selected: T;
+    selected: number;
     onSelect: (option: T) => void;
 };
 
@@ -24,7 +24,7 @@ export const ButtonGroup = <T extends string>({ options, selected, onSelect, ...
 
   return (
     <div {...rest}>
-      {options.map((option, idx) => <Button key={option} variant={selected == option ? "default" : "secondary"} onClick={handleClick} data-option={option} className={calcRounded(idx, options.length)}>{option}</Button>)}
+      {options.map((option, idx) => <Button key={option} variant={selected == idx ? "default" : "secondary"} onClick={handleClick} data-option={option} className={calcRounded(idx, options.length)}>{option}</Button>)}
     </div>
   )
 }
