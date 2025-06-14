@@ -125,13 +125,30 @@ export const getInventory = async (params: GetInventoryParams): Promise<Card[]> 
     return c.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
 }
 
+// GET /cart
+export const getCartIDs = async (): Promise<number[]> => {
+    await sleep(3)
+    const cartJSON = localStorage.getItem("cart");
+    if (cartJSON) {
+        return JSON.parse(cartJSON);
+    }
+    return []
+}
+
 export type AddToCartParams = {
     productId: number;
 };
 
 // POST /cart/add
 export const addToCart = async (params: AddToCartParams): Promise<void> => {
-    console.log(params) // para que eslint no se queje de no estar utilizando `params`
+    await sleep(2);
+    const cartJSON = localStorage.getItem("cart");
+    let cart = [];
+    if (cartJSON !== null) {
+        cart = JSON.parse(cartJSON);
+    }
+    cart.push(params.productId)
+    localStorage.setItem("cart", JSON.stringify(cart))
 }
 
 export type RemoveFromCartParams = {

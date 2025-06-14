@@ -1,5 +1,5 @@
 import { createContext, use } from "react";
-import type { LoginParams, UpdateParams, User } from "./api";
+import type { LoginParams, UpdateParams, User } from "@/api";
 
 type UserContextType = {
     user: User | null;

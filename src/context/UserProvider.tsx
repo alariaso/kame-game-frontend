@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import type { LoginParams, User, UpdateParams } from "./api";
+import type { LoginParams, User, UpdateParams } from "@/api";
 import { UserContext } from "./UserContext";
-import { login as apiLogin, logout as apiLogout, update as apiUpdate } from "./api";
+import { login as apiLogin, logout as apiLogout, update as apiUpdate } from "@/api";
 
 type UserProviderProps = React.PropsWithChildren;
 

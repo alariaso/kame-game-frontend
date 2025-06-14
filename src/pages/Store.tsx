@@ -24,12 +24,13 @@ export const Store: React.FC = () => {
   const [ loading, setLoading ] = useState(true);
   const [ error, setError ] = useState("");
   const [ page, setPage ] = useState(1);
-  const [ searchParams ] = useSearchParams();
+  const [ searchParams, setSearchParams ] = useSearchParams();
 
   const handleProductCategoryChange = (option: ProductCategory) => {
-    if (option != productCategory) {
+    if (option != productCategory || page != 1) {
       setLoading(true)
     }
+    setSearchParams({"page": "1"})
     setProductCategory(option)
   }
 
@@ -85,12 +86,12 @@ export const Store: React.FC = () => {
 
       {error.length > 0 && <p>Ha ocurrido un error inesperado: {error}</p>}
 
-      <div className="flex flex-wrap mt-10 gap-17">
+      <div className="flex flex-wrap mt-10 gap-17 justify-around">
         { loading && Array.from({length: 10}, (_, idx: number) => (
           <Product key={idx} />
         )) }
         { !loading && products.map(product => <Product key={product.id} product={product} />) }
-        { !loading && error.length == 0 && products.length == 0 && <p>No se encontraron {productCategory}</p>}
+        { !loading && error.length === 0 && products.length == 0 && <p>No se encontraron {productCategory}</p>}
       </div>
 
       <Pagination className="my-10">

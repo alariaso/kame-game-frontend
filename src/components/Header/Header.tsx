@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { useUser } from "../../UserContext";
+import { useUser } from "@/context/UserContext";
 import { LogOut, ShoppingCart, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popup } from "../Popup";

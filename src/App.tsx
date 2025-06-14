@@ -8,25 +8,28 @@ import { Battle } from './pages/Battle.tsx';
 import { Admin } from './pages/Admin.tsx';
 import { Header } from './components/Header/Header.tsx';
 import { Inventory } from "./pages/Inventory.tsx";
-import { UserProvider } from "./UserProvider.tsx";
-import { useUser } from "./UserContext.tsx";
+import { UserProvider } from "./context/UserProvider.tsx";
+import { useUser } from "./context/UserContext.tsx";
+import { CartProvider } from "./context/CartProvider.tsx";
 
 export const App: React.FC = () => {
   return (
     <UserProvider>
-      <Header />
-      <main className="mx-14">
-        <Routes>
-          <Route index element={<Home />} />
-          <Route path="/tienda" element={<Store />} />
-          <Route path="/inventario" element={<RequireAuth><Inventory /></RequireAuth>} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<Signup />} />
-          <Route path="/carrito" element={<RequireAuth><Cart /></RequireAuth>} />
-          <Route path="/batalla" element={<RequireAuth><Battle /></RequireAuth>} />
-          <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
-        </Routes>
-      </main>
+      <CartProvider>
+        <Header />
+        <main className="mx-14">
+          <Routes>
+            <Route index element={<Home />} />
+            <Route path="/tienda" element={<Store />} />
+            <Route path="/inventario" element={<RequireAuth><Inventory /></RequireAuth>} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/registro" element={<Signup />} />
+            <Route path="/carrito" element={<RequireAuth><Cart /></RequireAuth>} />
+            <Route path="/batalla" element={<RequireAuth><Battle /></RequireAuth>} />
+            <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
+          </Routes>
+        </main>
+      </CartProvider>
     </UserProvider>
   )
 }

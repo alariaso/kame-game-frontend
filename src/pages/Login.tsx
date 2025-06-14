@@ -1,5 +1,5 @@
 import { Navigate, useLocation, useNavigate } from "react-router";
-import { useUser } from "../UserContext"
+import { useUser } from "@/context/UserContext"
 import { useState, type FormEvent } from "react";
 
 export const Login: React.FC = () => {
