@@ -25,8 +25,6 @@ export const Product: React.FC<Props> = ({ product }) => {
   const navigate = useNavigate()
   const location = useLocation()
 
-  console.log(location)
-
   const handleButton = async () => {
     if (!product) return;
 
