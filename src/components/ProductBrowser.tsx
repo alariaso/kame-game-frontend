@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/pagination"
 import { ButtonGroup } from "@/elements/ButtonGroup";
 import { Search } from "@/elements/Search";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 
 type ProductCategory = "Cartas Individuales" | "Paquetes" | "Mis cartas";
@@ -21,21 +21,44 @@ type ProductBrowserProps<T> = {
 };
 
 export const ProductBrowser = <T extends InventoryCard | Product,>({ categories, productComponent }: ProductBrowserProps<T>) => {
-  const [ productCategory, setProductCategory ] = useState<ProductCategory>(categories[0]);
   const [ products, setProducts ] = useState<T[]>([]);
   const [ loading, setLoading ] = useState(true);
   const [ error, setError ] = useState("");
-  const [ page, setPage ] = useState(1);
   const [ searchParams, setSearchParams ] = useSearchParams();
-  const [ searchValue, setSearchValue ] = useState("");
-  const [ debouncedSearchValue, setDebouncedSearchValue ] = useState("")
+  const [ debouncedSearchValue, setDebouncedSearchValue ] = useState(() => searchParams.get("q") || "");
+
+  const page = useMemo(() => parseInt(searchParams.get("page") || "1"), [searchParams])
+  const searchValue = useMemo(() => searchParams.get("q") || "", [searchParams])
+  const productCategory = useMemo(() => {
+    const idx = parseInt(searchParams.get("category") || "0")
+    return categories[idx]
+  }, [searchParams, categories])
 
   const handleProductCategoryChange = (option: ProductCategory) => {
-    if (option != productCategory || page != 1) {
+    if (option != productCategory || page != 1 || !!searchValue) {
       setLoading(true)
     }
-    setSearchParams({"page": "1"})
-    setProductCategory(option)
+    setDebouncedSearchValue("")
+    setSearchParams(s => {
+      s.delete("page")
+      s.delete("q")
+      const c = categories.indexOf(option);
+      if (c > 0) {
+        s.set("category", c.toString())
+      } else {
+        s.delete("category")
+      }
+      return s
+    })
+  }
+
+  const handleSearchChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const value = e.target.value
+    setSearchParams(s => {
+      s.set("q", value)
+      s.delete("page")
+      return s
+    })
   }
 
   useEffect(() => {
@@ -46,35 +69,28 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
   }, [searchValue])
 
   useEffect(() => {
-    const page = searchParams.get("page");
-    if (page) {
-      setPage(parseInt(page))
-    }
-  }, [searchParams])
+    window.scrollTo(0, 0)
+  }, [page])
 
   useEffect(() => {
     async function loadProducts() {
       setLoading(true)
-      let params;
       let f;
 
       switch (productCategory) {
         case "Cartas Individuales":
-          f = getCards;
-          params = { page, itemsPerPage: 20, cardName: debouncedSearchValue };
+          f = getCards({ page, itemsPerPage: 20, cardName: debouncedSearchValue });
           break;
         case "Paquetes":
-          f = getPacks;
-          params = { page, itemsPerPage: 20, packName: debouncedSearchValue };
+          f = getPacks({ page, itemsPerPage: 20, packName: debouncedSearchValue });
           break;
         case "Mis cartas":
-          f = getInventory
-          params = { page, itemsPerPage: 20, cardName: debouncedSearchValue };
+          f = getInventory({ page, itemsPerPage: 20, cardName: debouncedSearchValue });
           break;
       }
 
       try {
-        const products = await f(params);
+        const products = await f;
         setProducts(products as T[])
         setError("")
       } catch (err) {
@@ -93,7 +109,7 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
 
   return (
     <>
-      <Search placeholder={categories.includes("Paquetes") ? "Buscar cartas o paquetes" : "Buscar cartas"} className="w-xs mt-8" value={searchValue} onChange={e => setSearchValue(e.target.value)} />
+      <Search placeholder={categories.includes("Paquetes") ? "Buscar cartas o paquetes" : "Buscar cartas"} className="w-xs mt-8" value={searchValue} onChange={handleSearchChange} />
       {categories.length > 1 && <ButtonGroup options={categories} selected={productCategory} onSelect={handleProductCategoryChange} className="mt-7" /> }
 
       {error.length > 0 && <p>Ha ocurrido un error inesperado: {error}</p>}
@@ -110,25 +126,25 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
         <PaginationContent>
           { page > 1 &&
             <PaginationItem>
-              <PaginationPrevious to={`?page=${page-1}`} />
+              <PaginationPrevious to={`?page=${page-1}&q=${debouncedSearchValue}`} />
             </PaginationItem>
           }
           { page > 1 &&
             <PaginationItem>
-              <PaginationLink to={`?page=${page-1}`}>{page-1}</PaginationLink>
+              <PaginationLink to={`?page=${page-1}&q=${debouncedSearchValue}`}>{page-1}</PaginationLink>
             </PaginationItem>
           }
           <PaginationItem>
-            <PaginationLink to={`?page=${page}`} className="text-primary">{page}</PaginationLink>
+            <PaginationLink to={`?page=${page}&q=${debouncedSearchValue}`} className="text-primary">{page}</PaginationLink>
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink to={`?page=${page+1}`}>{page+1}</PaginationLink>
+            <PaginationLink to={`?page=${page+1}&q=${debouncedSearchValue}`}>{page+1}</PaginationLink>
           </PaginationItem>
           <PaginationItem>
             <PaginationEllipsis />
           </PaginationItem>
           <PaginationItem>
-            <PaginationNext to={`?page=${page+1}`} />
+            <PaginationNext to={`?page=${page+1}&q=${debouncedSearchValue}`} />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
