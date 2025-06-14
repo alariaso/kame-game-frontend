@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 
 const calcRounded = (idx: number, n: number) => {
     if (idx == 0) {
