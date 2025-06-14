@@ -11,7 +11,7 @@ type CartContextType = {
 export const CartContext = createContext<CartContextType>(null!);
 
 export const useCart = () => {
-    const userContext = use(CartContext);
+    const cartContext = use(CartContext);
 
-    return userContext;
+    return cartContext;
 }
