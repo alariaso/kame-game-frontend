@@ -4,6 +4,7 @@ import type { LoginParams, UpdateParams, User } from "@/api";
 type UserContextType = {
     user: User | null;
     loading: boolean;
+    error: string;
     login: (loginParams: LoginParams) => Promise<void>;
     logout: () => Promise<void>;
     update: (updateParams: UpdateParams) => Promise<void>;

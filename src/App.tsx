@@ -11,6 +11,7 @@ import { Inventory } from "./pages/Inventory.tsx";
 import { UserProvider } from "./context/UserProvider.tsx";
 import { useUser } from "./context/UserContext.tsx";
 import { CartProvider } from "./context/CartProvider.tsx";
+import { Toaster } from "@/components/ui/sonner.tsx";
 
 export const App: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ export const App: React.FC = () => {
             <Route path="/batalla" element={<RequireAuth><Battle /></RequireAuth>} />
             <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
           </Routes>
+          <Toaster />
         </main>
       </CartProvider>
     </UserProvider>

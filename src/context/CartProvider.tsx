@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CartContext } from "./CartContext";
 import { getCartIDs, addToCart as apiAddToCart, removeFromCart as apiRemoveFromCart, type AddToCartParams, type RemoveFromCartParams } from "@/api";
+import { toast } from "sonner";
 
 type CartProviderProps = React.PropsWithChildren;
 
@@ -20,6 +21,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({children}) => {
                 const errorMessage = err instanceof Error ? err.message : String(err);
                 setCart([])
                 setError(errorMessage)
+                toast.error(errorMessage)
             }
             setLoading(false)
         }
@@ -33,6 +35,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({children}) => {
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : String(err);
             setError(errorMessage)
+            toast.error(errorMessage)
         }
     }
 
@@ -48,6 +51,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({children}) => {
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : String(err);
             setError(errorMessage)
+            toast.error(errorMessage)
         }
     }, [cart])
 
