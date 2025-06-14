@@ -6,45 +6,11 @@ import { useUser } from "@/context/UserContext";
 import { ShoppingCart, BookOpen, Swords } from "lucide-react";
 import {
     Card,
-    CardAction,
-    CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
 import React from "react";
-
-
-const cards = [
-    <Card className="w-full max-w-sm">
-        <CardHeader>
-            <ShoppingCart className="mx-auto"/>
-            <CardTitle className="text-center">Amplia colección</CardTitle>
-            <CardDescription className="text-center">
-                Descubre una extensa selección de cartas raras y paquetes exclusivos para potenciar tu mazo.
-            </CardDescription>
-        </CardHeader>
-    </Card>,
-    <Card className="w-full max-w-sm">
-        <CardHeader>
-            <BookOpen className="mx-auto"/>
-            <CardTitle className="text-center">Gestión de cartas</CardTitle>
-            <CardDescription className="text-center">
-                Organiza tus carts y crea estrategias imbatibles con nuestro sistema de gestión de mazos.
-            </CardDescription>
-        </CardHeader>
-    </Card>,
-    <Card className="w-full max-w-sm">
-        <CardHeader>
-            <Swords className="mx-auto"/>
-            <CardTitle className="text-center">Duelos místicos</CardTitle>
-            <CardDescription className="text-center">
-                Enfrenta a los trabajadores del mercado místico y prueba tus habilidades en intensos duelos.
-            </CardDescription>
-        </CardHeader>
-    </Card>
-]
 
 export const Home: React.FC = () => {
     const { user } = useUser();
@@ -73,9 +39,33 @@ export const Home: React.FC = () => {
             <section>
                 <H2 className="text-primary text-center">Descubre el poder de las cartas</H2>
                 <section className="flex justify-center gap-10 flex-wrap">
-                    {cards.map((card, i) => (
-                        <React.Fragment key={i}>{card}</React.Fragment>
-                    ))}
+                    <Card className="w-full max-w-sm">
+                        <CardHeader>
+                            <ShoppingCart className="mx-auto"/>
+                            <CardTitle className="text-center">Amplia colección</CardTitle>
+                            <CardDescription className="text-center">
+                            Descubre una extensa selección de cartas raras y paquetes exclusivos para potenciar tu mazo.
+                        </CardDescription>
+                        </CardHeader>
+                    </Card>
+                    <Card className="w-full max-w-sm">
+                        <CardHeader>
+                            <BookOpen className="mx-auto"/>
+                            <CardTitle className="text-center">Gestión de cartas</CardTitle>
+                            <CardDescription className="text-center">
+                                Organiza tus carts y crea estrategias imbatibles con nuestro sistema de gestión de mazos.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
+                    <Card className="w-full max-w-sm">
+                        <CardHeader>
+                            <Swords className="mx-auto"/>
+                            <CardTitle className="text-center">Duelos místicos</CardTitle>
+                            <CardDescription className="text-center">
+                                Enfrenta a los trabajadores del mercado místico y prueba tus habilidades en intensos duelos.
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
                 </section>
             </section>
         </>
