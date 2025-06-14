@@ -30,7 +30,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
         } catch (err) {
             setUser(null)
             localStorage.removeItem("user")
-            localStorage.removeItem("cart")
             const errorMessage = err instanceof Error ? err.message : String(err);
             setError(errorMessage)
             toast.error(errorMessage)
@@ -45,12 +44,10 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
             setUser(null)
             setError("")
             localStorage.removeItem("user")
-            localStorage.removeItem("cart")
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : String(err);
             setError(errorMessage)
             localStorage.removeItem("user")
-            localStorage.removeItem("cart")
             toast.error(errorMessage)
         }
         setLoading(false)
