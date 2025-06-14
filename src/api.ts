@@ -119,15 +119,25 @@ export const getPacks = async (params: GetPacksParams): Promise<Pack[]> => {
     return [];
 }
 
+export type InventoryCard = Card & {
+    amount: number;
+}
+
 export type GetInventoryParams = {
     page: number;
     itemsPerPage: number;
+    cardName?: string;
 };
 
 // GET /inventory
-export const getInventory = async (params: GetInventoryParams): Promise<Card[]> => {
-    const c = cards.slice(0, 24);
-    return c.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
+export const getInventory = async (params: GetInventoryParams): Promise<InventoryCard[]> => {
+    const c = cards.slice(11, 34).map(a => ({...a, amount: 1}));
+    let filteredCards = c;
+    if (params.cardName) {
+        const name = params.cardName.toLowerCase()
+        filteredCards = c.filter(card => card.name.toLowerCase().includes(name))
+    }
+    return filteredCards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as InventoryCard[]
 }
 
 // GET /cart
