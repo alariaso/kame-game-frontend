@@ -1,4 +1,4 @@
-import { removeFromCart, type Product as ApiProduct } from "@/api"
+import { type Product as ApiProduct } from "@/api"
 import {
   Card,
   CardAction,
@@ -18,18 +18,18 @@ type Props = {
 
 export const Product: React.FC<Props> = ({ product }) => {
   const { cart, loading: cartLoading, addToCart, removeFromCart } = useCart();
-  const [addToCartLoading, setAddToCartLoading] = useState(false);
+  const [addRemoveLoading, setAddRemoveLoading] = useState(false);
 
   const handleButton = async () => {
     if (!product) return;
 
-    setAddToCartLoading(true)
+    setAddRemoveLoading(true)
     if (cart.includes(product.id)) {
       await removeFromCart({ productId: product.id })
     } else {
       await addToCart({ productId: product.id })
     }
-    setAddToCartLoading(false)
+    setAddRemoveLoading(false)
   }
 
   let inCart = false;
@@ -47,7 +47,7 @@ export const Product: React.FC<Props> = ({ product }) => {
     </div>)
   }
 
-  const loading = cartLoading || addToCartLoading || !product;
+  const loading = cartLoading || addRemoveLoading || !product;
 
   return (
     <Card>
