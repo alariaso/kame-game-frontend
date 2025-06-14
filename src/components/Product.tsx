@@ -1,4 +1,4 @@
-import { type Product as ApiProduct } from "@/api"
+import { removeFromCart, type Product as ApiProduct } from "@/api"
 import {
   Card,
   CardAction,
@@ -17,15 +17,19 @@ type Props = {
 }
 
 export const Product: React.FC<Props> = ({ product }) => {
-  const { cart, loading: cartLoading, addToCart } = useCart();
+  const { cart, loading: cartLoading, addToCart, removeFromCart } = useCart();
   const [addToCartLoading, setAddToCartLoading] = useState(false);
 
-  const handleAddToCart = async () => {
-    if (product) {
-      setAddToCartLoading(true)
+  const handleButton = async () => {
+    if (!product) return;
+
+    setAddToCartLoading(true)
+    if (cart.includes(product.id)) {
+      await removeFromCart({ productId: product.id })
+    } else {
       await addToCart({ productId: product.id })
-      setAddToCartLoading(false)
     }
+    setAddToCartLoading(false)
   }
 
   let inCart = false;
@@ -56,7 +60,7 @@ export const Product: React.FC<Props> = ({ product }) => {
       </CardContent>
       <CardFooter>
         <CardAction className="w-full">
-          <Button onClick={handleAddToCart} className="w-full" variant={loading ? "secondary" : (inCart ? "secondary" : "default")}>
+          <Button onClick={handleButton} className="w-full" variant={loading ? "secondary" : (inCart ? "secondary" : "default")}>
             {loading ? "Cargando..." : (inCart ? "Eliminar del carrito" : "Agregar al carrito")}
           </Button>
         </CardAction>

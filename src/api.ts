@@ -157,5 +157,17 @@ export type RemoveFromCartParams = {
 
 // POST /cart/remove
 export const removeFromCart = async (params: RemoveFromCartParams): Promise<void> => {
-    console.log(params) // para que eslint no se queje de no estar utilizando `params`
+    await sleep(2);
+    const cartJSON = localStorage.getItem("cart");
+    let cart = [];
+    if (cartJSON !== null) {
+        cart = JSON.parse(cartJSON);
+    }
+
+    const idx = cart.indexOf(params.productId);
+    if (idx == -1) {
+        return;
+    }
+    cart.splice(idx, 1);
+    localStorage.setItem("cart", JSON.stringify(cart))
 }

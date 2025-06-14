@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { CartContext } from "./CartContext";
-import { getCartIDs, addToCart as apiAddToCart, type AddToCartParams } from "@/api";
+import { getCartIDs, addToCart as apiAddToCart, removeFromCart as apiRemoveFromCart, type AddToCartParams, type RemoveFromCartParams } from "@/api";
 
 type CartProviderProps = React.PropsWithChildren;
 
@@ -36,6 +36,21 @@ export const CartProvider: React.FC<CartProviderProps> = ({children}) => {
         }
     }
 
-    const value = useMemo(() => ({ cart, loading, error, addToCart }), [cart, loading, error])
+    const removeFromCart = useCallback(async (removeFromCartParams: RemoveFromCartParams) => {
+        const idx = cart.indexOf(removeFromCartParams.productId);
+        if (idx === -1) {
+            return;
+        }
+
+        try {
+            await apiRemoveFromCart(removeFromCartParams)
+            setCart(cart.toSpliced(idx, 1))
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : String(err);
+            setError(errorMessage)
+        }
+    }, [cart])
+
+    const value = useMemo(() => ({ cart, loading, error, addToCart, removeFromCart }), [cart, loading, error, removeFromCart])
     return <CartContext value={value}>{children}</CartContext>
 }
