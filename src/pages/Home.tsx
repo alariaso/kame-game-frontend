@@ -2,7 +2,7 @@ import { H1 } from "@/elements/H1"
 import { H2 } from "@/elements/H2";
 import { P } from "@/elements/P";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@/UserContext";
+import { useUser } from "@/context/UserContext";
 import { ShoppingCart, BookOpen, Swords } from "lucide-react";
 import {
     Card,
