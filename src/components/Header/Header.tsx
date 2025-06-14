@@ -27,7 +27,8 @@ export const Header: React.FC = () => {
     // popup states, estan aca para que el popup sea "reutilizable"
     // se pueden mover al popup si se ve necesario
     const [error, setError] = useState("")
-    const [amount, setAmount] = useState<string | undefined>();
+    const [amount, setAmount] = useState("");
+    const amountAsNumber = Number(amount);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     const handleLogout = async () => {
@@ -37,14 +38,14 @@ export const Header: React.FC = () => {
     const handleAddFunds = async () => {
         // validate input
         if (user) {
-            const funds = Number(amount);
-            if (!amount || isNaN(funds)) {
+            if (!amount || isNaN(amountAsNumber)) {
                 // TODO: handle
+                console.log(amountAsNumber)
                 return;
             }
 
             try {
-                await update({...user, yugiPesos: user.yugiPesos + funds})
+                await update({...user, yugiPesos: user.yugiPesos + amountAsNumber})
                 setIsPopupOpen(false);
             } catch {
                 // TODO: handle error
@@ -112,7 +113,7 @@ export const Header: React.FC = () => {
                             value: amount,
                             type: "number",
                             placeholder: "Cantidad a recargar",
-                            onChange: (e) => setAmount(e.target.value), // to update the amount state
+                            onChange: (e) => setAmount(e.target.value), // to controll the amount state
                             onKeyDown: (e) => {
                                 if (e.key === 'Enter') {
                                     handleAddFunds();
