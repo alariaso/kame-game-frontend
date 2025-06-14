@@ -44,7 +44,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({children}) => {
 
         try {
             await apiRemoveFromCart(removeFromCartParams)
-            setCart(cart.toSpliced(idx, 1))
+            setCart(cart.toSpliced(idx, 1)) // FIXME esto no funciona bien cuando se hacen varios al mismo tiempo
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : String(err);
             setError(errorMessage)
