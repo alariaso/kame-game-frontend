@@ -7,5 +7,10 @@ header nav a.active {
         & svg {
             color: var(--color-primary-foreground)
         }
+
+        & span {
+            color: var(--color-secondary-foreground);
+            background-color: var(--color-secondary);
+        }
     }
 }
