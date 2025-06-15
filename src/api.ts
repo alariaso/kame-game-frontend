@@ -110,7 +110,9 @@ export const getCards = async (params: GetCardsParams): Promise<SearchResponse<C
         const name = params.itemName.toLowerCase()
         filteredCards = cards.filter(card => card.name.toLowerCase().includes(name))
     }
-    const items = filteredCards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
+    const items = filteredCards
+        .slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page)
+        .map(card => ({...card, category: "card"})) as Card[]
     return {
         totalPages: Math.ceil(filteredCards.length / params.itemsPerPage),
         items
@@ -128,7 +130,8 @@ export const getPacks = async (params: GetPacksParams): Promise<SearchResponse<P
     return { totalPages: 0, items: [] };
 }
 
-export type InventoryCard = Card & {
+export type InventoryCard = Omit<Card, "category"> & {
+    category: "inventoryCard";
     amount: number;
 }
 
@@ -143,7 +146,9 @@ export const getInventory = async (params: GetInventoryParams): Promise<SearchRe
         const name = params.itemName.toLowerCase()
         filteredCards = c.filter(card => card.name.toLowerCase().includes(name))
     }
-    const items = filteredCards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as InventoryCard[]
+    const items = filteredCards
+        .slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page)
+        .map(card => ({...card, category: "inventoryCard"})) as InventoryCard[]
     return {
         totalPages: Math.ceil(filteredCards.length / params.itemsPerPage),
         items

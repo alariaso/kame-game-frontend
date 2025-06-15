@@ -45,16 +45,19 @@ export const Product: React.FC<Props> = ({ product }) => {
   let inCart = false;
   let title: string | JSX.Element = <Skeleton className="h-4 w-[15rem] rounded-none bg-secondary" />;
   let img: JSX.Element = <Skeleton className="h-[22rem] w-[15rem] rounded-md bg-secondary" />;
-  let priceAndStock: JSX.Element = <Skeleton className="" />
+  let price: JSX.Element = <Skeleton className="h-6 w-6 bg-secondary" />
+  let stock: JSX.Element = <Skeleton className="h-6 w-18 bg-secondary ml-auto" />
 
   if (product) {
     inCart = user ? cart.includes(product.id) : false;
     title = product.name;
     img = <img src={product.image_url} className="w-[15rem] h-[22rem]" />;
-    priceAndStock = (<div className="flex mt-4">
-      <span className="text-primary">${product.price}</span>
-      {product.category === "card" && <span className="ml-auto">Stock: {product.stock}</span>}
-    </div>)
+    price = <span className="text-primary">${product.price}</span>
+    if (product.category === "card") {
+      stock = <span className="ml-auto">Stock: {product.stock}</span>
+    } else {
+      stock = <></>
+    }
   }
 
   const loading = cartLoading || addRemoveLoading || !product;
@@ -66,7 +69,10 @@ export const Product: React.FC<Props> = ({ product }) => {
       </CardHeader>
       <CardContent>
         {img}
-        {priceAndStock}
+        <div className="flex mt-4">
+          {price}
+          {stock}
+        </div>
       </CardContent>
       <CardFooter>
         <CardAction className="w-full">
