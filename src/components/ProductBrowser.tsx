@@ -119,7 +119,7 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
   const ProductComponent = productComponent;
 
   return (
-    <>
+    <div className="px-14">
       <Search placeholder={categories.includes("Paquetes") ? "Buscar cartas o paquetes" : "Buscar cartas"} className="w-xs mt-8" value={searchValue} onChange={handleSearchChange} />
       {categories.length > 1 && <ButtonGroup options={categories} selected={productCategoryIdx} onSelect={handleProductCategoryChange} className="mt-7" /> }
 
@@ -189,6 +189,6 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
           </PaginationItem>
         </PaginationContent>
       </Pagination>
-    </>
+    </div>
   );
 }
