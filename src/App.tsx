@@ -14,11 +14,13 @@ import { CartProvider } from "./context/CartProvider.tsx";
 import { Toaster } from "@/components/ui/sonner.tsx";
 
 export const App: React.FC = () => {
+  // revisar si es necesario el margin desde el main
+  // puede ser un padding en store? pues restringe el layout de las pages
   return (
     <UserProvider>
       <CartProvider>
         <Header />
-        <main className="mx-14">
+        <main className="bg-[#0D0D0D] mx-14">
           <Routes>
             <Route index element={<Home />} />
             <Route path="/tienda" element={<Store />} />
