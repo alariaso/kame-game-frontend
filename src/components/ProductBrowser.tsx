@@ -22,6 +22,7 @@ type ProductBrowserProps<T> = {
 
 export const ProductBrowser = <T extends InventoryCard | Product,>({ categories, productComponent }: ProductBrowserProps<T>) => {
   const [ products, setProducts ] = useState<T[]>([]);
+  const [ totalPages, setTotalPages ] = useState<number | null>(null);
   const [ loading, setLoading ] = useState(true);
   const [ error, setError ] = useState("");
   const [ searchParams, setSearchParams ] = useSearchParams();
@@ -73,22 +74,24 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
     async function loadProducts() {
       setLoading(true)
       let f;
+      const params = { page, itemsPerPage: 20, itemName: debouncedSearchValue };
 
       switch (categories[productCategoryIdx]) {
         case "Cartas Individuales":
-          f = getCards({ page, itemsPerPage: 20, cardName: debouncedSearchValue });
+          f = getCards;
           break;
         case "Paquetes":
-          f = getPacks({ page, itemsPerPage: 20, packName: debouncedSearchValue });
+          f = getPacks;
           break;
         case "Mis cartas":
-          f = getInventory({ page, itemsPerPage: 20, cardName: debouncedSearchValue });
+          f = getInventory;
           break;
       }
 
       try {
-        const products = await f;
-        setProducts(products as T[])
+        const productsRes = await f(params);
+        setTotalPages(productsRes.totalPages)
+        setProducts(productsRes.items as T[])
         setError("")
       } catch (err) {
         setProducts([])
@@ -137,6 +140,16 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
               <PaginationPrevious to={createPageLink(page-1)} />
             </PaginationItem>
           }
+          { page > 3 && <>
+            <PaginationItem>
+              <PaginationLink to={createPageLink(1)}>{1}</PaginationLink>
+            </PaginationItem>
+          </> }
+          { page > 4 && <>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          </>}
           { page > 2 &&
             <PaginationItem>
               <PaginationLink to={createPageLink(page-2)}>{page-2}</PaginationLink>
@@ -150,15 +163,27 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
           <PaginationItem>
             <PaginationLink to={createPageLink(page)} className="text-primary">{page}</PaginationLink>
           </PaginationItem>
-          <PaginationItem>
-            <PaginationLink to={createPageLink(page+1)}>{page+1}</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink to={createPageLink(page+2)}>{page+2}</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
+
+          { (totalPages === null || (totalPages !== null && page+1 <= totalPages)) &&
+            <PaginationItem>
+              <PaginationLink to={createPageLink(page+1)}>{page+1}</PaginationLink>
+            </PaginationItem>
+          }
+          { (totalPages === null || (totalPages !== null && page+2 <= totalPages)) &&
+            <PaginationItem>
+              <PaginationLink to={createPageLink(page+2)}>{page+2}</PaginationLink>
+            </PaginationItem>
+          }
+          { (totalPages === null || (totalPages !== null && page+3 < totalPages)) && <>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          </>}
+          { totalPages !== null && (totalPages !== null && page+2 < totalPages) &&
+            <PaginationItem>
+              <PaginationLink to={createPageLink(totalPages)}>{totalPages}</PaginationLink>
+            </PaginationItem>
+          }
           <PaginationItem>
             <PaginationNext to={createPageLink(page+1)} />
           </PaginationItem>

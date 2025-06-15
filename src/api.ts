@@ -83,62 +83,71 @@ export const update = async (params: UpdateParams): Promise<User> => {
     return updatedUser;
 }
 
-export type GetCardsParams = {
-    page: number;
-    itemsPerPage: number;
-    cardName?: string;
-    cardKind?: CardKind; // TODO agregar en el enunciado que se puede filtrar por tipo de carta
-};
-
 const sleep = (seconds: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, seconds * 1000));
 };
 
-// GET /cards
-export const getCards = async (params: GetCardsParams): Promise<Card[]> => {
-    await sleep(2); // simulate api call time
-    let filteredCards = cards;
-    if (params.cardName) {
-        const name = params.cardName.toLowerCase()
-        filteredCards = cards.filter(card => card.name.toLowerCase().includes(name))
-    }
-    return filteredCards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
-}
-
-export type GetPacksParams = {
+export type SearchParams = {
     page: number;
     itemsPerPage: number;
-    packName?: string;
+    itemName?: string | null;
+};
+
+export type SearchResponse<T> = {
+    totalPages: number;
+    items: T[];
+};
+
+export type GetCardsParams = SearchParams & {
+    cardKind?: CardKind; // TODO agregar en el enunciado que se puede filtrar por tipo de carta
+};
+
+// GET /cards
+export const getCards = async (params: GetCardsParams): Promise<SearchResponse<Card>> => {
+    await sleep(2); // simulate api call time
+    let filteredCards = cards;
+    if (params.itemName) {
+        const name = params.itemName.toLowerCase()
+        filteredCards = cards.filter(card => card.name.toLowerCase().includes(name))
+    }
+    const items = filteredCards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as Card[]
+    return {
+        totalPages: Math.ceil(filteredCards.length / params.itemsPerPage),
+        items
+    }
+}
+
+export type GetPacksParams = SearchParams & {
     packRarity?: PackRarity; // TODO agregar en el enunciado que se puede filtrar por rareza de producto
 };
 
 // GET /packs
-export const getPacks = async (params: GetPacksParams): Promise<Pack[]> => {
+export const getPacks = async (params: GetPacksParams): Promise<SearchResponse<Pack>> => {
     await sleep(2);
     console.log(params) // para que eslint no se queje de no estar utilizando `params`
-    return [];
+    return { totalPages: 0, items: [] };
 }
 
 export type InventoryCard = Card & {
     amount: number;
 }
 
-export type GetInventoryParams = {
-    page: number;
-    itemsPerPage: number;
-    cardName?: string;
-};
+export type GetInventoryParams = GetCardsParams;
 
 // GET /inventory
-export const getInventory = async (params: GetInventoryParams): Promise<InventoryCard[]> => {
+export const getInventory = async (params: GetInventoryParams): Promise<SearchResponse<InventoryCard>> => {
     await sleep(2);
     const c = cards.slice(11, 34).map(a => ({...a, amount: 1}));
     let filteredCards = c;
-    if (params.cardName) {
-        const name = params.cardName.toLowerCase()
+    if (params.itemName) {
+        const name = params.itemName.toLowerCase()
         filteredCards = c.filter(card => card.name.toLowerCase().includes(name))
     }
-    return filteredCards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as InventoryCard[]
+    const items = filteredCards.slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page) as InventoryCard[]
+    return {
+        totalPages: Math.ceil(filteredCards.length / params.itemsPerPage),
+        items
+    }
 }
 
 // GET /cart
