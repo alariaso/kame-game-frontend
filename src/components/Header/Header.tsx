@@ -22,37 +22,12 @@ type WindowSizeState = {
 }
 
 export const Header: React.FC = () => {
-    const { user, logout, update } = useUser();
+    const { user, logout } = useUser();
     const [windowSize, setWindowSize] = useState<WindowSizeState>(() => ({width: window.innerWidth, height: window.innerHeight}));
-    // popup states, estan aca para que el popup sea "reutilizable"
-    // se pueden mover al popup si se ve necesario
-    const [error, setError] = useState("")
-    const [amount, setAmount] = useState("");
-    const amountAsNumber = Number(amount);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     const handleLogout = async () => {
         await logout()
-    }
-
-    const handleAddFunds = async () => {
-        // validate input
-        if (user) {
-            if (!amount || isNaN(amountAsNumber)) {
-                // TODO: handle
-                console.log(amountAsNumber)
-                return;
-            }
-
-            try {
-                await update({...user, yugiPesos: user.yugiPesos + amountAsNumber})
-                setIsPopupOpen(false);
-            } catch {
-                // TODO: handle error
-            } finally {
-                setAmount("");
-            }
-        }
     }
 
     useEffect(() => {
@@ -106,26 +81,7 @@ export const Header: React.FC = () => {
                     </NavigationMenuItem>
                 </> : <>
                     <NavigationMenuItem>
-                    <Popup 
-                        title="Recargar Yugi Pesos"
-                        description="Ingresa la cantidad que deseas recargar a tu cuenta"
-                        input={{className: "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
-                            value: amount,
-                            type: "number",
-                            placeholder: "Cantidad a recargar",
-                            onChange: (e) => setAmount(e.target.value), // to controll the amount state
-                            onKeyDown: (e) => {
-                                if (e.key === 'Enter') {
-                                    handleAddFunds();
-                                }
-                            }}}
-                        actionButton={{
-                            buttonProps: { onClick: handleAddFunds },
-                            text: "Recargar"
-                        }}
-                        open={isPopupOpen}
-                        onOpenChange={setIsPopupOpen}
-                    >
+                    <Popup open={isPopupOpen} setOpen={setIsPopupOpen}>
                         <Button variant="ghost" className="cursor-pointer text-primary">
                             <Wallet /> {user.yugiPesos} YP
                         </Button>

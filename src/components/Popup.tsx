@@ -1,6 +1,8 @@
-import React, { type ReactNode } from "react";
+import { useUser } from "@/context/UserContext";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import {
     Dialog,
     DialogContent,
@@ -12,47 +14,71 @@ import {
 } from "@/components/ui/dialog";
 
 type Props = {
-    children?: ReactNode;
-    title: string;
-    description: string;
-    input?: React.ComponentProps<typeof Input>;
-    actionButton?: {
-        buttonProps: React.ComponentProps<typeof Button>;
-        text: string;
-    }
-    open?: boolean;
-    onOpenChange?: (open: boolean) => void;
+    open: boolean;
+    setOpen: (state: boolean) => void;
 }
+export const Popup: React.FC<React.PropsWithChildren<Props>> = ({ open, setOpen, children }) => {
+    const { user, update } = useUser();
+    const [amount, setAmount] = useState("");
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    
+    const amountAsNumber = Number(amount);
 
-export const Popup: React.FC<React.PropsWithChildren<Props>> = ({
-    children,
-    title,
-    description,
-    input,
-    actionButton,
-    open,
-    onOpenChange
-}) => {
+    const handleAddFunds = async () => {
+        // validate input
+        if (user) {
+            if (!amount || isNaN(amountAsNumber) || amountAsNumber <= 0) {
+                setError("Valor incorrecto");
+                toast.error("Valor incorrecto"); // FIXME: si se presiona enter muchas veces se ejecuta justo cuando se esta cerrando el popup
+                return;
+            }
+
+            try {
+                setLoading(true);
+                await update({...user, yugiPesos: user.yugiPesos + amountAsNumber});
+                setOpen(false);
+                setError("");
+                toast.success("Fondos añadidos");
+            } catch (err) {
+                const errorMessage = err instanceof Error ? err.message : String(err);
+                setError(errorMessage);
+                toast.error(errorMessage)
+            } finally {
+                setLoading(false);
+                setAmount("");
+            }
+        }
+    }
+
     return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
             {children}
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
             <DialogHeader>
-                <DialogTitle className="text-primary text-lg font-semibold">{title}</DialogTitle>
+                <DialogTitle className="text-primary text-lg font-semibold">Recargar Yugi Pesos</DialogTitle>
                 <DialogDescription className="text-foreground text-sm leading-none font-medium">
-                    {description}
+                    Ingresa la cantidad a recargar
                 </DialogDescription>
             </DialogHeader>
-            {input && <Input {...input}></Input>}
-            {actionButton && (
+                <Input
+                    className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    value={amount}
+                    type="number"
+                    placeholder="Cantidad a recargar"
+                    onChange={(e) => setAmount(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter" && !loading) handleAddFunds();
+                    }}
+                >
+                </Input>
             <DialogFooter>
-                <Button {...actionButton.buttonProps}>
-                    {actionButton.text}
+                <Button onClick={handleAddFunds} disabled={loading}>
+                    Recargar
                 </Button>
             </DialogFooter>
-            )}
         </DialogContent>
     </Dialog>
     )
