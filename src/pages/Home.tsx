@@ -1,3 +1,4 @@
+import { NavLink } from "react-router";
 import { H1 } from "@/elements/H1"
 import { H2 } from "@/elements/H2";
 import { P } from "@/elements/P";
@@ -10,42 +11,49 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import React from "react";
 
 export const Home: React.FC = () => {
     const { user } = useUser();
 
     return (
         <>
-            <section className="bg-[#250032]">
-                <section>
+            <section className="bg-[#250032] py-10">
+                <div >
                     <H1>Kame Game</H1>
                     <P className="text-center">
                         Tu tienda virtual de cartas donde puedes comprar, coleccionar y batallar
                     </P>
-                    <section className="flex justify-center gap-6">
+                    <div className="flex justify-center gap-6 mt-6">
                         {user ? <>
-                            <Button variant="default"> <ShoppingCart/>Visitar Tienda</Button>
-                            <Button variant="outline"><Swords/>Ir a Batallas</Button>
+                            <NavLink to="/tienda">
+                                <Button variant="default" className="cursor-pointer"><ShoppingCart/>Visitar Tienda</Button>
+                            </NavLink>
+                            <NavLink to="/batalla">
+                                <Button variant="outline" className="cursor-pointer"><Swords/>Ir a Batallas</Button>
+                            </NavLink>
                         </> : <>
-                            <Button variant="default">Crear Cuenta</Button>
-                            <Button variant="outline">Acceder</Button>
+                            <NavLink to="/registro">
+                                <Button variant="default" className="cursor-pointer">Crear Cuenta</Button>
+                            </NavLink>
+                            <NavLink to="/login">
+                                <Button variant="outline" className="cursor-pointer">Acceder</Button>
+                            </NavLink>
                         </>}
-                    </section>
-                </section>
+                    </div>
+                </div>
             </section>
 
 
-            <section>
+            <section className="py-10">
                 <H2 className="text-primary text-center">Descubre el poder de las cartas</H2>
-                <section className="flex justify-center gap-10 flex-wrap">
+                <div className="flex justify-center gap-10 flex-wrap mt-10">
                     <Card className="w-full max-w-sm">
                         <CardHeader>
                             <ShoppingCart className="mx-auto"/>
                             <CardTitle className="text-center">Amplia colección</CardTitle>
                             <CardDescription className="text-center">
-                            Descubre una extensa selección de cartas raras y paquetes exclusivos para potenciar tu mazo.
-                        </CardDescription>
+                                Descubre una extensa selección de cartas raras y paquetes exclusivos para potenciar tu mazo.
+                            </CardDescription>
                         </CardHeader>
                     </Card>
                     <Card className="w-full max-w-sm">
@@ -53,7 +61,7 @@ export const Home: React.FC = () => {
                             <BookOpen className="mx-auto"/>
                             <CardTitle className="text-center">Gestión de cartas</CardTitle>
                             <CardDescription className="text-center">
-                                Organiza tus carts y crea estrategias imbatibles con nuestro sistema de gestión de mazos.
+                                Organiza tus cartas y crea estrategias imbatibles con nuestro sistema de gestión de mazos.
                             </CardDescription>
                         </CardHeader>
                     </Card>
@@ -66,7 +74,7 @@ export const Home: React.FC = () => {
                             </CardDescription>
                         </CardHeader>
                     </Card>
-                </section>
+                </div>
             </section>
         </>
     )
