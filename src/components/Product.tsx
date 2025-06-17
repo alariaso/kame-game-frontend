@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useState, type JSX } from "react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
-import { useUser } from "@/context/UserContext";
+import { useUser } from "@/context/AuthContext";
 import { useLocation, useNavigate } from "react-router";
 
 type Props = {

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { LoginParams, User, UpdateParams } from "@/api";
-import { UserContext } from "./UserContext";
+import { AuthContext } from "./AuthContext";
 import { login as apiLogin, logout as apiLogout, update as apiUpdate } from "@/api";
 import { toast } from "sonner";
 
@@ -69,5 +69,5 @@ export const UserProvider: React.FC<UserProviderProps> = ({children}) => {
     }
 
     const value = useMemo(() => ({ user, loading, error, login, logout, update }), [user, loading, error])
-    return <UserContext value={value}>{children}</UserContext>
+    return <AuthContext value={value}>{children}</AuthContext>
 }

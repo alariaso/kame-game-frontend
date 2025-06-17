@@ -9,7 +9,7 @@ import { Admin } from './pages/Admin.tsx';
 import { Header } from './components/Header/Header.tsx';
 import { Inventory } from "./pages/Inventory.tsx";
 import { UserProvider } from "./context/UserProvider.tsx";
-import { useUser } from "./context/UserContext.tsx";
+import { useUser } from "./context/AuthContext.tsx";
 import { CartProvider } from "./context/CartProvider.tsx";
 import { Toaster } from "@/components/ui/sonner.tsx";
 
