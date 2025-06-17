@@ -1,0 +1,179 @@
+import { Card, CardPack, UserInventory } from "@/types";
+
+// Cards mock data
+export const MOCK_CARDS: Card[] = [
+  {
+    id: "1",
+    name: "Mago Oscuro",
+    description: "El mago definitivo en términos de ataque y defensa.",
+    type: "monster",
+    rarity: "ultra-rare",
+    atk: 2500,
+    def: 2100,
+    price: 4500,
+    imageUrl: "https://ms.yugipedia.com//thumb/e/e5/DarkMagician-YGLD-EN-C-1E.png/300px-DarkMagician-YGLD-EN-C-1E.png",
+    stock: 5
+  },
+  {
+    id: "2",
+    name: "Dragón Blanco de Ojos Azules",
+    description: "Este dragón legendario es una poderosa máquina de destrucción.",
+    type: "monster",
+    rarity: "legendary",
+    atk: 3000,
+    def: 2500,
+    price: 6000,
+    imageUrl: "https://ms.yugipedia.com//thumb/d/d4/BlueEyesWhiteDragon-SDKS-EN-C-1E.png/300px-BlueEyesWhiteDragon-SDKS-EN-C-1E.png",
+    stock: 3
+  },
+  {
+    id: "3",
+    name: "Agujero Oscuro",
+    description: "Destruye todos los monstruos en el campo.",
+    type: "spell",
+    rarity: "rare",
+    price: 2000,
+    imageUrl: "https://ms.yugipedia.com//thumb/c/c8/DarkHole-SDKS-EN-C-1E.png/300px-DarkHole-SDKS-EN-C-1E.png",
+    stock: 10
+  },
+  {
+    id: "4",
+    name: "Cilindro Mágico",
+    description: "Niega el ataque de un monstruo y causa daño a tu oponente.",
+    type: "trap",
+    rarity: "common",
+    price: 1000,
+    imageUrl: "https://ms.yugipedia.com//thumb/c/cb/MagicCylinder-SDCL-EN-C-1E.png/300px-MagicCylinder-SDCL-EN-C-1E.png",
+    stock: 15
+  },
+  {
+    id: "5",
+    name: "Jinzo",
+    description: "Las cartas trampa no pueden ser activadas.",
+    type: "monster",
+    rarity: "ultra-rare",
+    atk: 2400,
+    def: 1500,
+    price: 3500,
+    imageUrl: "https://ms.yugipedia.com//thumb/c/c7/Jinzo-SDCL-EN-C-1E.png/300px-Jinzo-SDCL-EN-C-1E.png",
+    stock: 7
+  },
+  {
+    id: "6",
+    name: "Renace el Monstruo",
+    description: "Selecciona 1 monstruo en cualquier Cementerio y Invócalo de Modo Especial.",
+    type: "spell",
+    rarity: "rare",
+    price: 1800,
+    imageUrl: "https://ms.yugipedia.com//thumb/5/5b/MonsterReborn-SDCL-EN-C-1E.png/300px-MonsterReborn-SDCL-EN-C-1E.png",
+    stock: 12
+  },
+  {
+    id: "7",
+    name: "Kuriboh",
+    description: "Durante el cálculo de daño, si un monstruo del adversario ataca: puedes descartar esta carta; no recibes daño de batalla de ese ataque.",
+    type: "monster",
+    rarity: "common",
+    atk: 300,
+    def: 200,
+    price: 800,
+    imageUrl: "https://ms.yugipedia.com//thumb/0/0f/Kuriboh-YGLD-EN-C-1E.png/300px-Kuriboh-YGLD-EN-C-1E.png",
+    stock: 20
+  },
+  {
+    id: "8",
+    name: "Fuerza de Espejo",
+    description: "Cuando un monstruo del adversario declara un ataque: destruye todos los monstruos en Posición de Ataque que controle tu adversario.",
+    type: "trap",
+    rarity: "ultra-rare",
+    price: 3000,
+    imageUrl: "https://ms.yugipedia.com//thumb/6/6c/MirrorForce-SDCL-EN-C-1E.png/300px-MirrorForce-SDCL-EN-C-1E.png",
+    stock: 8
+  }
+];
+
+// Card packs mock data
+export const MOCK_CARD_PACKS: CardPack[] = [
+  {
+    id: "1",
+    name: "Leyendas Antiguas",
+    description: "Contiene cartas raras y ultra raras de las primeras épocas del juego.",
+    price: 5000,
+    imageUrl: "https://ms.yugipedia.com//thumb/a/a6/LegendofBlueEyesWhiteDragon-Booster-EN.jpg/270px-LegendofBlueEyesWhiteDragon-Booster-EN.jpg",
+    cardCount: 5,
+    stock: 10
+  },
+  {
+    id: "2",
+    name: "Sirvientes del Faraón",
+    description: "Paquete centrado en cartas con tema egipcio y poderes antiguos.",
+    price: 4500,
+    imageUrl: "https://ms.yugipedia.com//thumb/c/c8/DarkCrisis-Booster-EN.jpg/270px-DarkCrisis-Booster-EN.jpg",
+    cardCount: 5,
+    stock: 15
+  },
+  {
+    id: "3",
+    name: "Fuerzas Cibernéticas",
+    description: "Cartas de tipo máquina y efectos tecnológicos avanzados.",
+    price: 4000,
+    imageUrl: "https://ms.yugipedia.com//thumb/d/d1/InvasionofChaos-Booster-EN.jpg/270px-InvasionofChaos-Booster-EN.jpg",
+    cardCount: 5,
+    stock: 12
+  }
+];
+
+// User inventory mock data
+export const MOCK_USER_INVENTORY: UserInventory = {
+  cards: [
+    {
+      id: "user-card-1",
+      cardId: "1",
+      quantity: 2,
+      card: MOCK_CARDS[0]
+    },
+    {
+      id: "user-card-2",
+      cardId: "2",
+      quantity: 1,
+      card: MOCK_CARDS[1]
+    },
+    {
+      id: "user-card-3",
+      cardId: "3",
+      quantity: 1,
+      card: MOCK_CARDS[2]
+    },
+    {
+      id: "user-card-4",
+      cardId: "4",
+      quantity: 3,
+      card: MOCK_CARDS[3]
+    },
+    {
+      id: "user-card-5",
+      cardId: "5",
+      quantity: 1,
+      card: MOCK_CARDS[4]
+    },
+    {
+      id: "user-card-6",
+      cardId: "6",
+      quantity: 1,
+      card: MOCK_CARDS[5]
+    },
+    {
+      id: "user-card-7",
+      cardId: "7",
+      quantity: 2,
+      card: MOCK_CARDS[6]
+    }
+  ],
+  decks: [
+    {
+      id: "1",
+      name: "Mi primer mazo",
+      cards: ["user-card-1", "user-card-3", "user-card-4"]
+    }
+  ]
+};
