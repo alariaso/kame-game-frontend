@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Label } from "@/components/ui/label";
 import {
     Dialog,
     DialogContent,
@@ -25,12 +26,14 @@ export const Popup: React.FC<React.PropsWithChildren<Props>> = ({ open, setOpen,
     
     const amountAsNumber = Number(amount);
 
-    const handleAddFunds = async () => {
+    const handleAddFunds = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
         // validate input
         if (user) {
             if (!amount || isNaN(amountAsNumber) || amountAsNumber <= 0) {
                 setError("Valor incorrecto");
-                toast.error("Valor incorrecto"); // FIXME: si se presiona enter muchas veces se ejecuta justo cuando se esta cerrando el popup
+                toast.error("Valor incorrecto");
                 return;
             }
 
@@ -61,25 +64,29 @@ export const Popup: React.FC<React.PropsWithChildren<Props>> = ({ open, setOpen,
             <DialogHeader>
                 <DialogTitle className="text-primary text-lg font-semibold">Recargar Yugi Pesos</DialogTitle>
                 <DialogDescription className="text-foreground text-sm leading-none font-medium">
-                    Ingresa la cantidad a recargar
+                    Aca puedes recargar Yugi Pesos a tu cuenta
                 </DialogDescription>
             </DialogHeader>
+            <form onSubmit={handleAddFunds} className="space-y-4 mt-2">
+                <Label htmlFor="amount" className="text-foreground text-sm leading-none font-medium">
+                    Ingresa el monto a recargar
+                </Label>
                 <Input
+                    id="amount"
                     className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     value={amount}
                     type="number"
                     placeholder="Cantidad a recargar"
                     onChange={(e) => setAmount(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter" && !loading) handleAddFunds();
-                    }}
+                    disabled={loading}
                 >
                 </Input>
-            <DialogFooter>
-                <Button onClick={handleAddFunds} disabled={loading}>
-                    Recargar
-                </Button>
-            </DialogFooter>
+                <DialogFooter>
+                    <Button type="submit" disabled={loading}>
+                        Recargar
+                    </Button>
+                </DialogFooter>
+            </form>
         </DialogContent>
     </Dialog>
     )
