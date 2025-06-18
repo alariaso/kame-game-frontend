@@ -14,11 +14,11 @@ import {
 
 export const Home: React.FC = () => {
     const { user } = useUser();
-    // TODO: complete the layout
+
     return (
         <>
-            <section className="bg-[#250032] py-10 flex items-center justify-center">
-                <div className="container mx-auto flex flex-col items-center justify-center">
+            <section className="bg-[#250032] py-10 md:py-14 flex items-center justify-center">
+                <div className="container mx-auto">
                     <H1>Kame Game</H1>
                     <P className="text-center">
                         Tu tienda virtual de cartas donde puedes comprar, coleccionar y batallar
@@ -44,13 +44,15 @@ export const Home: React.FC = () => {
             </section>
 
 
-            <section className="py-14 flex flex-col justify-center">
-                <div className="container mx-auto flex flex-col gap-5 justify-center">
+            <section className="py-14 md:py-18">
+                <div className="container mx-auto">
                     <H2 className="text-primary text-center">Descubre el poder de las cartas</H2>
-                    <div className="flex justify-center gap-10 flex-wrap mt-10">
+                    <div className="flex justify-center items-center gap-15 flex-wrap mt-10">
                         <Card className="w-full max-w-sm bg-black">
-                            <CardHeader>
-                                <ShoppingCart className="mx-auto"/>
+                            <CardHeader className="flex flex-col gap-4 items-center">
+                                <div className="mx-auto rounded-full bg-primary/20 h-12 w-12 flex justify-center items-center">
+                                    <ShoppingCart className="text-primary h-6 w-6"/>
+                                </div>
                                 <CardTitle className="text-center">Amplia colección</CardTitle>
                                 <CardDescription className="text-center">
                                     Descubre una extensa selección de cartas raras y paquetes exclusivos para potenciar tu mazo.
@@ -58,8 +60,10 @@ export const Home: React.FC = () => {
                             </CardHeader>
                         </Card>
                         <Card className="w-full max-w-sm bg-black">
-                            <CardHeader>
-                                <BookOpen className="mx-auto"/>
+                            <CardHeader className="flex flex-col gap-4 items-center">
+                                <div className="mx-auto rounded-full bg-primary/20 h-12 w-12 flex justify-center items-center">
+                                    <BookOpen className="text-primary h-6 w-6"/>
+                                </div>
                                 <CardTitle className="text-center">Gestión de cartas</CardTitle>
                                 <CardDescription className="text-center">
                                     Organiza tus cartas y crea estrategias imbatibles con nuestro sistema de gestión de mazos.
@@ -67,8 +71,10 @@ export const Home: React.FC = () => {
                             </CardHeader>
                         </Card>
                         <Card className="w-full max-w-sm bg-black">
-                            <CardHeader>
-                                <Swords className="mx-auto"/>
+                            <CardHeader className="flex flex-col gap-4 items-center">
+                                <div className="mx-auto rounded-full bg-primary/20 h-12 w-12 flex justify-center items-center">
+                                    <Swords className="text-primary h-6 w-6"/>
+                                </div>
                                 <CardTitle className="text-center">Duelos místicos</CardTitle>
                                 <CardDescription className="text-center">
                                     Enfrenta a los trabajadores del mercado místico y prueba tus habilidades en intensos duelos.

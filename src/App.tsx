@@ -18,7 +18,7 @@ export const App: React.FC = () => {
     <UserProvider>
       <CartProvider>
         <Header />
-        <main className="bg-[#0D0D0D]">
+        <main className="bg-[#0D0D0D] min-h-[calc(100vh-100px)]"> {/* header's size fixed? */}
           <Routes>
             <Route index element={<Home />} />
             <Route path="/tienda" element={<Store />} />

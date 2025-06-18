@@ -41,6 +41,7 @@ export const Popup: React.FC<React.PropsWithChildren<Props>> = ({ open, setOpen,
                 setError("");
                 toast.success("Fondos añadidos");
             } catch (err) {
+                console.log(error); // eslint error
                 const errorMessage = err instanceof Error ? err.message : String(err);
                 setError(errorMessage);
                 toast.error(errorMessage)

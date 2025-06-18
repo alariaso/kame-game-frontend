@@ -108,7 +108,7 @@ export const Header: React.FC = () => {
 
     return (
         <header>
-            <NavigationMenu className="p-9 data-[orientation=horizontal]:max-w-full justify-between" orientation={inSmallScreen ? "vertical" : "horizontal"}>
+            <NavigationMenu className="p-7 data-[orientation=horizontal]:max-w-full justify-between" orientation={inSmallScreen ? "vertical" : "horizontal"}>
                 <NavigationMenuList data-orientation="horizontal">
                     <NavigationMenuItem>
                         <NavigationMenuLink asChild>
