@@ -67,7 +67,7 @@ export const Popup: React.FC<React.PropsWithChildren<Props>> = ({ open, setOpen,
                     Aca puedes recargar Yugi Pesos a tu cuenta
                 </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleAddFunds} className="space-y-4 mt-2">
+            <form onSubmit={handleAddFunds} className="mt-2">
                 <Label htmlFor="amount">
                 </Label>
                 <Input
@@ -80,7 +80,7 @@ export const Popup: React.FC<React.PropsWithChildren<Props>> = ({ open, setOpen,
                     disabled={loading}
                 >
                 </Input>
-                <DialogFooter>
+                <DialogFooter className="mt-4">
                     <Button type="submit" disabled={loading}>
                         Recargar
                     </Button>

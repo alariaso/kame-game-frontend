@@ -20,12 +20,12 @@ import { P } from "@/elements/P";
 const FormSchema = z.object({
     username: z.string().
     trim().
-    min(3, "Minimo 3 caracteres").
-    max(30, "maximo 30 caracteres"),
+    min(3).
+    max(30),
     password: z.string().
     trim().
-    min(8, "Minimo 8 caracteres").
-    max(50, "Maximo 50 caracteres")
+    min(8).
+    max(50)
 })
 
 export const Login: React.FC = () => {
@@ -42,7 +42,7 @@ export const Login: React.FC = () => {
     })
     
     async function onSubmit(values: z.infer<typeof FormSchema>) {
-        await login({username: values.username, password: ""});
+        await login({username: values.username, password: values.password});
         await navigate(location.state?.prevLocation || "/");
     }
 
@@ -65,7 +65,7 @@ export const Login: React.FC = () => {
                     <P className="text-center">Accede a tu cuenta para comprar cartas y participar en duelos</P>
                 </div>
                 <Form {...form}>
-                    <form className="space-y-2" onSubmit={form.handleSubmit(onSubmit)}>
+                    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                         <FormField
                             control={form.control}
                             name="username"
@@ -92,7 +92,7 @@ export const Login: React.FC = () => {
                                 </FormItem>
                             )}
                         />
-                        <Button className="w-full" type="submit"><LogOut className="text-background"/>Iniciar sesión</Button>
+                        <Button className="w-full cursor-pointer" type="submit"><LogOut className="text-background"/>Iniciar sesión</Button>
                     </form>
                 </Form>
                 <P className="text-center">¿No tienes cuenta? <Link to={"/registro"} className="text-primary">Regístrate</Link></P>
