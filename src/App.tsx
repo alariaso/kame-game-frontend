@@ -14,11 +14,16 @@ import { CartProvider } from "./context/CartProvider.tsx";
 import { Toaster } from "@/components/ui/sonner.tsx";
 
 export const App: React.FC = () => {
+  const location = useLocation();
+
+  const bgColor = location.pathname === "/login" || location.pathname === "/registro"
+  ? "bg-[#250032]" : "bg-[#0D0D0D]";
+
   return (
     <UserProvider>
       <CartProvider>
         <Header />
-        <main className="bg-[#0D0D0D] min-h-[calc(100vh-100px)]"> {/* header's size fixed? */}
+        <main className={`${bgColor} min-h-[calc(100vh-100px)]`}> {/* header's size fixed? */}
           <Routes>
             <Route index element={<Home />} />
             <Route path="/tienda" element={<Store />} />

@@ -68,12 +68,11 @@ export const Popup: React.FC<React.PropsWithChildren<Props>> = ({ open, setOpen,
                 </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleAddFunds} className="space-y-4 mt-2">
-                <Label htmlFor="amount" className="text-foreground text-sm leading-none font-medium">
-                    Ingresa el monto a recargar
+                <Label htmlFor="amount">
                 </Label>
                 <Input
                     id="amount"
-                    className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none border-primary"
                     value={amount}
                     type="number"
                     placeholder="Cantidad a recargar"
