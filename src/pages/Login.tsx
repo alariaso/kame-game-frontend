@@ -56,7 +56,7 @@ export const Login: React.FC = () => {
 
     return (
         <div className="min-h-[calc(100vh-100px)] flex justify-center items-center">
-            <div className="bg-[#1E1E1EE5] max-w-md px-10 py-8 rounded-lg space-y-6">
+            <div className="bg-[#1E1E1EE5] w-full max-w-md px-10 py-8 rounded-lg space-y-6">
                 <div>
                     <div className="mx-auto rounded-full bg-primary/20 h-12 w-12 flex justify-center items-center">
                         <UserRound className="text-primary h-6 w-6"/>
