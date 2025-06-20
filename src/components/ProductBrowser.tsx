@@ -60,7 +60,7 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
   const [ debouncedSearchValue, setDebouncedSearchValue ] = useState(() => searchParams.get("q") || "");
 
   const page = useMemo(() => parseInt(searchParams.get("page") || "1"), [searchParams])
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(() => searchParams.get("q") || "");
   const productCategoryIdx = useMemo(() => parseInt(searchParams.get("category") || "0"), [searchParams])
 
   const filters = useMemo(() => extraFilters[categories[productCategoryIdx]], [categories, productCategoryIdx])
