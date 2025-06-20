@@ -149,6 +149,11 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
     if (productCategoryIdx > 0) {
       s += `&category=${productCategoryIdx}`
     }
+    for (const [filter, value] of Object.entries(filterValues)) {
+      if (value) {
+        s += `&${filter}=${value}`
+      }
+    }
     return s
   };
 
