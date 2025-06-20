@@ -1,4 +1,4 @@
-import { getCards, getInventory, getPacks, type InventoryCard, type Product } from "@/api";
+import { getCards, getInventory, getPacks, type CardKind, type InventoryCard, type PackRarity, type Product } from "@/api";
 import {
   Pagination,
   PaginationContent,
@@ -12,12 +12,43 @@ import { ButtonGroup } from "@/elements/ButtonGroup";
 import { Search } from "@/elements/Search";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type ProductCategory = "Cartas Individuales" | "Paquetes" | "Mis cartas";
 
 type ProductBrowserProps<T> = {
   categories: ProductCategory[];
   productComponent: React.ComponentType<{product?: T}>;
+};
+
+const apiCalls = {
+  "Cartas Individuales": getCards,
+  "Paquetes": getPacks,
+  "Mis cartas": getInventory
+}
+
+type Filter = "cardKind" | "packRarity";
+
+const extraFilters: Record<ProductCategory, Filter[]> = {
+  "Cartas Individuales": ["cardKind"],
+  "Paquetes": ["packRarity"],
+  "Mis cartas": ["cardKind"],
+};
+
+type FilterInfo = {
+  title: string,
+  values: (CardKind | PackRarity)[];
+}
+
+const filterInfo: Record<Filter, FilterInfo> = {
+  cardKind: {
+    title: "Tipo",
+    values: ["DARK", "DIVINE", "EARTH", "FIRE", "LIGHT", "WATER", "WIND"]
+  },
+  packRarity: {
+    title: "Rareza",
+    values: ["COMMON", "RARE", "SUPER RARE", "ULTRA RARE"]
+  },
 };
 
 export const ProductBrowser = <T extends InventoryCard | Product,>({ categories, productComponent }: ProductBrowserProps<T>) => {
@@ -31,6 +62,11 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
   const page = useMemo(() => parseInt(searchParams.get("page") || "1"), [searchParams])
   const searchValue = useMemo(() => searchParams.get("q") || "", [searchParams])
   const productCategoryIdx = useMemo(() => parseInt(searchParams.get("category") || "0"), [searchParams])
+
+  const filters = useMemo(() => extraFilters[categories[productCategoryIdx]], [categories, productCategoryIdx])
+  const filterValues = useMemo<Partial<Record<Filter, string | null>>>(() => {
+    return filters.reduce((acc, v) => ({ ...acc, [v]: searchParams.get(v) }), {})
+  }, [filters, searchParams]);
 
   const handleProductCategoryChange = (option: ProductCategory) => {
     if (option != categories[productCategoryIdx] || page != 1 || !!searchValue) {
@@ -59,6 +95,20 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
     })
   }
 
+  const handleFilterChange = (filter: Filter) => {
+    return (value: string) => {
+      setSearchParams(s => {
+        if (value.length > 0) {
+          s.set(filter, value)
+        } else {
+          s.delete(filter)
+        }
+        s.delete("page")
+        return s
+      })
+    }
+  }
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setDebouncedSearchValue(searchValue)
@@ -73,20 +123,8 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
   useEffect(() => {
     async function loadProducts() {
       setLoading(true)
-      let f;
-      const params = { page, itemsPerPage: 20, itemName: debouncedSearchValue };
-
-      switch (categories[productCategoryIdx]) {
-        case "Cartas Individuales":
-          f = getCards;
-          break;
-        case "Paquetes":
-          f = getPacks;
-          break;
-        case "Mis cartas":
-          f = getInventory;
-          break;
-      }
+      const f = apiCalls[categories[productCategoryIdx]];
+      const params = { page, itemsPerPage: 20, itemName: debouncedSearchValue, ...filterValues } as Parameters<typeof f>[0];
 
       try {
         const productsRes = await f(params);
@@ -103,7 +141,7 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
     }
 
     loadProducts()
-  }, [categories, productCategoryIdx, page, debouncedSearchValue])
+  }, [categories, productCategoryIdx, page, debouncedSearchValue, filterValues])
 
   const createPageLink = (targetPage: number) => {
     let s = `?page=${targetPage}`
@@ -121,7 +159,23 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
   return (
     <div className="px-14">
       <Search placeholder={categories.includes("Paquetes") ? "Buscar cartas o paquetes" : "Buscar cartas"} className="w-xs mt-8" value={searchValue} onChange={handleSearchChange} />
-      {categories.length > 1 && <ButtonGroup options={categories} selected={productCategoryIdx} onSelect={handleProductCategoryChange} className="mt-7" /> }
+
+      <div className="flex mt-7 gap-4">
+        {categories.length > 1 && <ButtonGroup options={categories} selected={productCategoryIdx} onSelect={handleProductCategoryChange} /> }
+        {filters.map(filter => {
+          const info = filterInfo[filter]
+          return (
+            <Select key={filter} value={filterValues[filter] || ""} onValueChange={handleFilterChange(filter)}>
+              <SelectTrigger className="w-[180px] border-primary" value={filterValues[filter] || ""} onReset={() => handleFilterChange(filter)("")}>
+                <SelectValue placeholder={info.title} />
+              </SelectTrigger>
+              <SelectContent>
+                {info.values.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          )
+      })}
+      </div>
 
       {error.length > 0 && <p>Ha ocurrido un error inesperado: {error}</p>}
 

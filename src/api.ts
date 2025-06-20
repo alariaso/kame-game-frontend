@@ -21,7 +21,7 @@ export type Card = {
     attack: number;
 }
 
-export type PackRarity = "COMMON" | "RARE" | "SUPER RARE" | "ULTRA RARE"
+export type PackRarity = "COMMON" | "RARE" | "SUPER RARE" | "ULTRA RARE";
 
 export type Pack = {
     category: "pack";
@@ -110,6 +110,9 @@ export const getCards = async (params: GetCardsParams): Promise<SearchResponse<C
         const name = params.itemName.toLowerCase()
         filteredCards = cards.filter(card => card.name.toLowerCase().includes(name))
     }
+    if (params.cardKind) {
+        filteredCards = filteredCards.filter(card => card.kind === params.cardKind)
+    }
     const items = filteredCards
         .slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page)
         .map(card => ({...card, category: "card"})) as Card[]
@@ -145,6 +148,9 @@ export const getInventory = async (params: GetInventoryParams): Promise<SearchRe
     if (params.itemName) {
         const name = params.itemName.toLowerCase()
         filteredCards = c.filter(card => card.name.toLowerCase().includes(name))
+    }
+    if (params.cardKind) {
+        filteredCards = filteredCards.filter(card => card.kind === params.cardKind)
     }
     const items = filteredCards
         .slice(params.itemsPerPage*(params.page-1), params.itemsPerPage*params.page)

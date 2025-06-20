@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const calcRounded = (idx: number, n: number) => {
     if (idx == 0) {
@@ -24,7 +25,7 @@ export const ButtonGroup = <T extends string>({ options, selected, onSelect, ...
 
   return (
     <div {...rest}>
-      {options.map((option, idx) => <Button key={option} variant={selected == idx ? "default" : "secondary"} onClick={handleClick} data-option={option} className={calcRounded(idx, options.length)}>{option}</Button>)}
+      {options.map((option, idx) => <Button key={option} variant={selected == idx ? "default" : "secondary"} onClick={handleClick} data-option={option} className={cn(calcRounded(idx, options.length), "border-primary border-solid border-1")}>{option}</Button>)}
     </div>
   )
 }

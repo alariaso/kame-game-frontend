@@ -52,7 +52,7 @@ export const Product: React.FC<Props> = ({ product }) => {
     inCart = user ? cart.includes(product.id) : false;
     title = product.name;
     img = <img src={product.image_url} className="w-[15rem] h-[22rem]" />;
-    price = <span className="text-primary">${product.price}</span>
+    price = <span className="text-primary">${Math.round(product.price, 2)}</span>
     if (product.category === "card") {
       stock = <span className="ml-auto">Stock: {product.stock}</span>
     } else {

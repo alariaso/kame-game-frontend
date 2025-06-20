@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, XCircleIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -26,11 +26,13 @@ function SelectTrigger({
   className,
   size = "default",
   children,
+  onReset,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-  size?: "sm" | "default"
+  size?: "sm" | "default";
+  onReset?: () => void;
 }) {
-  return (
+  return (<div className="relative">
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
       data-size={size}
@@ -45,7 +47,10 @@ function SelectTrigger({
         <ChevronDownIcon className="size-4 opacity-50" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
-  )
+    {props.value && onReset && <SelectPrimitive.Icon asChild>
+      <XCircleIcon className="size-4 opacity-50 absolute right-8 top-[50%] -translate-y-[50%] cursor-pointer" onClick={onReset} />
+    </SelectPrimitive.Icon>}
+  </div>)
 }
 
 function SelectContent({
