@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, Navigate, useLocation, useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -13,8 +13,9 @@ import {
     FormMessage,
   } from "@/components/ui/form"
 import { CirclePlus, UserRoundPlus } from "lucide-react";
-import { H1 } from "@/elements/H1";
 import { P } from "@/elements/P";
+import { FormContainer } from "@/components/FormContainer"
+import { useUser } from "@/context/UserContext";
 
 const FormSchema = z.object({
     username: z.string()
@@ -35,6 +36,7 @@ const FormSchema = z.object({
 })
 
 export const Signup: React.FC = () => {
+    const { user, loading } = useUser();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -52,17 +54,24 @@ export const Signup: React.FC = () => {
         console.log(values) // eslint error
     }
 
+    if (loading) {
+        return <p>Loading...</p>
+    }
+
+    if (user !== null) {
+        return <Navigate to={location.state?.prevLocation || "/"} />
+    }
+
     return (
-        <div className="min-h-[calc(100vh-100px)] flex justify-center items-center">
-            <div className="bg-[#1E1E1EE5] w-full max-w-md px-10 py-8 rounded-lg space-y-6">
-                <div>
-                    <div className="mx-auto rounded-full bg-primary/20 h-12 w-12 flex justify-center items-center">
-                        <UserRoundPlus className="text-primary h-6 w-6"/>
-                    </div>
-                    <H1>Crear cuenta</H1>
-                    <P className="text-center">Únete al mercado de cartas más exclusivo</P>
-                </div>
-                <Form {...form}>
+        <FormContainer
+        header={{
+            title: "Crear cuenta",
+            description: "Únete al mercado de cartas más exclusivo",
+            icon: UserRoundPlus
+        }}
+        footer={<P className="text-center">¿Ya tienes cuenta? <Link to={"/login"} className="text-primary">Iniciar sesión</Link></P>}
+        >
+            <Form {...form}>
                     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                         <FormField
                             control={form.control}
@@ -76,7 +85,7 @@ export const Signup: React.FC = () => {
                                         {form.formState.errors.username ? <>
                                                 <FormMessage />
                                             </> : <>
-                                                <FormMessage className="text-[#FFF]">Solo letras, entre 3 y 30 carácteres</FormMessage>
+                                                <FormMessage className="text-muted-foreground">Solo letras, entre 3 y 30 carácteres</FormMessage>
                                             </>
                                         }
                                 </FormItem>
@@ -94,7 +103,7 @@ export const Signup: React.FC = () => {
                                     {form.formState.errors.password ? <>
                                             <FormMessage />
                                         </> : <>
-                                            <FormMessage className="text-[#FFF]">Entre 3 y 50 carácteres</FormMessage>
+                                            <FormMessage className="text-muted-foreground">Entre 3 y 50 carácteres</FormMessage>
                                         </>
                                     }
                                 </FormItem>
@@ -116,8 +125,6 @@ export const Signup: React.FC = () => {
                         <Button className="w-full cursor-pointer" type="submit"><CirclePlus className="text-background"/>Crear cuenta</Button>
                     </form>
                 </Form>
-                <P className="text-center">¿Ya tienes cuenta? <Link to={"/login"} className="text-primary">Iniciar sesión</Link></P>
-            </div>
-        </div>
+        </FormContainer>
     )
 }

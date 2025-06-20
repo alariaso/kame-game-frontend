@@ -14,8 +14,8 @@ import {
     FormMessage,
   } from "@/components/ui/form"
 import { LogOut, UserRound } from "lucide-react";
-import { H1 } from "@/elements/H1";
 import { P } from "@/elements/P";
+import { FormContainer } from "@/components/FormContainer";
 
 const FormSchema = z.object({
     username: z.string().
@@ -55,16 +55,16 @@ export const Login: React.FC = () => {
     }
 
     return (
-        <div className="min-h-[calc(100vh-100px)] flex justify-center items-center">
-            <div className="bg-[#1E1E1EE5] w-full max-w-md px-10 py-8 rounded-lg space-y-6">
-                <div>
-                    <div className="mx-auto rounded-full bg-primary/20 h-12 w-12 flex justify-center items-center">
-                        <UserRound className="text-primary h-6 w-6"/>
-                    </div>
-                    <H1>Iniciar sesión</H1>
-                    <P className="text-center">Accede a tu cuenta para comprar cartas y participar en duelos</P>
-                </div>
-                <Form {...form}>
+        <FormContainer
+            header={{
+                title: "Iniciar sesión",
+                description: "Accede a tu cuenta para comprar cartas y participar en duelos",
+                icon: UserRound
+            }
+            }
+            footer={<P className="text-center">¿No tienes cuenta? <Link to={"/registro"} className="text-primary">Regístrate</Link></P>}
+        >
+            <Form {...form}>
                     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                         <FormField
                             control={form.control}
@@ -95,8 +95,6 @@ export const Login: React.FC = () => {
                         <Button className="w-full cursor-pointer" type="submit"><LogOut className="text-background"/>Iniciar sesión</Button>
                     </form>
                 </Form>
-                <P className="text-center">¿No tienes cuenta? <Link to={"/registro"} className="text-primary">Regístrate</Link></P>
-            </div>
-        </div>
+        </FormContainer>
     )
 }
