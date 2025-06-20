@@ -115,6 +115,10 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
   }, [searchValue, setSearchParams])
 
   useEffect(() => {
+    setSearchValue(debouncedSearchValue)
+  }, [debouncedSearchValue])
+
+  useEffect(() => {
     window.scrollTo(0, 0)
   }, [page])
 
