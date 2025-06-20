@@ -11,8 +11,8 @@ import {
 import { ButtonGroup } from "@/elements/ButtonGroup";
 import { Search } from "@/elements/Search";
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import useSearchParams from "@/hooks/useSearchParams";
 
 export type ProductCategory = "Cartas Individuales" | "Paquetes" | "Mis cartas";
 
@@ -57,10 +57,10 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
   const [ loading, setLoading ] = useState(true);
   const [ error, setError ] = useState("");
   const [ searchParams, setSearchParams ] = useSearchParams();
-  const [ debouncedSearchValue, setDebouncedSearchValue ] = useState(() => searchParams.get("q") || "");
 
   const page = useMemo(() => parseInt(searchParams.get("page") || "1"), [searchParams])
   const [searchValue, setSearchValue] = useState(() => searchParams.get("q") || "");
+  const debouncedSearchValue = useMemo(() => searchParams.get("q") || "", [searchParams]);
   const productCategoryIdx = useMemo(() => parseInt(searchParams.get("category") || "0"), [searchParams])
 
   const filters = useMemo(() => extraFilters[categories[productCategoryIdx]], [categories, productCategoryIdx])
@@ -72,7 +72,6 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
     if (option != categories[productCategoryIdx] || page != 1 || !!searchValue) {
       setLoading(true)
     }
-    setDebouncedSearchValue("")
     setSearchParams(s => {
       s.delete("page")
       s.delete("q")
@@ -102,7 +101,6 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setDebouncedSearchValue(searchValue)
       setSearchParams(s => {
         if (searchValue.length > 0) {
           s.set("q", searchValue)
@@ -112,9 +110,9 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
         s.delete("page")
         return s
       })
-    }, 300)
+    }, 400)
     return () => clearTimeout(timeout);
-  }, [searchValue])
+  }, [searchValue, setSearchParams])
 
   useEffect(() => {
     window.scrollTo(0, 0)
