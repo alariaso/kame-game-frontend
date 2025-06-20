@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-type ProductCategory = "Cartas Individuales" | "Paquetes" | "Mis cartas";
+export type ProductCategory = "Cartas Individuales" | "Paquetes" | "Mis cartas";
 
 type ProductBrowserProps<T> = {
   categories: ProductCategory[];
@@ -60,7 +60,7 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
   const [ debouncedSearchValue, setDebouncedSearchValue ] = useState(() => searchParams.get("q") || "");
 
   const page = useMemo(() => parseInt(searchParams.get("page") || "1"), [searchParams])
-  const searchValue = useMemo(() => searchParams.get("q") || "", [searchParams])
+  const [searchValue, setSearchValue] = useState("");
   const productCategoryIdx = useMemo(() => parseInt(searchParams.get("category") || "0"), [searchParams])
 
   const filters = useMemo(() => extraFilters[categories[productCategoryIdx]], [categories, productCategoryIdx])
@@ -86,15 +86,6 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
     })
   }
 
-  const handleSearchChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const value = e.target.value
-    setSearchParams(s => {
-      s.set("q", value)
-      s.delete("page")
-      return s
-    })
-  }
-
   const handleFilterChange = (filter: Filter) => {
     return (value: string) => {
       setSearchParams(s => {
@@ -112,6 +103,15 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
   useEffect(() => {
     const timeout = setTimeout(() => {
       setDebouncedSearchValue(searchValue)
+      setSearchParams(s => {
+        if (searchValue.length > 0) {
+          s.set("q", searchValue)
+        } else {
+          s.delete("q")
+        }
+        s.delete("page")
+        return s
+      })
     }, 300)
     return () => clearTimeout(timeout);
   }, [searchValue])
@@ -158,7 +158,7 @@ export const ProductBrowser = <T extends InventoryCard | Product,>({ categories,
 
   return (
     <div className="px-14">
-      <Search placeholder={categories.includes("Paquetes") ? "Buscar cartas o paquetes" : "Buscar cartas"} className="w-xs mt-8" value={searchValue} onChange={handleSearchChange} />
+      <Search placeholder={categories.includes("Paquetes") ? "Buscar cartas o paquetes" : "Buscar cartas"} className="w-xs mt-8" value={searchValue} onChange={e => setSearchValue(e.target.value)} />
 
       <div className="flex mt-7 gap-4">
         {categories.length > 1 && <ButtonGroup options={categories} selected={productCategoryIdx} onSelect={handleProductCategoryChange} /> }
