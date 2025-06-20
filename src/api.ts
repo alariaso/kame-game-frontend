@@ -73,7 +73,7 @@ export type UpdateParams = {
 
 // PUT /update
 export const update = async (params: UpdateParams): Promise<User> => {
-    await sleep(1);
+    await sleep(0.2);
     const updatedUser = {
         username: params.username,
         isAdmin: params.isAdmin,
@@ -82,10 +82,6 @@ export const update = async (params: UpdateParams): Promise<User> => {
 
     return updatedUser;
 }
-
-const sleep = (seconds: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
-};
 
 export type SearchParams = {
     page: number;
@@ -104,7 +100,7 @@ export type GetCardsParams = SearchParams & {
 
 // GET /cards
 export const getCards = async (params: GetCardsParams): Promise<SearchResponse<Card>> => {
-    await sleep(2); // simulate api call time
+    await sleep(0.5); // simulate api call time
     let filteredCards = cards;
     if (params.itemName) {
         const name = params.itemName.toLowerCase()
@@ -128,7 +124,7 @@ export type GetPacksParams = SearchParams & {
 
 // GET /packs
 export const getPacks = async (params: GetPacksParams): Promise<SearchResponse<Pack>> => {
-    await sleep(2);
+    await sleep(0.5);
     console.log(params) // para que eslint no se queje de no estar utilizando `params`
     return { totalPages: 0, items: [] };
 }
@@ -142,7 +138,7 @@ export type GetInventoryParams = GetCardsParams;
 
 // GET /inventory
 export const getInventory = async (params: GetInventoryParams): Promise<SearchResponse<InventoryCard>> => {
-    await sleep(2);
+    await sleep(0.5);
     const c = cards.slice(11, 34).map(a => ({...a, amount: 1}));
     let filteredCards = c;
     if (params.itemName) {
@@ -163,7 +159,7 @@ export const getInventory = async (params: GetInventoryParams): Promise<SearchRe
 
 // GET /cart
 export const getCartIDs = async (): Promise<number[]> => {
-    await sleep(3)
+    await sleep(1)
     const cartJSON = localStorage.getItem("cart");
     if (cartJSON) {
         return JSON.parse(cartJSON);
@@ -177,7 +173,7 @@ export type AddToCartParams = {
 
 // POST /cart/add
 export const addToCart = async (params: AddToCartParams): Promise<void> => {
-    await sleep(2);
+    await sleep(0.5);
     const cartJSON = localStorage.getItem("cart");
     let cart = [];
     if (cartJSON !== null) {
@@ -193,7 +189,7 @@ export type RemoveFromCartParams = {
 
 // POST /cart/remove
 export const removeFromCart = async (params: RemoveFromCartParams): Promise<void> => {
-    await sleep(2);
+    await sleep(0.5);
     const cartJSON = localStorage.getItem("cart");
     let cart = [];
     if (cartJSON !== null) {
@@ -207,3 +203,7 @@ export const removeFromCart = async (params: RemoveFromCartParams): Promise<void
     cart.splice(idx, 1);
     localStorage.setItem("cart", JSON.stringify(cart))
 }
+
+const sleep = (seconds: number): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+};
