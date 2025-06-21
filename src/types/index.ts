@@ -1,3 +1,4 @@
+
 // Tipos para las cartas
 export interface Card {
   id: string;
