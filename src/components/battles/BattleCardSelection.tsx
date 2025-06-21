@@ -89,7 +89,7 @@ const BattleCardSelection: React.FC<BattleCardSelectionProps> = ({
           >
             Todos
           </Button>
-          <Button
+          {/* <Button
             variant="ghost"
             className={`text-sm ${activeFilter === 'monster' ? 'bg-gold/20 text-gold' : 'text-gray-400 hover:text-gold'}`}
             onClick={() => setActiveFilter('monster')}
@@ -109,7 +109,7 @@ const BattleCardSelection: React.FC<BattleCardSelectionProps> = ({
             onClick={() => setActiveFilter('trap')}
           >
             Trampas
-          </Button>
+          </Button> */}
         </div>
       </div>
       
