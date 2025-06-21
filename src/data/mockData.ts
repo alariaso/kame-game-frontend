@@ -11,7 +11,7 @@ export const MOCK_CARDS: Card[] = [
     atk: 2500,
     def: 2100,
     price: 4500,
-    imageUrl: "https://ms.yugipedia.com//thumb/e/e5/DarkMagician-YGLD-EN-C-1E.png/300px-DarkMagician-YGLD-EN-C-1E.png",
+    imageUrl: "https://ygocards.blob.core.windows.net/cards/10000.jpg",
     stock: 5
   },
   {
@@ -23,7 +23,7 @@ export const MOCK_CARDS: Card[] = [
     atk: 3000,
     def: 2500,
     price: 6000,
-    imageUrl: "https://ms.yugipedia.com//thumb/d/d4/BlueEyesWhiteDragon-SDKS-EN-C-1E.png/300px-BlueEyesWhiteDragon-SDKS-EN-C-1E.png",
+    imageUrl: "https://images.ygoprodeck.com/images/cards/27551.jpg",
     stock: 3
   },
   {
@@ -33,7 +33,7 @@ export const MOCK_CARDS: Card[] = [
     type: "spell",
     rarity: "rare",
     price: 2000,
-    imageUrl: "https://ms.yugipedia.com//thumb/c/c8/DarkHole-SDKS-EN-C-1E.png/300px-DarkHole-SDKS-EN-C-1E.png",
+    imageUrl: "https://ygocards.blob.core.windows.net/cards/10000.jpg",
     stock: 10
   },
   {
@@ -43,7 +43,7 @@ export const MOCK_CARDS: Card[] = [
     type: "trap",
     rarity: "common",
     price: 1000,
-    imageUrl: "https://ms.yugipedia.com//thumb/c/cb/MagicCylinder-SDCL-EN-C-1E.png/300px-MagicCylinder-SDCL-EN-C-1E.png",
+    imageUrl: "https://images.ygoprodeck.com/images/cards/27551.jpg",
     stock: 15
   },
   {
@@ -55,7 +55,7 @@ export const MOCK_CARDS: Card[] = [
     atk: 2400,
     def: 1500,
     price: 3500,
-    imageUrl: "https://ms.yugipedia.com//thumb/c/c7/Jinzo-SDCL-EN-C-1E.png/300px-Jinzo-SDCL-EN-C-1E.png",
+    imageUrl: "https://ygocards.blob.core.windows.net/cards/10000.jpg",
     stock: 7
   },
   {
@@ -65,7 +65,7 @@ export const MOCK_CARDS: Card[] = [
     type: "spell",
     rarity: "rare",
     price: 1800,
-    imageUrl: "https://ms.yugipedia.com//thumb/5/5b/MonsterReborn-SDCL-EN-C-1E.png/300px-MonsterReborn-SDCL-EN-C-1E.png",
+    imageUrl: "https://images.ygoprodeck.com/images/cards/27551.jpg",
     stock: 12
   },
   {
@@ -77,7 +77,7 @@ export const MOCK_CARDS: Card[] = [
     atk: 300,
     def: 200,
     price: 800,
-    imageUrl: "https://ms.yugipedia.com//thumb/0/0f/Kuriboh-YGLD-EN-C-1E.png/300px-Kuriboh-YGLD-EN-C-1E.png",
+    imageUrl: "https://ygocards.blob.core.windows.net/cards/10000.jpg",
     stock: 20
   },
   {
@@ -87,7 +87,7 @@ export const MOCK_CARDS: Card[] = [
     type: "trap",
     rarity: "ultra-rare",
     price: 3000,
-    imageUrl: "https://ms.yugipedia.com//thumb/6/6c/MirrorForce-SDCL-EN-C-1E.png/300px-MirrorForce-SDCL-EN-C-1E.png",
+    imageUrl: "https://images.ygoprodeck.com/images/cards/27551.jpg",
     stock: 8
   }
 ];
