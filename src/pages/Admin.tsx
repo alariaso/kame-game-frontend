@@ -367,8 +367,8 @@ const Admin: React.FC = () => {
           
           <TabsContent value="cards" className="mt-0">
             <Card className="bg-black/20 border-gold/10">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-gold">Gestión de Cartas</CardTitle>
+              <CardHeader className="flex flex-col md:flex-row items-center justify-between pb-2">
+                <CardTitle className="text-gold text-sm md:text-2xl">Gestión de Cartas</CardTitle>
                 <Button 
                   className="bg-gold hover:bg-gold-dark text-black font-medium"
                   onClick={() => setAddCardDialogOpen(true)}
@@ -409,8 +409,8 @@ const Admin: React.FC = () => {
           
           <TabsContent value="packs" className="mt-0">
             <Card className="bg-black/20 border-gold/10">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-gold">Gestión de Paquetes</CardTitle>
+              <CardHeader className="flex flex-col md:flex-row items-center justify-between pb-2">
+                <CardTitle className="text-gold text-sm md:text-2xl">Gestión de Paquetes</CardTitle>
                 <Button 
                   className="bg-gold hover:bg-gold-dark text-black font-medium"
                   onClick={() => setAddPackDialogOpen(true)}
