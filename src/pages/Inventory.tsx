@@ -155,7 +155,7 @@ const Inventory: React.FC = () => {
                 >
                   Todos
                 </Button>
-                <Button
+                {/* <Button
                   variant="ghost"
                   className={`text-sm ${activeFilter === 'monster' ? 'bg-gold/20 text-gold' : 'text-gray-400 hover:text-gold'}`}
                   onClick={() => setActiveFilter('monster')}
@@ -175,7 +175,7 @@ const Inventory: React.FC = () => {
                   onClick={() => setActiveFilter('trap')}
                 >
                   Trampas
-                </Button>
+                </Button> */}
               </div>
             </div>
             
