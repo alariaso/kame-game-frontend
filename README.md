@@ -36,6 +36,14 @@
 - `src/components/` — Componentes reutilizables de UI.
 - `src/context/` — Contextos globales como autenticación.
 
+## 💡 Usuarios de prueba
+### User
+- **Usuario:** user
+- **Contraseña:** user123
+### Admin
+- **Usuario:** admin
+- **Contraseña:** admin123
+
 ## 💡 Tecnologías utilizadas
 - **React** + **TypeScript**
 - **Vite** (entorno de desarrollo rápido)
