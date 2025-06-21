@@ -44,7 +44,7 @@
 - **Usuario:** admin
 - **Contraseña:** admin123
 
-## 💡 Tecnologías utilizadas
+## 👤 Tecnologías utilizadas
 - **React** + **TypeScript**
 - **Vite** (entorno de desarrollo rápido)
 - **React Router** (ruteo)
