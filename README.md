@@ -1,54 +1,50 @@
-# React + TypeScript + Vite
+# Kame Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+¡Bienvenido a **Kame Game**! Este es un mercado de cartas místico y elegante donde puedes descubrir, comprar y gestionar cartas para crear tu mazo legendario y enfrentarte en duelos épicos.
 
-Currently, two official plugins are available:
+## 🚀 Características principales
+- **Tienda de cartas**: Explora y adquiere cartas raras y paquetes exclusivos.
+- **Gestión de mazos**: Organiza tus cartas y crea estrategias imbatibles.
+- **Duelos místicos**: Enfréntate a otros jugadores o trabajadores del Mercado Místico.
+- **Autenticación de usuarios**: Regístrate, inicia sesión y accede a funciones exclusivas.
+- **Interfaz moderna**: UI elegante y responsiva, optimizada para una experiencia inmersiva.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Instalación y ejecución
 
-## Expanding the ESLint configuration
+1. **Clona el repositorio:**
+   ```bash
+   git clone https://github.com/tu-usuario/kame-game-frontend.git
+   cd kame-game-frontend
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. **Instala las dependencias:**
+   ```bash
+   npm install
+   ```
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+3. **Configura las variables de entorno:**
+   - Crea un archivo `.env` en la raíz si es necesario y agrega las variables requeridas (por ejemplo, la URL de la API backend).
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+4. **Ejecuta la aplicación en modo desarrollo:**
+   ```bash
+   npm run dev
+   ```
+   La app estará disponible en `http://localhost:5173` (o el puerto configurado).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 📁 Estructura del proyecto
+- `src/pages/` — Páginas principales como Home, Tienda, Batallas, etc.
+- `src/components/` — Componentes reutilizables de UI.
+- `src/context/` — Contextos globales como autenticación.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## 💡 Tecnologías utilizadas
+- **React** + **TypeScript**
+- **Vite** (entorno de desarrollo rápido)
+- **React Router** (ruteo)
+- **Tailwind CSS** (estilos)
+- **Lucide React** (iconos)
+
+## ✨ Contribuciones
+¡Las contribuciones son bienvenidas! Abre un issue o pull request para sugerencias y mejoras.
+
+## 📜 Licencia
+Este proyecto está bajo la licencia MIT.
