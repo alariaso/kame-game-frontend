@@ -1,52 +1,89 @@
-import { Routes, Route, Navigate, useLocation } from "react-router";
-import { Home } from './pages/Home.tsx';
-import { Store } from './pages/Store.tsx';
-import { Login } from './pages/Login.tsx';
-import { Signup } from './pages/Signup.tsx';
-import { Cart } from './pages/Cart.tsx';
-import { Battle } from './pages/Battle.tsx';
-import { Admin } from './pages/Admin.tsx';
-import { Header } from './components/Header/Header.tsx';
-import { Inventory } from "./pages/Inventory.tsx";
-import { UserProvider } from "./context/UserProvider.tsx";
-import { useUser } from "./context/AuthContext.tsx";
-import { CartProvider } from "./context/CartProvider.tsx";
-import { Toaster } from "@/components/ui/sonner.tsx";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createContext, useContext } from "react";
 
-export const App: React.FC = () => {
+// Pages
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Shop from "./pages/Shop";
+import Cart from "./pages/Cart"; 
+import Inventory from "./pages/Inventory";
+import Battles from "./pages/Battles";
+import Admin from "./pages/Admin";
+import NotFound from "./pages/NotFound";
+
+// Components and Context
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
+import { useCart } from "./hooks/useCart";
+
+export const CartContext = createContext<ReturnType<typeof useCart> | null>(null);
+
+const queryClient = new QueryClient();
+
+// Create an AppContent component that uses the cart hook after AuthProvider is available
+const AppContent = () => {
+  const cartUtils = useCart();
+  
+  // Make addToCart available globally
+  if (typeof window !== "undefined") {
+    (window as any).addToCart = cartUtils.addToCart;
+  }
+
   return (
-    <UserProvider>
-      <CartProvider>
-        <Header />
-        <main className="bg-[#0D0D0D]">
-          <Routes>
-            <Route index element={<Home />} />
-            <Route path="/tienda" element={<Store />} />
-            <Route path="/inventario" element={<RequireAuth><Inventory /></RequireAuth>} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/registro" element={<Signup />} />
-            <Route path="/carrito" element={<RequireAuth><Cart /></RequireAuth>} />
-            <Route path="/batalla" element={<RequireAuth><Battle /></RequireAuth>} />
-            <Route path="/admin" element={<RequireAuth><Admin /></RequireAuth>} />
-          </Routes>
-          <Toaster />
-        </main>
-      </CartProvider>
-    </UserProvider>
-  )
-}
+    <CartContext.Provider value={cartUtils}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <div className="min-h-screen bg-background flex flex-col">
+          <Navbar />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/cart" element={<Cart />} /> {/* Añadimos la ruta del carrito */}
+              <Route path="/inventory" element={
+                <ProtectedRoute>
+                  <Inventory />
+                </ProtectedRoute>
+              } />
+              <Route path="/battles" element={
+                <ProtectedRoute>
+                  <Battles />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute requireAdmin={true}>
+                  <Admin />
+                </ProtectedRoute>
+              } />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+        </div>
+      </TooltipProvider>
+    </CartContext.Provider>
+  );
+};
 
-const RequireAuth: React.FC<React.PropsWithChildren> = ({children}) => {
-  const { user, loading } = useUser();
-  const location = useLocation();
+// Main App component with proper provider nesting
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
 
-  if (loading) {
-    return <p>Loading...</p>
-  }
-
-  if (user === null) {
-    return <Navigate to="/login" state={{"prevLocation": location}} />
-  }
-
-  return <>{children}</>;
-}
+export default App;

@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Card, CardPack, UserInventory, UserCard } from "@/types";
@@ -335,3 +336,4 @@ export const useAuth = () => {
   }
   return context;
 };
+
