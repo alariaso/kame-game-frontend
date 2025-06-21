@@ -99,7 +99,7 @@ export const MOCK_CARD_PACKS: CardPack[] = [
     name: "Leyendas Antiguas",
     description: "Contiene cartas raras y ultra raras de las primeras épocas del juego.",
     price: 5000,
-    imageUrl: "https://ms.yugipedia.com//thumb/a/a6/LegendofBlueEyesWhiteDragon-Booster-EN.jpg/270px-LegendofBlueEyesWhiteDragon-Booster-EN.jpg",
+    imageUrl: "https://magicsurvenezuela.com/wp-content/uploads/2020/10/PXL_20201008_185015197-scaled.jpg",
     cardCount: 5,
     stock: 10
   },
@@ -108,7 +108,7 @@ export const MOCK_CARD_PACKS: CardPack[] = [
     name: "Sirvientes del Faraón",
     description: "Paquete centrado en cartas con tema egipcio y poderes antiguos.",
     price: 4500,
-    imageUrl: "https://ms.yugipedia.com//thumb/c/c8/DarkCrisis-Booster-EN.jpg/270px-DarkCrisis-Booster-EN.jpg",
+    imageUrl: "https://magicsurvenezuela.com/wp-content/uploads/2020/10/PXL_20201008_185015197-scaled.jpg",
     cardCount: 5,
     stock: 15
   },
@@ -117,7 +117,7 @@ export const MOCK_CARD_PACKS: CardPack[] = [
     name: "Fuerzas Cibernéticas",
     description: "Cartas de tipo máquina y efectos tecnológicos avanzados.",
     price: 4000,
-    imageUrl: "https://ms.yugipedia.com//thumb/d/d1/InvasionofChaos-Booster-EN.jpg/270px-InvasionofChaos-Booster-EN.jpg",
+    imageUrl: "https://magicsurvenezuela.com/wp-content/uploads/2020/10/PXL_20201008_185015197-scaled.jpg",
     cardCount: 5,
     stock: 12
   }
