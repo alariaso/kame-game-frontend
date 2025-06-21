@@ -145,7 +145,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
                   {roundResult.winner === 'ai' && <span>¡Has perdido!</span>}
                   {roundResult.winner === 'draw' && <span>¡Empate!</span>}
                 </div>
-                <p className="text-xs text-gray-400 mt-1">{roundResult.reason}</p>
+                <p className="text-xs text-gray-400 mt-1 text-center">{roundResult.reason}</p>
               </div>
               
               <div className="w-full md:w-2/5 flex flex-col items-center">
