@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,15 +11,15 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Shop from "./pages/Shop";
-import Cart from "./pages/Cart"; 
+import Cart from "./pages/Cart"; // Importamos la nueva página del carrito
 import Inventory from "./pages/Inventory";
-import Battles from "./pages/Battles";
+import Battles from "./pages/Battle";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 // Components and Context
 import Navbar from "./components/Navbar";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/Protectedroute";
 import { AuthProvider } from "./context/AuthContext";
 import { useCart } from "./hooks/useCart";
 
