@@ -43,8 +43,5 @@
 - **Tailwind CSS** (estilos)
 - **Lucide React** (iconos)
 
-## ✨ Contribuciones
-¡Las contribuciones son bienvenidas! Abre un issue o pull request para sugerencias y mejoras.
-
 ## 📜 Licencia
 Este proyecto está bajo la licencia MIT.
