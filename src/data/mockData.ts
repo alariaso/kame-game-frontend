@@ -1,4 +1,4 @@
-import { Card, CardPack, UserInventory } from "@/types";
+import type { Card, CardPack, UserInventory } from "@/types";
 
 // Cards mock data
 export const MOCK_CARDS: Card[] = [
