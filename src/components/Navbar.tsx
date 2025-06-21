@@ -124,109 +124,112 @@ const Navbar: React.FC = () => {
       
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-[73px] bg-black/90 backdrop-blur-md p-6 flex flex-col gap-6 z-40">
-          <div className="flex flex-col gap-4">
-            <Link 
-              to="/shop" 
-              className={`text-lg font-medium hover:text-gold py-2 border-b border-gold/10 ${isActive("/shop") ? "text-gold" : "text-gray-300"}`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Tienda
-            </Link>
-            
-            {isAuthenticated && (
-              <>
-                <Link 
-                  to="/inventory" 
-                  className={`text-lg font-medium hover:text-gold py-2 border-b border-gold/10 ${isActive("/inventory") ? "text-gold" : "text-gray-300"}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Inventario
-                </Link>
-                <Link 
-                  to="/battles" 
-                  className={`text-lg font-medium hover:text-gold py-2 border-b border-gold/10 ${isActive("/battles") ? "text-gold" : "text-gray-300"}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Batallas
-                </Link>
-                {isAdmin && (
+        <div className="md:hidden fixed inset-0 top-[73px] !bg-black backdrop-blur-md p-6 flex flex-col gap-6 z-40">
+          <div className="bg-black">
+            <div className="flex flex-col gap-4 bg-black">
+              <Link 
+                to="/shop" 
+                className={`text-lg font-medium hover:text-gold py-2 border-b border-gold/10 ${isActive("/shop") ? "text-gold" : "text-gray-300"}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Tienda
+              </Link>
+              
+              {isAuthenticated && (
+                <>
                   <Link 
-                    to="/admin" 
-                    className={`text-lg font-medium hover:text-gold py-2 border-b border-gold/10 ${isActive("/admin") ? "text-gold" : "text-gray-300"}`}
+                    to="/inventory" 
+                    className={`text-lg font-medium hover:text-gold py-2 border-b border-gold/10 ${isActive("/inventory") ? "text-gold" : "text-gray-300"}`}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Administración
+                    Inventario
                   </Link>
-                )}
-              </>
-            )}
-          </div>
-          
-          {/* UserBalance, Cart and Auth buttons (mobile) */}
-          <div className="mt-auto">
-            <div className="flex items-center justify-between mb-4">
-              {isAuthenticated && <UserBalance />}
-              
-              {/* Shopping Cart (mobile) - Ahora navega a la página del carrito */}
-              {cart && (
-                <Button 
-                  variant="outline" 
-                  size="icon"
-                  className="relative bg-black/40 border-gold/30 hover:bg-gold/10"
-                  onClick={() => {
-                    goToCart();
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  <CartIcon className="h-5 w-5 text-gold" />
-                  {cart.cartItems.length > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-gold text-black text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                      {cart.cartItems.reduce((acc, item) => acc + item.quantity, 0)}
-                    </span>
+                  <Link 
+                    to="/battles" 
+                    className={`text-lg font-medium hover:text-gold py-2 border-b border-gold/10 ${isActive("/battles") ? "text-gold" : "text-gray-300"}`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Batallas
+                  </Link>
+                  {isAdmin && (
+                    <Link 
+                      to="/admin" 
+                      className={`text-lg font-medium hover:text-gold py-2 border-b border-gold/10 ${isActive("/admin") ? "text-gold" : "text-gray-300"}`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Administración
+                    </Link>
                   )}
-                </Button>
+                </>
               )}
             </div>
             
-            {isAuthenticated ? (
-              <div className="flex flex-col gap-4 mt-4">
-                <span className="text-gray-300">Conectado como: {user!.username}</span>
-                <Button 
-                  variant="outline" 
-                  className="border-gold/20 hover:bg-gold/10 text-gold w-full"
-                  onClick={() => {
-                    logout();
-                    setIsMenuOpen(false);
-                  }}
-                >
-                  <LogOut size={18} className="mr-2" />
-                  Cerrar Sesión
-                </Button>
+            {/* UserBalance, Cart and Auth buttons (mobile) */}
+            <div className="mt-auto bg-black">
+              <div className="flex items-center justify-between mb-4">
+                {isAuthenticated && <UserBalance />}
+                
+                {/* Shopping Cart (mobile) - Ahora navega a la página del carrito */}
+                {cart && (
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    className="relative bg-black/40 border-gold/30 hover:bg-gold/10"
+                    onClick={() => {
+                      goToCart();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <CartIcon className="h-5 w-5 text-gold" />
+                    {cart.cartItems.length > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-gold text-black text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                        {cart.cartItems.reduce((acc, item) => acc + item.quantity, 0)}
+                      </span>
+                    )}
+                  </Button>
+                )}
               </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                <Button 
-                  asChild 
-                  variant="ghost" 
-                  className="hover:bg-gold/10 text-gray-300 hover:text-gold w-full"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Link to="/login">
-                    <User size={18} className="mr-2" />
-                    Iniciar Sesión
-                  </Link>
-                </Button>
-                <Button 
-                  asChild 
-                  className="bg-gold hover:bg-gold-dark text-black font-semibold w-full"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Link to="/register">Crear Cuenta</Link>
-                </Button>
-              </div>
-            )}
+              
+              {isAuthenticated ? (
+                <div className="flex flex-col gap-4 mt-4">
+                  <span className="text-gray-300">Conectado como: {user!.username}</span>
+                  <Button 
+                    variant="outline" 
+                    className="border-gold/20 hover:bg-gold/10 text-gold w-full"
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <LogOut size={18} className="mr-2" />
+                    Cerrar Sesión
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <Button 
+                    asChild 
+                    variant="ghost" 
+                    className="hover:bg-gold/10 text-gray-300 hover:text-gold w-full"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Link to="/login">
+                      <User size={18} className="mr-2" />
+                      Iniciar Sesión
+                    </Link>
+                  </Button>
+                  <Button 
+                    asChild 
+                    className="bg-gold hover:bg-gold-dark text-black font-semibold w-full"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Link to="/register">Crear Cuenta</Link>
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
+          
         </div>
       )}
     </header>
