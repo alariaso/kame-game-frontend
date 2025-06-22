@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext"
 import { Menu, X, LogOut, User, ShoppingCart as CartIcon } from "lucide-react"
 import UserBalance from "./UserBalance"
 import { CartContext } from "@/App"
+import logo from "@/../public/logo.png" // Adjust the path if needed
 
 const Navbar: React.FC = () => {
 	const { user, isAuthenticated, logout, isAdmin } = useAuth()
@@ -26,6 +27,11 @@ const Navbar: React.FC = () => {
 		<header className="w-full py-4 px-6 bg-black/50 backdrop-blur-md border-b border-gold/10 sticky top-0 z-50">
 			<div className="container mx-auto flex justify-between items-center">
 				<Link to="/" className="flex items-center gap-2">
+					<img
+						src={logo}
+						alt="Kame Game Logo"
+						className="h-10 w-auto"
+					/>
 					<span className="text-gold font-heading text-xl font-bold">
 						Kame Game
 					</span>
