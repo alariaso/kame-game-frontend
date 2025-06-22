@@ -248,6 +248,13 @@ const Admin: React.FC = () => {
 					<span>{pack.cardCount} cartas</span>
 				</td>
 				<td className="py-3 px-4">
+					<span
+						className={`inline-block px-2 py-1 rounded-full text-xs ${getPackRarityColor(pack.rarity)}`}
+					>
+						{formatPackRarity(pack.rarity)}
+					</span>
+				</td>
+				<td className="py-3 px-4">
 					{isEditing ? (
 						<div className="flex items-center">
 							<Button
@@ -312,6 +319,14 @@ const Admin: React.FC = () => {
 						>
 							<Edit size={16} />
 						</Button>
+						<Button
+							variant="ghost"
+							size="icon"
+							className="h-8 w-8 text-red-500 hover:bg-red-500/10"
+							onClick={() => deleteCard(pack.id)}
+						>
+							<Trash2 size={16} />
+						</Button>
 					</div>
 				</td>
 			</tr>
@@ -369,6 +384,37 @@ const Admin: React.FC = () => {
 			case "ultra-rare":
 				return "bg-purple-600 text-white"
 			case "legendary":
+				return "bg-gold text-black"
+			default:
+				return "bg-gray-600 text-white"
+		}
+	}
+
+	// New functions for pack rarity
+	const formatPackRarity = (rarity: string): string => {
+		switch (rarity) {
+			case "common":
+				return "Común"
+			case "rare":
+				return "Rara"
+			case "super-rare":
+				return "Super Rara"
+			case "ultra-rare":
+				return "Ultra Rara"
+			default:
+				return rarity
+		}
+	}
+
+	const getPackRarityColor = (rarity: string): string => {
+		switch (rarity) {
+			case "common":
+				return "bg-gray-600 text-white"
+			case "rare":
+				return "bg-blue-600 text-white"
+			case "super-rare":
+				return "bg-purple-600 text-white"
+			case "ultra-rare":
 				return "bg-gold text-black"
 			default:
 				return "bg-gray-600 text-white"
@@ -520,6 +566,9 @@ const Admin: React.FC = () => {
 													Contenido
 												</th>
 												<th className="py-3 px-4 font-medium">
+													Rareza
+												</th>
+												<th className="py-3 px-4 font-medium">
 													Precio
 												</th>
 												<th className="py-3 px-4 font-medium">
@@ -536,7 +585,7 @@ const Admin: React.FC = () => {
 											) : (
 												<tr>
 													<td
-														colSpan={5}
+														colSpan={6}
 														className="py-6 text-center text-gray-400"
 													>
 														No se encontraron
