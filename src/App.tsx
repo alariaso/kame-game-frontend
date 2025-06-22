@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound"
 
 // Components and Context
 import Navbar from "./components/Navbar"
+import Footer from "./components/Footer"
 import ProtectedRoute from "./components/Protectedroute"
 import { AuthProvider } from "./context/AuthContext"
 import { useCart } from "./hooks/useCart"
@@ -100,6 +101,7 @@ const AppContent = () => {
 							<Route path="*" element={<NotFound />} />
 						</Routes>
 					</main>
+					<Footer />
 				</div>
 			</TooltipProvider>
 		</CartContext.Provider>
