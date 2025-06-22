@@ -1,1 +1,1 @@
-export const Signup: React.FC = () => <div>Crear cuenta</div>;
+export const Signup: React.FC = () => <div>Crear cuenta</div>

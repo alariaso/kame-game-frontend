@@ -1,77 +1,81 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 240 17% 8%;
-    --foreground: 0 0% 98%;
+	:root {
+		--background: 240 17% 8%;
+		--foreground: 0 0% 98%;
 
-    --card: 240 17% 12%;
-    --card-foreground: 0 0% 98%;
+		--card: 240 17% 12%;
+		--card-foreground: 0 0% 98%;
 
-    --popover: 240 17% 12%;
-    --popover-foreground: 0 0% 98%;
+		--popover: 240 17% 12%;
+		--popover-foreground: 0 0% 98%;
 
-    --primary: 47 65% 52%;
-    --primary-foreground: 240 5.9% 10%;
+		--primary: 47 65% 52%;
+		--primary-foreground: 240 5.9% 10%;
 
-    --secondary: 240 17% 20%;
-    --secondary-foreground: 0 0% 98%;
+		--secondary: 240 17% 20%;
+		--secondary-foreground: 0 0% 98%;
 
-    --muted: 240 17% 16%;
-    --muted-foreground: 240 5% 64.9%;
+		--muted: 240 17% 16%;
+		--muted-foreground: 240 5% 64.9%;
 
-    --accent: 280 70% 16%;
-    --accent-foreground: 0 0% 98%;
+		--accent: 280 70% 16%;
+		--accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
+		--destructive: 0 62.8% 30.6%;
+		--destructive-foreground: 0 0% 98%;
 
-    --border: 240 17% 18%;
-    --input: 240 17% 18%;
-    --ring: 47 65% 52%;
+		--border: 240 17% 18%;
+		--input: 240 17% 18%;
+		--ring: 47 65% 52%;
 
-    --radius: 0.5rem;
-  }
+		--radius: 0.5rem;
+	}
 }
 
 @layer base {
-  * {
-    @apply border-border selection:bg-gold/20 selection:text-white;
-  }
-  
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
-  }
+	* {
+		@apply border-border selection:bg-gold/20 selection:text-white;
+	}
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-semibold;
-  }
+	body {
+		@apply bg-background text-foreground antialiased;
+		font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		@apply font-heading font-semibold;
+	}
 }
 
 @layer utilities {
-  .glassmorphism {
-    @apply bg-black/40 backdrop-blur-md border border-white/10;
-  }
-  
-  .card-hover {
-    @apply transition-all duration-200 hover:shadow-lg hover:shadow-gold/20 hover:-translate-y-1;
-  }
+	.glassmorphism {
+		@apply bg-black/40 backdrop-blur-md border border-white/10;
+	}
 
-  .gold-gradient {
-    @apply bg-gradient-to-b from-gold to-gold-dark;
-  }
-  
-  .mystic-glow {
-    @apply shadow-lg shadow-mystic/40;
-  }
-  
-  .card-container {
-    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4;
-  }
+	.card-hover {
+		@apply transition-all duration-200 hover:shadow-lg hover:shadow-gold/20 hover:-translate-y-1;
+	}
+
+	.gold-gradient {
+		@apply bg-gradient-to-b from-gold to-gold-dark;
+	}
+
+	.mystic-glow {
+		@apply shadow-lg shadow-mystic/40;
+	}
+
+	.card-container {
+		@apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4;
+	}
 }
