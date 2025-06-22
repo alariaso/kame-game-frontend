@@ -43,7 +43,7 @@ const Shop: React.FC = () => {
 		},
 		packRarity: {
 			title: "Rareza",
-			values: ["Comun", "Rara", "Super Rara", "Ultra Rara"],
+			values: ["Común", "Rara", "Super Rara", "Ultra Rara"],
 		},
 	}
 

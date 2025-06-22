@@ -448,13 +448,13 @@ const Admin: React.FC = () => {
 
 	const getPackRarityColor = (rarity: string): string => {
 		switch (rarity) {
-			case "common":
+			case "Común":
 				return "bg-gray-600 text-white"
-			case "rare":
+			case "Rara":
 				return "bg-blue-600 text-white"
-			case "super-rare":
+			case "Super Rara":
 				return "bg-purple-600 text-white"
-			case "ultra-rare":
+			case "Ultra Rara":
 				return "bg-gold text-black"
 			default:
 				return "bg-gray-600 text-white"

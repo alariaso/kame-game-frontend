@@ -125,7 +125,7 @@ export const MOCK_CARD_PACKS: CardPack[] = [
 			"https://magicsurvenezuela.com/wp-content/uploads/2020/10/PXL_20201008_185015197-scaled.jpg",
 		cardCount: 5,
 		stock: 10,
-		rarity: "Comun",
+		rarity: "Común",
 		cardIds: ["1", "2", "3", "4", "5"],
 		discount: 0,
 	},
