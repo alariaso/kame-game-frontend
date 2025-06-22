@@ -25,17 +25,19 @@ const Navbar: React.FC = () => {
 
 	return (
 		<header className="w-full py-4 px-6 bg-black/50 backdrop-blur-md border-b border-gold/10 sticky top-0 z-50">
-			<div className="container mx-auto flex justify-between items-center">
-				<Link to="/" className="flex items-center gap-2">
-					<img
-						src={logo}
-						alt="Kame Game Logo"
-						className="h-10 w-auto"
-					/>
-					<span className="text-gold font-heading text-xl font-bold">
-						Kame Game
-					</span>
-				</Link>
+			<div className="container mx-auto flex items-center justify-between">
+				<div className="flex items-center flex-shrink-0 mr-4">
+					<Link to="/" className="flex items-center gap-2">
+						<img
+							src={logo}
+							alt="Kame Game Logo"
+							className="h-10 w-auto"
+						/>
+						<span className="text-gold font-heading text-xl font-bold whitespace-nowrap">
+							Kame Game
+						</span>
+					</Link>
+				</div>
 
 				{/* Mobile menu button */}
 				<button
@@ -46,7 +48,7 @@ const Navbar: React.FC = () => {
 				</button>
 
 				{/* Desktop Navigation */}
-				<nav className="hidden md:flex gap-6 items-center">
+				<nav className="hidden md:flex flex-wrap gap-x-6 gap-y-0 items-center justify-center flex-1 min-w-0 overflow-hidden">
 					<Link
 						to="/shop"
 						className={`font-medium hover:text-gold transition-colors ${isActive("/shop") ? "text-gold" : "text-gray-300"}`}
@@ -81,7 +83,7 @@ const Navbar: React.FC = () => {
 				</nav>
 
 				{/* Auth buttons, UserBalance and Cart (desktop) */}
-				<div className="hidden md:flex items-center gap-4">
+				<div className="hidden md:flex items-center gap-4 flex-shrink-0">
 					{isAuthenticated && <UserBalance />}
 
 					{/* Shopping Cart - Ahora navega a la página del carrito */}
