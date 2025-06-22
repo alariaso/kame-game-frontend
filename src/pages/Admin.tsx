@@ -708,68 +708,6 @@ const Admin: React.FC = () => {
 					</TabsContent>
 				</Tabs>
 
-				{/* Estadísticas */}
-				<div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-					<Card className="bg-black/20 border-gold/10">
-						<CardHeader className="pb-2">
-							<CardTitle className="text-lg text-gold">
-								Total de Cartas
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className="text-3xl font-bold">{cards.length}</p>
-						</CardContent>
-					</Card>
-
-					<Card className="bg-black/20 border-gold/10">
-						<CardHeader className="pb-2">
-							<CardTitle className="text-lg text-gold">
-								Total de Paquetes
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className="text-3xl font-bold">{packs.length}</p>
-						</CardContent>
-					</Card>
-
-					<Card className="bg-black/20 border-gold/10">
-						<CardHeader className="pb-2">
-							<CardTitle className="text-lg text-gold">
-								Valor del Inventario
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className="text-3xl font-bold">
-								$
-								{cards.reduce(
-									(sum, card) =>
-										sum + card.price * card.stock,
-									0
-								) +
-									packs.reduce(
-										(sum, pack) =>
-											sum + pack.price * pack.stock,
-										0
-									)}
-							</p>
-						</CardContent>
-					</Card>
-
-					<Card className="bg-black/20 border-gold/10">
-						<CardHeader className="pb-2">
-							<CardTitle className="text-lg text-gold">
-								Bajo Stock
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className="text-3xl font-bold">
-								{cards.filter((card) => card.stock < 5).length +
-									packs.filter((pack) => pack.stock < 5)
-										.length}
-							</p>
-						</CardContent>
-					</Card>
-				</div>
 			</div>
 		</div>
 	)
