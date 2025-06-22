@@ -295,6 +295,22 @@ const Admin: React.FC = () => {
 					</span>
 				</td>
 				<td className="py-3 px-4">
+					<span
+						className={`
+					 inline-block px-2 py-1 rounded-full text-xs font-medium
+					 ${
+							pack.discount >= 0.3
+								? "bg-green-600/20 text-green-400 border border-green-400/30"
+								: pack.discount >= 0.15
+									? "bg-blue-600/20 text-blue-400 border border-blue-400/30"
+									: "bg-gray-600/20 text-gray-400 border border-gray-400/30"
+						}
+				  `}
+					>
+						{Math.round(pack.discount * 100)}%
+					</span>
+				</td>
+				<td className="py-3 px-4">
 					{isEditing ? (
 						<div className="flex items-center">
 							<Button
@@ -610,6 +626,9 @@ const Admin: React.FC = () => {
 													Rareza
 												</th>
 												<th className="py-3 px-4 font-medium">
+													Descuento
+												</th>
+												<th className="py-3 px-4 font-medium">
 													Precio
 												</th>
 												<th className="py-3 px-4 font-medium">
@@ -626,7 +645,7 @@ const Admin: React.FC = () => {
 											) : (
 												<tr>
 													<td
-														colSpan={6}
+														colSpan={7}
 														className="py-6 text-center text-gray-400"
 													>
 														No se encontraron
