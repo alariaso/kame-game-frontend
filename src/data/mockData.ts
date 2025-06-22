@@ -126,6 +126,8 @@ export const MOCK_CARD_PACKS: CardPack[] = [
 		cardCount: 5,
 		stock: 10,
 		rarity: "COMUN",
+		cardIds: ["1", "2", "3", "4", "5"],
+		discount: 0,
 	},
 	{
 		id: "2",
@@ -138,6 +140,8 @@ export const MOCK_CARD_PACKS: CardPack[] = [
 		cardCount: 5,
 		stock: 15,
 		rarity: "RARA",
+		cardIds: ["4", "5", "6", "7", "8"],
+		discount: 0,
 	},
 	{
 		id: "3",
@@ -149,6 +153,8 @@ export const MOCK_CARD_PACKS: CardPack[] = [
 		cardCount: 5,
 		stock: 12,
 		rarity: "SUPER_RARA",
+		cardIds: ["1", "3", "5", "7", "8"],
+		discount: 0,
 	},
 ]
 

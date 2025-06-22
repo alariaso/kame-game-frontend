@@ -3,13 +3,40 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Label } from "@/components/ui/label"
 import { MOCK_CARDS, MOCK_CARD_PACKS } from "@/data/mockData"
 import type { Card as CardType, CardPack } from "@/types"
 import { toast } from "sonner"
 import { Plus, Edit, Trash2, ArrowUp, ArrowDown, Search } from "lucide-react"
 import AddCardForm from "@/components/admin/AddCardForm"
 import AddPackForm from "@/components/admin/AddPackForm"
+
+// Helper function to calculate package rarity based on cards
+const calculatePackageRarity = (cards: CardType[]): string => {
+	if (cards.length === 0) return "common" // Default if no cards
+
+	// Map rarities to numerical values
+	const rarityValues: Record<string, number> = {
+		common: 1,
+		rare: 2,
+		"ultra-rare": 3,
+		legendary: 4,
+	}
+
+	// Calculate average rarity
+	const total = cards.reduce(
+		(sum, card) => sum + rarityValues[card.rarity],
+		0
+	)
+	const average = total / cards.length
+
+	// Determine package rarity based on average
+	if (average >= 1.0 && average < 1.5) return "common"
+	if (average >= 1.5 && average < 2.5) return "rare"
+	if (average >= 2.5 && average < 3.5) return "super-rare"
+	if (average >= 3.5) return "ultra-rare"
+
+	return "common" // Default fallback
+}
 
 const Admin: React.FC = () => {
 	const [cards, setCards] = useState<CardType[]>(MOCK_CARDS)
@@ -101,8 +128,21 @@ const Admin: React.FC = () => {
 	}
 
 	// Handler para añadir un nuevo paquete
-	const handleAddPack = (packData: CardPack) => {
-		setPacks([...packs, packData])
+	const handleAddPack = (
+		packData: Omit<CardPack, "rarity" | "cardCount">
+	) => {
+		const packageCards = cards.filter((card) =>
+			packData.cardIds.includes(card.id)
+		)
+		const calculatedRarity = calculatePackageRarity(packageCards)
+
+		const newPack: CardPack = {
+			...packData,
+			rarity: calculatedRarity,
+			cardCount: packData.cardIds.length,
+		}
+
+		setPacks([...packs, newPack])
 	}
 
 	// Renderiza fila de la tabla de cartas
@@ -367,7 +407,7 @@ const Admin: React.FC = () => {
 			case "rare":
 				return "Rara"
 			case "ultra-rare":
-				return "Ultra"
+				return "Ultra Rara"
 			case "legendary":
 				return "Legendaria"
 			default:
@@ -444,6 +484,7 @@ const Admin: React.FC = () => {
 					open={addPackDialogOpen}
 					onOpenChange={setAddPackDialogOpen}
 					onAddPack={handleAddPack}
+					cards={cards}
 				/>
 
 				{/* Tabs para Cartas y Paquetes */}

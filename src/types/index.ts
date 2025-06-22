@@ -26,6 +26,8 @@ export interface CardPack {
 	cardCount: number
 	stock: number
 	rarity: string
+	cardIds: string[]
+	discount: number
 }
 
 // Tipos para el usuario
