@@ -10,6 +10,7 @@ export interface Card {
 	price: number
 	imageUrl: string
 	stock: number
+	kind: string
 }
 
 export type CardType = "monster" | "spell" | "trap"
@@ -24,6 +25,7 @@ export interface CardPack {
 	imageUrl: string
 	cardCount: number
 	stock: number
+	rarity: string
 }
 
 // Tipos para el usuario

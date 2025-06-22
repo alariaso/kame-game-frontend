@@ -13,6 +13,7 @@ export const MOCK_CARDS: Card[] = [
 		price: 4500,
 		imageUrl: "https://ygocards.blob.core.windows.net/cards/10000.jpg",
 		stock: 5,
+		kind: "WATER",
 	},
 	{
 		id: "2",
@@ -26,6 +27,7 @@ export const MOCK_CARDS: Card[] = [
 		price: 6000,
 		imageUrl: "https://images.ygoprodeck.com/images/cards/27551.jpg",
 		stock: 3,
+		kind: "LIGHT",
 	},
 	{
 		id: "3",
@@ -38,6 +40,7 @@ export const MOCK_CARDS: Card[] = [
 		price: 2000,
 		imageUrl: "https://ygocards.blob.core.windows.net/cards/10000.jpg",
 		stock: 10,
+		kind: "DARK",
 	},
 	{
 		id: "4",
@@ -51,6 +54,7 @@ export const MOCK_CARDS: Card[] = [
 		price: 1000,
 		imageUrl: "https://images.ygoprodeck.com/images/cards/27551.jpg",
 		stock: 15,
+		kind: "DIVINE",
 	},
 	{
 		id: "5",
@@ -63,6 +67,7 @@ export const MOCK_CARDS: Card[] = [
 		price: 3500,
 		imageUrl: "https://ygocards.blob.core.windows.net/cards/10000.jpg",
 		stock: 7,
+		kind: "EARTH",
 	},
 	{
 		id: "6",
@@ -76,6 +81,7 @@ export const MOCK_CARDS: Card[] = [
 		def: 200,
 		imageUrl: "https://images.ygoprodeck.com/images/cards/27551.jpg",
 		stock: 12,
+		kind: "FIRE",
 	},
 	{
 		id: "7",
@@ -89,6 +95,7 @@ export const MOCK_CARDS: Card[] = [
 		price: 800,
 		imageUrl: "https://ygocards.blob.core.windows.net/cards/10000.jpg",
 		stock: 20,
+		kind: "WIND",
 	},
 	{
 		id: "8",
@@ -102,6 +109,7 @@ export const MOCK_CARDS: Card[] = [
 		def: 200,
 		imageUrl: "https://images.ygoprodeck.com/images/cards/27551.jpg",
 		stock: 8,
+		kind: "LIGHT",
 	},
 ]
 
@@ -117,6 +125,7 @@ export const MOCK_CARD_PACKS: CardPack[] = [
 			"https://magicsurvenezuela.com/wp-content/uploads/2020/10/PXL_20201008_185015197-scaled.jpg",
 		cardCount: 5,
 		stock: 10,
+		rarity: "COMUN",
 	},
 	{
 		id: "2",
@@ -128,6 +137,7 @@ export const MOCK_CARD_PACKS: CardPack[] = [
 			"https://magicsurvenezuela.com/wp-content/uploads/2020/10/PXL_20201008_185015197-scaled.jpg",
 		cardCount: 5,
 		stock: 15,
+		rarity: "RARA",
 	},
 	{
 		id: "3",
@@ -138,6 +148,7 @@ export const MOCK_CARD_PACKS: CardPack[] = [
 			"https://magicsurvenezuela.com/wp-content/uploads/2020/10/PXL_20201008_185015197-scaled.jpg",
 		cardCount: 5,
 		stock: 12,
+		rarity: "SUPER_RARA",
 	},
 ]
 

@@ -4,19 +4,117 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CartContext } from "@/App"
 
+type ProductCategory = "Cartas Individuales" | "Paquetes"
+type Filter = "cardKind" | "packRarity"
+
 const Shop: React.FC = () => {
 	const { getAvailableCards, getAvailablePacks } = useAuth()
 	const [activeTab, setActiveTab] = useState<string>("cards")
+	const [searchTerm, setSearchTerm] = useState<string>("")
+	const [filters, setFilters] = useState<Record<Filter, string | null>>({
+		cardKind: null,
+		packRarity: null,
+	})
 	const cart = useContext(CartContext)
 
-	const availableCards = getAvailableCards()
-	const availablePacks = getAvailablePacks()
+	// define filters according to the category
+	const categoryMap: Record<string, ProductCategory> = {
+		cards: "Cartas Individuales",
+		packs: "Paquetes",
+	}
+
+	const extraFilters: Record<ProductCategory, Filter[]> = {
+		"Cartas Individuales": ["cardKind"],
+		Paquetes: ["packRarity"],
+	}
+
+	const filterInfo: Record<Filter, { title: string; values: string[] }> = {
+		cardKind: {
+			title: "Tipo",
+			values: [
+				"DARK",
+				"DIVINE",
+				"EARTH",
+				"FIRE",
+				"LIGHT",
+				"WATER",
+				"WIND",
+			],
+		},
+		packRarity: {
+			title: "Rareza",
+			values: ["COMUN", "RARA", "SUPER_RARA", "ULTRA_RARA"],
+		},
+	}
+
+	// obtain more products with filters applied
+	const availableCards = getAvailableCards().filter((card) => {
+		const matchesSearch = card.name
+			.toLowerCase()
+			.includes(searchTerm.toLowerCase())
+		const matchesFilter = filters.cardKind
+			? card.kind === filters.cardKind
+			: true
+		return matchesSearch && matchesFilter
+	})
+
+	const availablePacks = getAvailablePacks().filter((pack) => {
+		const matchesSearch = pack.name
+			.toLowerCase()
+			.includes(searchTerm.toLowerCase())
+		const matchesFilter = filters.packRarity
+			? pack.rarity === filters.packRarity
+			: true
+		return matchesSearch && matchesFilter
+	})
+
+	// manage changes in the filers
+	const handleFilterChange = (filterName: Filter, value: string) => {
+		setFilters((prev) => ({
+			...prev,
+			[filterName]: value === "all" ? null : value,
+		}))
+	}
 
 	return (
 		<div className="container mx-auto py-6 px-4 sm:px-6">
 			<h1 className="text-2xl sm:text-3xl font-bold text-gold mb-6">
 				Tienda de Duelo
 			</h1>
+
+			{/* search bar and filters */}
+			<div className="mb-6 flex flex-col md:flex-row gap-3">
+				<input
+					type="text"
+					placeholder="Buscar por nombre..."
+					value={searchTerm}
+					onChange={(e) => setSearchTerm(e.target.value)}
+					className="flex-1 px-4 py-2 bg-black/30 border border-gold/20 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gold"
+				/>
+
+				{extraFilters[categoryMap[activeTab]].map((filterKey) => {
+					const filter = filterInfo[filterKey]
+					return (
+						<select
+							key={filterKey}
+							value={filters[filterKey] || "all"}
+							onChange={(e) =>
+								handleFilterChange(filterKey, e.target.value)
+							}
+							className="px-4 py-2 bg-black/30 border border-gold/20 rounded text-white focus:outline-none focus:ring-1 focus:ring-gold"
+						>
+							<option value="all">
+								Todos los {filter.title.toLowerCase()}
+							</option>
+							{filter.values.map((value) => (
+								<option key={value} value={value}>
+									{value}
+								</option>
+							))}
+						</select>
+					)
+				})}
+			</div>
 
 			<Tabs
 				defaultValue="cards"
@@ -42,7 +140,7 @@ const Shop: React.FC = () => {
 					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 						{availableCards.length === 0 ? (
 							<div className="col-span-full text-center py-8 text-gray-400">
-								No hay cartas disponibles en este momento
+								No hay cartas disponibles con estos filtros
 							</div>
 						) : (
 							availableCards.map((card) => (
@@ -89,7 +187,7 @@ const Shop: React.FC = () => {
 					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 						{availablePacks.length === 0 ? (
 							<div className="col-span-full text-center py-8 text-gray-400">
-								No hay paquetes disponibles en este momento
+								No hay paquetes disponibles con estos filtros
 							</div>
 						) : (
 							availablePacks.map((pack) => (
