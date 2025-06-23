@@ -1,3 +1,4 @@
+
 import { useState } from "react"
 import { Card as CardType, CardPack } from "@/types"
 import { useAuth } from "@/context/AuthContext"
@@ -30,7 +31,7 @@ export const useCart = () => {
 		setCartItems((prevItems) => {
 			// Verificar si el ítem ya está en el carrito
 			const existingItemIndex = prevItems.findIndex(
-				(cartItem) => cartItem.id === item.id
+				(cartItem) => cartItem.id === item.id && cartItem.type === itemType
 			)
 
 			if (existingItemIndex >= 0) {
@@ -40,18 +41,16 @@ export const useCart = () => {
 				return updatedItems
 			} else {
 				// Si no existe, agregarlo al carrito
-				return [
-					...prevItems,
-					{
-						id: item.id,
-						name: item.name,
-						price: item.price,
-						quantity: 1,
-						imageUrl: item.imageUrl,
-						type: itemType,
-						itemRef: item,
-					},
-				]
+				const newItem: CartItem = {
+					id: item.id,
+					name: item.name,
+					price: item.price,
+					quantity: 1,
+					imageUrl: item.imageUrl,
+					type: itemType,
+					itemRef: item,
+				}
+				return [...prevItems, newItem]
 			}
 		})
 

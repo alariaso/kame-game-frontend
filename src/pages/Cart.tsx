@@ -1,3 +1,4 @@
+
 import React, { useContext } from "react"
 import { CartContext } from "@/App"
 import { Button } from "@/components/ui/button"
@@ -9,6 +10,7 @@ import {
 	CardFooter,
 } from "@/components/ui/card"
 import { Plus, Minus, Trash2 } from "lucide-react"
+import { CardPack } from "@/types"
 
 const Cart = () => {
 	const cart = useContext(CartContext)
@@ -36,10 +38,31 @@ const Cart = () => {
 		(acc, item) => acc + item.quantity,
 		0
 	)
-	const totalPrice = cart.cartItems.reduce(
-		(acc, item) => acc + item.price * item.quantity,
-		0
-	)
+
+	// Calcular subtotal (precio original)
+	const subtotal = cart.cartItems.reduce((acc, item) => {
+		if (item.type === "pack") {
+			// Para paquetes, calcular el precio original basado en las cartas que contiene
+			const pack = item.itemRef as CardPack
+			const originalPrice = pack.cardCount * 150 // Asumiendo precio promedio de carta de 150
+			return acc + originalPrice * item.quantity
+		}
+		return acc + item.price * item.quantity
+	}, 0)
+
+	// Calcular descuento
+	const discount = cart.cartItems.reduce((acc, item) => {
+		if (item.type === "pack") {
+			const pack = item.itemRef as CardPack
+			const originalPrice = pack.cardCount * 150
+			const discountAmount = originalPrice - item.price
+			return acc + discountAmount * item.quantity
+		}
+		return acc
+	}, 0)
+
+	// Precio total después del descuento
+	const totalPrice = subtotal - discount
 
 	return (
 		<div className="container mx-auto py-12 px-4">
@@ -55,7 +78,7 @@ const Cart = () => {
 						</CardHeader>
 						<CardContent className="divide-y divide-gold/10">
 							{cart.cartItems.map((item) => (
-								<div key={item.id} className="flex gap-4 py-4">
+								<div key={`${item.id}-${item.type}`} className="flex gap-4 py-4">
 									<div className="w-20 h-20 rounded overflow-hidden flex-shrink-0">
 										<img
 											src={item.imageUrl}
@@ -70,8 +93,13 @@ const Cart = () => {
 										<p className="text-sm text-gray-400">
 											{item.type === "card"
 												? "Carta"
-												: "Paquete"}
+												: `Paquete (${(item.itemRef as CardPack).cardCount} cartas)`}
 										</p>
+										{item.type === "pack" && (
+											<p className="text-xs text-green-400">
+												¡Precio con descuento!
+											</p>
+										)}
 										<div className="flex justify-between items-center mt-2">
 											<span className="font-medium">
 												${item.price}
@@ -138,8 +166,14 @@ const Cart = () => {
 						<CardContent className="py-4">
 							<div className="flex justify-between items-center mb-2">
 								<span>Subtotal:</span>
-								<span>${totalPrice}</span>
+								<span>${subtotal}</span>
 							</div>
+							{discount > 0 && (
+								<div className="flex justify-between items-center mb-2">
+									<span className="text-green-400">Descuento:</span>
+									<span className="text-green-400">-${discount}</span>
+								</div>
+							)}
 						</CardContent>
 						<CardFooter className="flex-col border-t border-gold/10 pt-4">
 							<div className="flex justify-between items-center w-full mb-4">
@@ -170,3 +204,4 @@ const Cart = () => {
 }
 
 export default Cart
+ 
