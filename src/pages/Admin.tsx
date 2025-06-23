@@ -92,6 +92,12 @@ const Admin: React.FC = () => {
 		toast.success("Carta eliminada correctamente")
 	}
 
+	// Función para eliminar un paquete
+	const deletePack = (id: string) => {
+		setPacks(packs.filter((pack) => pack.id !== id))
+		toast.success("Paquete eliminada correctamente")
+	}
+
 	// Función para modificar el precio de un paquete
 	const updatePackPrice = (id: string, change: number) => {
 		setPacks(
@@ -425,7 +431,7 @@ const Admin: React.FC = () => {
 							variant="ghost"
 							size="icon"
 							className="h-8 w-8 text-red-500 hover:bg-red-500/10"
-							onClick={() => deleteCard(pack.id)}
+							onClick={() => deletePack(pack.id)}
 						>
 							<Trash2 size={16} />
 						</Button>
