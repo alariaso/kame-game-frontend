@@ -1,3 +1,4 @@
+
 import React, { useState } from "react"
 import {
 	Card,
@@ -8,9 +9,9 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MOCK_USER_INVENTORY } from "@/data/mockData"
-import type { UserCard } from "@/types"
-import { Search, BookOpen, Plus } from "lucide-react"
+import { MOCK_USER_INVENTORY, MOCK_CARD_PACKS } from "@/data/mockData"
+import type { UserCard, CardPack } from "@/types"
+import { Search, Package, Plus } from "lucide-react"
 import { Input } from "@/components/ui/input"
 
 const Inventory: React.FC = () => {
@@ -19,6 +20,9 @@ const Inventory: React.FC = () => {
 	)
 	const [searchTerm, setSearchTerm] = useState("")
 	const [activeFilter, setActiveFilter] = useState("all")
+
+	// Simulamos paquetes comprados por el usuario (en una implementación real vendría de la base de datos)
+	const userPacks = MOCK_CARD_PACKS.slice(0, 2) // Simulamos que el usuario tiene los primeros 2 paquetes
 
 	// Filtrar cartas según la búsqueda y el filtro activo
 	const filteredCards = userCards.filter((userCard) => {
@@ -89,34 +93,42 @@ const Inventory: React.FC = () => {
 		)
 	}
 
-	// Renderiza un mazo
-	const renderDeck = (deck: {
-		id: string
-		name: string
-		cards: string[]
-	}) => (
+	// Renderiza un paquete
+	const renderPack = (pack: CardPack) => (
 		<Card
-			key={deck.id}
+			key={pack.id}
 			className="bg-black/40 backdrop-blur-sm border-gold/10 hover:border-gold/30 card-hover"
 		>
-			<CardHeader>
-				<CardTitle className="text-gold">{deck.name}</CardTitle>
+			<CardHeader className="p-4 pb-2">
+				<div className="flex justify-between items-start">
+					<CardTitle className="text-lg text-gold truncate">
+						{pack.name}
+					</CardTitle>
+					<span className="text-xs px-2 py-1 rounded-full bg-purple-600 text-white">
+						{pack.rarity}
+					</span>
+				</div>
 			</CardHeader>
-			<CardContent>
-				<p className="text-sm text-gray-400">
-					Cartas: {deck.cards.length}
-				</p>
+			<CardContent className="p-4 pt-0 pb-2">
+				<div className="aspect-[3/4] overflow-hidden rounded-md mb-3">
+					<img
+						src={pack.imageUrl}
+						alt={pack.name}
+						className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+					/>
+				</div>
+				<div className="mt-2">
+					<p className="text-sm text-gray-400 line-clamp-2 h-10">
+						{pack.description}
+					</p>
+					<div className="flex justify-between mt-2 text-sm text-gray-300">
+						<span>Cartas: {pack.cardCount}</span>
+						<span className="text-green-400">
+							{pack.discount > 0 && `${Math.round(pack.discount * 100)}% OFF`}
+						</span>
+					</div>
+				</div>
 			</CardContent>
-			<CardFooter className="flex justify-between">
-				<Button variant="ghost" className="text-gold hover:bg-gold/10">
-					<BookOpen size={18} className="mr-2" />
-					Ver
-				</Button>
-				<Button variant="ghost" className="text-gold hover:bg-gold/10">
-					<Plus size={18} className="mr-2" />
-					Editar
-				</Button>
-			</CardFooter>
 		</Card>
 	)
 
@@ -159,12 +171,12 @@ const Inventory: React.FC = () => {
 						Tu Inventario
 					</h1>
 					<p className="text-gray-400 max-w-2xl mx-auto">
-						Administra tus cartas y mazos para crear las estrategias
+						Administra tus cartas y paquetes para crear las estrategias
 						más poderosas.
 					</p>
 				</div>
 
-				{/* Tabs para Cartas y Mazos */}
+				{/* Tabs para Cartas y Paquetes */}
 				<Tabs defaultValue="cards" className="w-full">
 					<TabsList className="w-full max-w-md mx-auto mb-6 bg-black/40 border border-gold/10">
 						<TabsTrigger
@@ -174,10 +186,10 @@ const Inventory: React.FC = () => {
 							Mis Cartas
 						</TabsTrigger>
 						<TabsTrigger
-							value="decks"
+							value="packs"
 							className="flex-1 data-[state=active]:bg-gold data-[state=active]:text-black"
 						>
-							Mis Mazos
+							Mis Paquetes
 						</TabsTrigger>
 					</TabsList>
 
@@ -208,27 +220,6 @@ const Inventory: React.FC = () => {
 								>
 									Todos
 								</Button>
-								{/* <Button
-                  variant="ghost"
-                  className={`text-sm ${activeFilter === 'monster' ? 'bg-gold/20 text-gold' : 'text-gray-400 hover:text-gold'}`}
-                  onClick={() => setActiveFilter('monster')}
-                >
-                  Monstruos
-                </Button>
-                <Button
-                  variant="ghost"
-                  className={`text-sm ${activeFilter === 'spell' ? 'bg-gold/20 text-gold' : 'text-gray-400 hover:text-gold'}`}
-                  onClick={() => setActiveFilter('spell')}
-                >
-                  Hechizos
-                </Button>
-                <Button
-                  variant="ghost"
-                  className={`text-sm ${activeFilter === 'trap' ? 'bg-gold/20 text-gold' : 'text-gray-400 hover:text-gold'}`}
-                  onClick={() => setActiveFilter('trap')}
-                >
-                  Trampas
-                </Button> */}
 							</div>
 						</div>
 
@@ -246,25 +237,21 @@ const Inventory: React.FC = () => {
 						)}
 					</TabsContent>
 
-					<TabsContent value="decks" className="mt-0">
-						<div className="flex justify-end mb-6">
-							<Button className="bg-gold hover:bg-gold-dark text-black font-medium">
-								<Plus size={18} className="mr-2" />
-								Crear Nuevo Mazo
-							</Button>
-						</div>
-
-						{MOCK_USER_INVENTORY.decks.length > 0 ? (
-							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-								{MOCK_USER_INVENTORY.decks.map(renderDeck)}
+					<TabsContent value="packs" className="mt-0">
+						{userPacks.length > 0 ? (
+							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+								{userPacks.map(renderPack)}
 							</div>
 						) : (
 							<div className="text-center py-12">
 								<p className="text-gray-400">
-									No has creado ningún mazo aún.
+									No tienes paquetes comprados aún.
 								</p>
-								<Button className="bg-gold hover:bg-gold-dark text-black font-medium mt-4">
-									Crear Mi Primer Mazo
+								<Button 
+									asChild
+									className="bg-gold hover:bg-gold/80 text-black font-medium mt-4"
+								>
+									<a href="/shop">Comprar Paquetes</a>
 								</Button>
 							</div>
 						)}
