@@ -10,25 +10,13 @@ const Home: React.FC = () => {
 	return (
 		<div className="min-h-[calc(100vh-73px)] flex flex-col">
 			{/* Hero Section */}
-			<section className="relative py-20 px-6 flex flex-col items-center justify-center bg-gradient-to-b from-mystic/70 to-background text-center">
-				<div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?q=80&w=1974')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
+			<section className="relative py-20 px-6 flex flex-col items-center justify-center bg-[#250032] text-center">
 				<div className="container max-w-4xl mx-auto relative z-10">
-					<h1 className="text-4xl md:text-6xl font-bold mb-6 relative group">
-						<span
-							className="relative z-10 bg-gradient-to-r from-gold via-gold-light to-gold bg-clip-text text-transparent 
-                          transition-all duration-700 ease-in-out"
-						>
-							Kame Game
-						</span>
-						<span
-							className="absolute inset-0 bg-gradient-to-r from-gold/20 to-gold-light/20 blur-xl opacity-50 
-                          group-hover:opacity-70 transition-opacity duration-700 ease-in-out"
-						></span>
+				<h1 className="text-4xl md:text-6xl font-bold mb-6 text-gold">
+					Kame Game
 					</h1>
 					<p className="text-lg md:text-xl mb-8 text-gray-300 max-w-2xl mx-auto">
-						Bienvenido al mercado de cartas más místico y elegante.
-						Encuentra las cartas más poderosas y arma tu mazo
-						legendario.
+						Tu tienda virtual de cartas donde puedes comprar, coleccionar y batallar.
 					</p>
 					<div className="flex flex-col sm:flex-row gap-4 justify-center">
 						{isAuthenticated ? (
