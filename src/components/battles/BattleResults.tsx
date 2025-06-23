@@ -97,9 +97,6 @@ const BattleResult: React.FC<BattleResultProps> = ({ result, onNewBattle }) => {
 									¡Recompensas Obtenidas!
 								</h3>
 							</div>
-							<p className="text-gray-300">
-								Has ganado 100 monedas y puntos de experiencia
-							</p>
 						</div>
 					)}
 				</CardContent>

@@ -84,6 +84,28 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 		}
 	}
 
+	// Get attribute color
+	const getAttributeColor = (kind: string): string => {
+		switch (kind) {
+			case "DIVINE":
+				return "text-yellow-300"
+			case "DARK":
+				return "text-purple-400"
+			case "LIGHT":
+				return "text-blue-300"
+			case "FIRE":
+				return "text-red-400"
+			case "WATER":
+				return "text-blue-500"
+			case "EARTH":
+				return "text-green-500"
+			case "WIND":
+				return "text-gray-300"
+			default:
+				return "text-gray-400"
+		}
+	}
+
 	// Resolve winner icon and class
 	const getWinnerDisplay = (winner: string | null) => {
 		if (winner === "player") {
@@ -179,6 +201,9 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 												</span>
 											)}
 										</p>
+										<p className={`text-xs font-medium ${getAttributeColor(roundResult.playerCard.kind)}`}>
+											{roundResult.playerCard.kind}
+										</p>
 									</div>
 								</div>
 							</div>
@@ -230,6 +255,9 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 												</span>
 											)}
 										</p>
+										<p className={`text-xs font-medium ${getAttributeColor(roundResult.aiCard.kind)}`}>
+											{roundResult.aiCard.kind}
+										</p>
 									</div>
 								</div>
 							</div>
@@ -279,6 +307,9 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 												{card.type.toUpperCase()}
 												{card.type === "monster" &&
 													` (ATK: ${card.atk})`}
+											</p>
+											<p className={`text-xs ${getAttributeColor(card.kind)} font-medium`}>
+												{card.kind}
 											</p>
 										</div>
 									)

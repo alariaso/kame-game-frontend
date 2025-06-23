@@ -47,7 +47,48 @@ const Battles: React.FC = () => {
 		reason: string
 	} | null>(null)
 
+	// Store last played cards for tiebreaker
+	const [lastPlayedCards, setLastPlayedCards] = useState<{
+		playerCard: CardType | null
+		aiCard: CardType | null
+	}>({ playerCard: null, aiCard: null })
+
 	const userCards = MOCK_USER_INVENTORY.cards
+
+	// Function to determine winner based on exact attribute matchups
+	const determineWinner = (playerCard: CardType, aiCard: CardType): { winner: "player" | "ai" | "draw", reason: string } => {
+		const playerKind = playerCard.kind
+		const aiKind = aiCard.kind
+
+		// If same attribute, it's a draw
+		if (playerKind === aiKind) {
+			return { winner: "draw", reason: `Ambas cartas tienen el mismo atributo (${playerKind})` }
+		}
+
+		// Define exact winning matchups based on the provided list
+		const winningMatchups: Record<string, string[]> = {
+			'DIVINE': ['DARK', 'EARTH', 'FIRE', 'LIGHT', 'WATER', 'WIND'], // DIVINE wins against everything
+			'DARK': ['EARTH', 'FIRE', 'WATER', 'WIND'], // DARK loses to DIVINE and LIGHT
+			'LIGHT': ['DARK', 'EARTH', 'FIRE', 'WATER', 'WIND'], // LIGHT loses to DIVINE only
+			'EARTH': ['FIRE'], // EARTH loses to DARK, DIVINE, LIGHT, WATER, WIND
+			'FIRE': ['WIND'], // FIRE loses to DARK, DIVINE, EARTH, LIGHT, WATER
+			'WATER': ['FIRE', 'WIND'], // WATER loses to DARK, DIVINE, EARTH, LIGHT
+			'WIND': ['EARTH'] // WIND loses to DARK, DIVINE, FIRE, LIGHT, WATER
+		}
+
+		// Check if player wins
+		if (winningMatchups[playerKind]?.includes(aiKind)) {
+			return { winner: "player", reason: `${playerKind} vence a ${aiKind}` }
+		}
+
+		// Check if AI wins
+		if (winningMatchups[aiKind]?.includes(playerKind)) {
+			return { winner: "ai", reason: `${aiKind} vence a ${playerKind}` }
+		}
+
+		// If no matchup is defined, it's a draw
+		return { winner: "draw", reason: `No hay relación definida entre ${playerKind} y ${aiKind}` }
+	}
 
 	// Prepare player deck from selected cards
 	const prepareBattle = () => {
@@ -132,41 +173,11 @@ const Battles: React.FC = () => {
 		const playerCard = playerDeck.cards[playerDeck.selectedCardIndex]
 		const aiCard = aiDeck.cards[aiDeck.selectedCardIndex]
 
-		let winner: "player" | "ai" | "draw" = "draw"
-		let reason = ""
+		// Store last played cards for potential tiebreaker
+		setLastPlayedCards({ playerCard, aiCard })
 
-		// Compare card types (monster > spell > trap)
-		if (playerCard.type !== aiCard.type) {
-			if (
-				(playerCard.type === "monster" && aiCard.type === "spell") ||
-				(playerCard.type === "spell" && aiCard.type === "trap") ||
-				(playerCard.type === "trap" && aiCard.type === "monster")
-			) {
-				winner = "player"
-				reason = `${playerCard.type} vence a ${aiCard.type}`
-			} else {
-				winner = "ai"
-				reason = `${aiCard.type} vence a ${playerCard.type}`
-			}
-		}
-		// If same type, compare attack (for monsters) or just declare a draw
-		else {
-			if (playerCard.type === "monster" && aiCard.type === "monster") {
-				if (playerCard.atk! > aiCard.atk!) {
-					winner = "player"
-					reason = `Ataque superior (${playerCard.atk} > ${aiCard.atk})`
-				} else if (playerCard.atk! < aiCard.atk!) {
-					winner = "ai"
-					reason = `Ataque superior (${aiCard.atk} > ${playerCard.atk})`
-				} else {
-					winner = "draw"
-					reason = "Empate en ataque"
-				}
-			} else {
-				winner = "draw"
-				reason = "Mismo tipo de carta"
-			}
-		}
+		// Determine winner using exact attribute logic
+		const { winner, reason } = determineWinner(playerCard, aiCard)
 
 		// Update rounds won
 		const newRoundsWon = { ...roundsWon }
@@ -204,19 +215,33 @@ const Battles: React.FC = () => {
 			selectedCardIndex: null,
 		})
 
-		// Check if there's a battle winner
+		// Check if there's a battle winner (first to 3 wins)
 		if (newRoundsWon.player >= 3) {
 			endBattle("player")
 		} else if (newRoundsWon.ai >= 3) {
 			endBattle("ai")
 		} else if (currentRound >= 5) {
-			// If we've played 5 rounds and no one has 3 wins, determine winner by most wins
+			// If we've played 5 rounds, determine winner
 			if (newRoundsWon.player > newRoundsWon.ai) {
 				endBattle("player")
 			} else if (newRoundsWon.player < newRoundsWon.ai) {
 				endBattle("ai")
 			} else {
-				endBattle("draw")
+				// Tiebreaker: compare attack of last played cards
+				if (lastPlayedCards.playerCard && lastPlayedCards.aiCard) {
+					const playerAtk = lastPlayedCards.playerCard.atk || 0
+					const aiAtk = lastPlayedCards.aiCard.atk || 0
+					
+					if (playerAtk > aiAtk) {
+						endBattle("player")
+					} else if (playerAtk < aiAtk) {
+						endBattle("ai")
+					} else {
+						endBattle("draw")
+					}
+				} else {
+					endBattle("draw")
+				}
 			}
 		}
 	}
@@ -249,6 +274,7 @@ const Battles: React.FC = () => {
 		setCurrentRound(0)
 		setRoundsWon({ player: 0, ai: 0 })
 		setRoundResult(null)
+		setLastPlayedCards({ playerCard: null, aiCard: null })
 		setStage(STAGES.SELECTION)
 	}
 
@@ -387,20 +413,16 @@ const Battles: React.FC = () => {
 								carta para combatir.
 							</p>
 							<p>
-								• Jerarquía de tipos: Monstruo &gt; Hechizo &gt;
-								Trampa &gt; Monstruo.
+								• Jerarquía de atributos: DIVINE vence a todos, DARK y LIGHT son fuertes, otros tienen relaciones específicas.
 							</p>
 							<p>
-								• Si hay empate en tipos, se compara el ataque
-								(solo para monstruos).
+								• Si los atributos son iguales o no hay relación, la ronda termina en empate.
 							</p>
 							<p>
-								• Se juegan hasta 5 rondas o hasta que un
-								jugador gane 3 rondas.
+								• Gana el duelo quien obtenga 3 victorias en rondas.
 							</p>
 							<p>
-								• Ganar duelos te otorga monedas y puntos que
-								puedes canjear en la tienda.
+								• En caso de empate tras 5 rondas, se desempata por ataque de la última carta jugada.
 							</p>
 						</CardContent>
 					</Card>
