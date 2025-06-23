@@ -179,13 +179,12 @@ const Battles: React.FC = () => {
 		// Determine winner using exact attribute logic
 		const { winner, reason } = determineWinner(playerCard, aiCard)
 
-		// Update rounds won
-		const newRoundsWon = { ...roundsWon }
-		if (winner === "player") {
-			newRoundsWon.player += 1
-		} else if (winner === "ai") {
-			newRoundsWon.ai += 1
-		}
+		// Calculate new rounds won using current values
+		const newPlayerScore = winner === "player" ? roundsWon.player + 1 : roundsWon.player
+		const newAiScore = winner === "ai" ? roundsWon.ai + 1 : roundsWon.ai
+
+		// Update rounds won with calculated values
+		const newRoundsWon = { player: newPlayerScore, ai: newAiScore }
 		setRoundsWon(newRoundsWon)
 
 		// Set round result
@@ -215,53 +214,59 @@ const Battles: React.FC = () => {
 			selectedCardIndex: null,
 		})
 
-		// Check if there's a battle winner (first to 3 wins)
-		if (newRoundsWon.player >= 3) {
-			endBattle("player")
-		} else if (newRoundsWon.ai >= 3) {
-			endBattle("ai")
+		// Check if there's a battle winner using calculated values
+		if (newPlayerScore >= 3) {
+			setBattleResult({
+				winner: "player",
+				playerScore: newPlayerScore,
+				aiScore: newAiScore,
+			})
+			setStage(STAGES.RESULT)
+			toast.success("¡Has ganado la batalla!")
+		} else if (newAiScore >= 3) {
+			setBattleResult({
+				winner: "ai",
+				playerScore: newPlayerScore,
+				aiScore: newAiScore,
+			})
+			setStage(STAGES.RESULT)
+			toast.error("Has perdido esta vez. ¡Inténtalo de nuevo!")
 		} else if (currentRound >= 5) {
-			// If we've played 5 rounds, determine winner
-			if (newRoundsWon.player > newRoundsWon.ai) {
-				endBattle("player")
-			} else if (newRoundsWon.player < newRoundsWon.ai) {
-				endBattle("ai")
+			// If we've played 5 rounds, determine winner using calculated values
+			let finalWinner: "player" | "ai" | "draw"
+			
+			if (newPlayerScore > newAiScore) {
+				finalWinner = "player"
+			} else if (newPlayerScore < newAiScore) {
+				finalWinner = "ai"
 			} else {
 				// Tiebreaker: compare attack of last played cards
-				if (lastPlayedCards.playerCard && lastPlayedCards.aiCard) {
-					const playerAtk = lastPlayedCards.playerCard.atk || 0
-					const aiAtk = lastPlayedCards.aiCard.atk || 0
-					
-					if (playerAtk > aiAtk) {
-						endBattle("player")
-					} else if (playerAtk < aiAtk) {
-						endBattle("ai")
-					} else {
-						endBattle("draw")
-					}
+				const playerAtk = playerCard.atk || 0
+				const aiAtk = aiCard.atk || 0
+				
+				if (playerAtk > aiAtk) {
+					finalWinner = "player"
+				} else if (playerAtk < aiAtk) {
+					finalWinner = "ai"
 				} else {
-					endBattle("draw")
+					finalWinner = "draw"
 				}
 			}
-		}
-	}
 
-	// End the battle with a result
-	const endBattle = (winner: "player" | "ai" | "draw") => {
-		setBattleResult({
-			winner,
-			playerScore: roundsWon.player,
-			aiScore: roundsWon.ai,
-		})
+			setBattleResult({
+				winner: finalWinner,
+				playerScore: newPlayerScore,
+				aiScore: newAiScore,
+			})
+			setStage(STAGES.RESULT)
 
-		setStage(STAGES.RESULT)
-
-		if (winner === "player") {
-			toast.success("¡Has ganado la batalla!")
-		} else if (winner === "ai") {
-			toast.error("Has perdido esta vez. ¡Inténtalo de nuevo!")
-		} else {
-			toast.info("La batalla ha terminado en empate.")
+			if (finalWinner === "player") {
+				toast.success("¡Has ganado la batalla!")
+			} else if (finalWinner === "ai") {
+				toast.error("Has perdido esta vez. ¡Inténtalo de nuevo!")
+			} else {
+				toast.info("La batalla ha terminado en empate.")
+			}
 		}
 	}
 
