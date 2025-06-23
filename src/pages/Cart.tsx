@@ -1,4 +1,3 @@
-
 import React, { useContext } from "react"
 import { CartContext } from "@/App"
 import { Button } from "@/components/ui/button"
@@ -39,12 +38,11 @@ const Cart = () => {
 		0
 	)
 
-	// Calcular subtotal (precio original)
-	const subtotal = cart.cartItems.reduce((acc, item) => {
+	// Calcular total real sin descuento (antes llamado subtotal)
+	const totalPrice = cart.cartItems.reduce((acc, item) => {
 		if (item.type === "pack") {
-			// Para paquetes, calcular el precio original basado en las cartas que contiene
 			const pack = item.itemRef as CardPack
-			const originalPrice = pack.cardCount * 150 // Asumiendo precio promedio de carta de 150
+			const originalPrice = pack.cardCount * 150
 			return acc + originalPrice * item.quantity
 		}
 		return acc + item.price * item.quantity
@@ -61,8 +59,8 @@ const Cart = () => {
 		return acc
 	}, 0)
 
-	// Precio total después del descuento
-	const totalPrice = subtotal - discount
+	// Calcular subtotal con descuentos aplicados
+	const subtotal = totalPrice - discount
 
 	return (
 		<div className="container mx-auto py-12 px-4">
@@ -204,4 +202,3 @@ const Cart = () => {
 }
 
 export default Cart
- 
