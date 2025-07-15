@@ -1,3 +1,4 @@
+
 import React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -27,7 +28,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog"
-import { CardType, CardRarity } from "@/types"
+import { createCard } from "@/services/api"
 
 const formSchema = z.object({
 	name: z
@@ -45,6 +46,7 @@ const formSchema = z.object({
 	price: z.string().min(1, { message: "El precio es requerido" }),
 	imageUrl: z.string().url({ message: "Debe ser una URL válida" }),
 	stock: z.string().min(1, { message: "El stock es requerido" }),
+	attribute: z.enum(["DARK", "DIVINE", "EARTH", "FIRE", "LIGHT", "WATER", "WIND"] as const),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -72,26 +74,49 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 			price: "",
 			imageUrl: "",
 			stock: "1",
+			attribute: "FIRE",
 		},
 	})
 
-	const onSubmit = (data: FormValues) => {
-		// Convertir valores numéricos
-		const cardData = {
-			...data,
-			price: Number(data.price),
-			stock: Number(data.stock),
-			...(data.type === "monster" && {
-				atk: Number(data.atk),
-				def: Number(data.def),
-			}),
-			id: crypto.randomUUID(),
-		}
+	const onSubmit = async (data: FormValues) => {
+		try {
+			// Preparar datos para la API (solo los campos requeridos por el endpoint)
+			const cardData = {
+				name: data.name,
+				price: Number(data.price),
+				imageUrl: data.imageUrl,
+				attribute: data.attribute,
+				attack: Number(data.atk) || 0,
+			}
 
-		onAddCard(cardData)
-		toast.success("Carta agregada correctamente")
-		form.reset()
-		onOpenChange(false)
+			// Llamar a la API real
+			const response = await createCard(cardData)
+			
+			if (response.error) {
+				toast.error("Error al crear la carta: " + response.message)
+			} else {
+				toast.success("Carta creada correctamente")
+				
+				// Llamar al callback para actualizar la UI local si se necesita
+				const localCardData = {
+					...data,
+					price: Number(data.price),
+					stock: Number(data.stock),
+					...(data.type === "monster" && {
+						atk: Number(data.atk),
+						def: Number(data.def),
+					}),
+					id: crypto.randomUUID(),
+				}
+				onAddCard(localCardData)
+				
+				form.reset()
+				onOpenChange(false)
+			}
+		} catch (error) {
+			console.error("Error creating card:", error)
+			toast.error("Error de conexión al crear la carta")
+		}
 	}
 
 	const cardType = form.watch("type")
@@ -153,6 +178,36 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 												<SelectItem value="trap">
 													Trampa
 												</SelectItem>
+											</SelectContent>
+										</Select>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+
+							<FormField
+								control={form.control}
+								name="attribute"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Atributo</FormLabel>
+										<Select
+											onValueChange={field.onChange}
+											defaultValue={field.value}
+										>
+											<FormControl>
+												<SelectTrigger className="bg-black/30 border-gold/20">
+													<SelectValue placeholder="Seleccionar atributo" />
+												</SelectTrigger>
+											</FormControl>
+											<SelectContent className="bg-background border-gold/30">
+												<SelectItem value="DARK">Oscuridad</SelectItem>
+												<SelectItem value="DIVINE">Divino</SelectItem>
+												<SelectItem value="EARTH">Tierra</SelectItem>
+												<SelectItem value="FIRE">Fuego</SelectItem>
+												<SelectItem value="LIGHT">Luz</SelectItem>
+												<SelectItem value="WATER">Agua</SelectItem>
+												<SelectItem value="WIND">Viento</SelectItem>
 											</SelectContent>
 										</Select>
 										<FormMessage />
