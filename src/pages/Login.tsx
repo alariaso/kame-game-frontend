@@ -106,12 +106,6 @@ const Login: React.FC = () => {
 						</Link>
 					</p>
 				</div>
-
-				<div className="mt-8 pt-6 border-t border-gold/10 text-gray-500 text-sm text-center">
-					<p>Para fines de prueba:</p>
-					<p>Usuario: admin | Contraseña: admin123</p>
-					<p>Usuario: user | Contraseña: user123</p>
-				</div>
 			</div>
 		</div>
 	)
