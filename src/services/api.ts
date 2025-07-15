@@ -1,3 +1,4 @@
+// Configuración base de la API
 const API_BASE_URL = 'http://localhost:3000'
 
 // Tipos para las respuestas de la API
@@ -142,4 +143,36 @@ export const logout = async (): Promise<void> => {
 // Función para verificar si el usuario está autenticado
 export const isAuthenticated = (): boolean => {
   return getAuthToken() !== null
+}
+
+// Tipos para las nuevas funciones
+export interface CardData {
+  name: string
+  price: number
+  imageUrl: string
+  attribute: string
+  attack: number
+}
+
+export interface GetCardsResponse {
+  results: any[]
+  totalPages: number
+}
+
+// 4️⃣ Función para crear carta
+export const createCard = async (cardData: CardData): Promise<ApiResponse<any>> => {
+  return makeAuthenticatedRequest('/cards/', {
+    method: 'POST',
+    body: JSON.stringify(cardData),
+  })
+}
+
+// 5️⃣ Función para obtener cartas con paginación
+export const getCards = async (page: number = 1, itemsPerPage: number = 10): Promise<ApiResponse<GetCardsResponse>> => {
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    itemsPerPage: itemsPerPage.toString(),
+  })
+
+  return makeAuthenticatedRequest<GetCardsResponse>(`/cards?${queryParams.toString()}`)
 }
