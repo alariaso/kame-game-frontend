@@ -1,21 +1,52 @@
-import React, { useState, useContext } from "react"
+
+import React, { useState, useContext, useEffect } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CartContext } from "@/App"
+import { getCards } from "@/services/api"
+import { toast } from "sonner"
 
 type ProductCategory = "Cartas Individuales" | "Paquetes"
 type Filter = "cardKind" | "packRarity"
 
 const Shop: React.FC = () => {
-	const { getAvailableCards, getAvailablePacks } = useAuth()
+	const { getAvailablePacks } = useAuth()
 	const [activeTab, setActiveTab] = useState<string>("cards")
 	const [searchTerm, setSearchTerm] = useState<string>("")
 	const [filters, setFilters] = useState<Record<Filter, string | null>>({
 		cardKind: null,
 		packRarity: null,
 	})
+	const [apiCards, setApiCards] = useState<any[]>([])
+	const [loading, setLoading] = useState<boolean>(false)
+	const [totalPages, setTotalPages] = useState<number>(1)
+	const [currentPage, setCurrentPage] = useState<number>(1)
 	const cart = useContext(CartContext)
+
+	// Cargar cartas desde la API
+	useEffect(() => {
+		const loadCards = async () => {
+			setLoading(true)
+			try {
+				const response = await getCards(currentPage, 20)
+				if (response.error) {
+					toast.error("Error al cargar las cartas: " + response.message)
+				} else {
+					setApiCards(response.data?.results || [])
+					setTotalPages(response.data?.totalPages || 1)
+				}
+			} catch (error) {
+				console.error("Error loading cards:", error)
+				toast.error("Error de conexión al cargar las cartas")
+			}
+			setLoading(false)
+		}
+
+		if (activeTab === "cards") {
+			loadCards()
+		}
+	}, [activeTab, currentPage])
 
 	// define filters according to the category
 	const categoryMap: Record<string, ProductCategory> = {
@@ -47,13 +78,13 @@ const Shop: React.FC = () => {
 		},
 	}
 
-	// obtain more products with filters applied
-	const availableCards = getAvailableCards().filter((card) => {
+	// Filtrar cartas de la API
+	const filteredApiCards = apiCards.filter((card) => {
 		const matchesSearch = card.name
 			.toLowerCase()
 			.includes(searchTerm.toLowerCase())
 		const matchesFilter = filters.cardKind
-			? card.kind === filters.cardKind
+			? card.attribute === filters.cardKind
 			: true
 		return matchesSearch && matchesFilter
 	})
@@ -68,7 +99,7 @@ const Shop: React.FC = () => {
 		return matchesSearch && matchesFilter
 	})
 
-	// manage changes in the filers
+	// manage changes in the filters
 	const handleFilterChange = (filterName: Filter, value: string) => {
 		setFilters((prev) => ({
 			...prev,
@@ -137,50 +168,67 @@ const Shop: React.FC = () => {
 				</TabsList>
 
 				<TabsContent value="cards">
-					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-						{availableCards.length === 0 ? (
-							<div className="col-span-full text-center py-8 text-gray-400">
-								No hay cartas disponibles con estos filtros
-							</div>
-						) : (
-							availableCards.map((card) => (
-								<Card
-									key={card.id}
-									className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
-								>
-									<div className="aspect-[3/4] overflow-hidden">
-										<img
-											src={card.imageUrl}
-											alt={card.name}
-											className="w-full h-full object-cover transition-transform hover:scale-110"
-										/>
-									</div>
-									<div className="p-3">
-										<h3 className="font-medium text-gold truncate">
-											{card.name}
-										</h3>
-										<div className="flex justify-between items-center mt-2">
-											<span className="text-sm text-gray-300">
-												Stock: {card.stock}
-											</span>
-											<span className="font-bold">
-												${card.price}
-											</span>
+					{loading ? (
+						<div className="text-center py-8 text-gray-400">
+							Cargando cartas...
+						</div>
+					) : (
+						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+							{filteredApiCards.length === 0 ? (
+								<div className="col-span-full text-center py-8 text-gray-400">
+									No hay cartas disponibles con estos filtros
+								</div>
+							) : (
+								filteredApiCards.map((card) => (
+									<Card
+										key={card.id || card.name}
+										className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
+									>
+										<div className="aspect-[3/4] overflow-hidden">
+											<img
+												src={card.imageUrl}
+												alt={card.name}
+												className="w-full h-full object-cover transition-transform hover:scale-110"
+											/>
 										</div>
-										<button
-											className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
-											onClick={() =>
-												cart?.addToCart(card, "card")
-											}
-											disabled={card.stock <= 0}
-										>
-											Agregar al carrito
-										</button>
-									</div>
-								</Card>
-							))
-						)}
-					</div>
+										<div className="p-3">
+											<h3 className="font-medium text-gold truncate">
+												{card.name}
+											</h3>
+											<div className="flex justify-between items-center mt-2">
+												<span className="text-sm text-gray-300">
+													ATK: {card.attack}
+												</span>
+												<span className="font-bold">
+													${card.price}
+												</span>
+											</div>
+											<div className="flex justify-between items-center mt-1">
+												<span className="text-xs text-gray-400">
+													{card.attribute}
+												</span>
+											</div>
+											<button
+												className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
+												onClick={() =>
+													cart?.addToCart({
+														...card,
+														category: "card",
+														id: card.id || card.name,
+														image_url: card.imageUrl,
+														kind: card.attribute,
+														stock: 1
+													}, "card")
+												}
+											>
+												Agregar al carrito
+											</button>
+										</div>
+									</Card>
+								))
+							)}
+						</div>
+					)}
 				</TabsContent>
 
 				<TabsContent value="packs">
