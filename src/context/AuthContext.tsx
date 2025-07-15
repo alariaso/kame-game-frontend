@@ -6,6 +6,7 @@ import {
 	MOCK_CARD_PACKS,
 	MOCK_USER_INVENTORY,
 } from "@/data/mockData"
+import * as apiService from "@/services/api"
 
 // Define los tipos de usuario
 type Role = "user" | "admin"
@@ -16,24 +17,6 @@ export interface User {
 	role: Role
 	balance: number // Saldo en Yugi Pesos
 }
-
-// Mock de usuarios para pruebas
-const MOCK_USERS = [
-	{
-		id: "1",
-		username: "admin",
-		password: "admin123",
-		role: "admin" as Role,
-		balance: 10000,
-	},
-	{
-		id: "2",
-		username: "user",
-		password: "user123",
-		role: "user" as Role,
-		balance: 5000,
-	},
-]
 
 // Copia local de las cartas y paquetes para manipular el stock
 let availableCards = [...MOCK_CARDS]
@@ -52,6 +35,7 @@ interface AuthContextType {
 	buyPack: (packId: string) => boolean
 	getAvailableCards: () => Card[]
 	getAvailablePacks: () => CardPack[]
+	refreshUserData: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -62,19 +46,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	const [user, setUser] = useState<User | null>(null)
 	const [userInventory, setUserInventory] =
 		useState<UserInventory>(MOCK_USER_INVENTORY)
+	const [loading, setLoading] = useState(true)
 
-	// Intenta restaurar la sesión desde localStorage al cargar la aplicación
+	// Intenta restaurar la sesión desde el token almacenado
 	useEffect(() => {
-		const storedUser = localStorage.getItem("user")
-		if (storedUser) {
-			try {
-				setUser(JSON.parse(storedUser))
-			} catch (error) {
-				console.error("Error parsing stored user", error)
-				localStorage.removeItem("user")
+		const initializeAuth = async () => {
+			if (apiService.isAuthenticated()) {
+				await refreshUserData()
 			}
+			setLoading(false)
 		}
+
+		initializeAuth()
 	}, [])
+
+	// Función para refrescar datos del usuario
+	const refreshUserData = async () => {
+		try {
+			const response = await apiService.getUser()
+			
+			if (response.status === 200 && response.data) {
+				const userData = response.data
+				const userObj: User = {
+					id: "1", // Se podría obtener del backend
+					username: userData.name,
+					role: "user", // Se podría obtener del backend
+					balance: userData.yugiPesos,
+				}
+				setUser(userObj)
+			} else {
+				// Si hay error al obtener usuario, limpiar autenticación
+				apiService.clearAuthToken()
+				setUser(null)
+			}
+		} catch (error) {
+			console.error("Error refreshing user data:", error)
+			apiService.clearAuthToken()
+			setUser(null)
+		}
+	}
 
 	// Validación de nombre de usuario: solo letras, 3-30 caracteres
 	const validateUsername = (username: string): boolean => {
@@ -107,7 +117,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
 		const updatedUser = { ...user, balance: user.balance + amount }
 		setUser(updatedUser)
-		localStorage.setItem("user", JSON.stringify(updatedUser))
 		toast.success(`Has depositado ${amount} Yugi Pesos`)
 	}
 
@@ -131,24 +140,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			return false
 		}
 
-		// Actualizar saldo
 		const updatedUser = { ...user, balance: user.balance - card.price }
 		setUser(updatedUser)
-		localStorage.setItem("user", JSON.stringify(updatedUser))
 
-		// Actualizar stock
 		const updatedCards = [...availableCards]
 		updatedCards[cardIndex] = { ...card, stock: card.stock - 1 }
 		availableCards = updatedCards
 
-		// Actualizar inventario
 		const existingCardInInventory = userInventory.cards.find(
 			(item) => item.cardId === cardId
 		)
 		let updatedInventory: UserInventory
 
 		if (existingCardInInventory) {
-			// Si ya tiene la carta, aumentar cantidad
 			const updatedUserCards = userInventory.cards.map((item) =>
 				item.cardId === cardId
 					? { ...item, quantity: item.quantity + 1 }
@@ -156,7 +160,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			)
 			updatedInventory = { ...userInventory, cards: updatedUserCards }
 		} else {
-			// Si no tiene la carta, agregarla al inventario
 			const newUserCard: UserCard = {
 				id: `inv-${Date.now()}`,
 				cardId: card.id,
@@ -194,17 +197,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			return false
 		}
 
-		// Actualizar saldo
 		const updatedUser = { ...user, balance: user.balance - pack.price }
 		setUser(updatedUser)
-		localStorage.setItem("user", JSON.stringify(updatedUser))
 
-		// Actualizar stock
 		const updatedPacks = [...availablePacks]
 		updatedPacks[packIndex] = { ...pack, stock: pack.stock - 1 }
 		availablePacks = updatedPacks
 
-		// Simular las cartas obtenidas del paquete (lógica simplificada)
 		const randomCards = getRandomCards(pack.cardCount)
 		let updatedInventory = { ...userInventory }
 
@@ -214,14 +213,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			)
 
 			if (existingCardInInventory) {
-				// Si ya tiene la carta, aumentar cantidad
 				updatedInventory.cards = updatedInventory.cards.map((item) =>
 					item.cardId === card.id
 						? { ...item, quantity: item.quantity + 1 }
 						: item
 				)
 			} else {
-				// Si no tiene la carta, agregarla al inventario
 				const newUserCard: UserCard = {
 					id: `inv-${Date.now()}-${card.id}`,
 					cardId: card.id,
@@ -273,19 +270,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			return false
 		}
 
-		// Mock de autenticación
-		const foundUser = MOCK_USERS.find(
-			(u) => u.username === username && u.password === password
-		)
+		try {
+			const response = await apiService.login(username, password)
 
-		if (foundUser) {
-			const { password, ...userWithoutPassword } = foundUser
-			setUser(userWithoutPassword)
-			localStorage.setItem("user", JSON.stringify(userWithoutPassword))
-			toast.success(`¡Bienvenido, ${username}!`)
-			return true
-		} else {
-			toast.error("Credenciales incorrectas")
+			if (response.status === 200 && response.data?.accessToken) {
+				// Obtener datos del usuario después del login exitoso
+				await refreshUserData()
+				toast.success(`¡Bienvenido, ${username}!`)
+				return true
+			} else {
+				toast.error(response.message || "Credenciales incorrectas")
+				return false
+			}
+		} catch (error) {
+			console.error("Login error:", error)
+			toast.error("Error al iniciar sesión")
 			return false
 		}
 	}
@@ -308,41 +307,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			return false
 		}
 
-		// Verificar si el usuario ya existe
-		if (MOCK_USERS.some((u) => u.username === username)) {
-			toast.error("Este nombre de usuario ya existe")
+		try {
+			const response = await apiService.signUp(username, password)
+
+			if (response.status === 200 || response.status === 201) {
+				toast.success("¡Registro exitoso! Ahora puedes iniciar sesión")
+				return true
+			} else {
+				// Manejar mensajes específicos del servidor
+				if (response.message === "user already exists") {
+					toast.error("Este nombre de usuario ya existe")
+				} else {
+					toast.error(response.message || "Error en el registro")
+				}
+				return false
+			}
+		} catch (error) {
+			console.error("Register error:", error)
+			toast.error("Error al registrarse")
 			return false
 		}
-
-		// En un entorno real, aquí se enviaría una petición al servidor
-		// Para este demo, simulamos que el registro fue exitoso
-		const newUser = {
-			id: `${MOCK_USERS.length + 1}`,
-			username,
-			password,
-			role: "user" as Role,
-			balance: 1000, // Saldo inicial para nuevos usuarios
-		}
-
-		MOCK_USERS.push(newUser)
-
-		const { password: _, ...userWithoutPassword } = newUser
-		setUser(userWithoutPassword)
-		localStorage.setItem("user", JSON.stringify(userWithoutPassword))
-
-		toast.success("¡Registro exitoso!")
-		return true
 	}
 
 	// Función de logout
 	const logout = () => {
+		apiService.logout()
 		setUser(null)
-		localStorage.removeItem("user")
 		toast.info("Sesión cerrada")
 	}
 
 	// Verificar si el usuario es administrador
 	const isAdmin = user?.role === "admin"
+
+	if (loading) {
+		return <div>Cargando...</div> // Puedes crear un componente de loading más elaborado
+	}
 
 	return (
 		<AuthContext.Provider
@@ -359,6 +358,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 				buyPack,
 				getAvailableCards,
 				getAvailablePacks,
+				refreshUserData,
 			}}
 		>
 			{children}
