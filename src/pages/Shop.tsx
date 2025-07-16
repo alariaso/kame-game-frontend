@@ -1,8 +1,15 @@
-
 import React, { useState, useContext, useEffect } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { 
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import { CartContext } from "@/App"
 import { getCards } from "@/services/api"
 import { toast } from "sonner"
@@ -47,6 +54,13 @@ const Shop: React.FC = () => {
 			loadCards()
 		}
 	}, [activeTab, currentPage])
+
+	// Función para cambiar de página
+	const handlePageChange = (page: number) => {
+		if (page >= 1 && page <= totalPages) {
+			setCurrentPage(page)
+		}
+	}
 
 	// define filters according to the category
 	const categoryMap: Record<string, ProductCategory> = {
@@ -173,61 +187,112 @@ const Shop: React.FC = () => {
 							Cargando cartas...
 						</div>
 					) : (
-						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-							{filteredApiCards.length === 0 ? (
-								<div className="col-span-full text-center py-8 text-gray-400">
-									No hay cartas disponibles con estos filtros
-								</div>
-							) : (
-								filteredApiCards.map((card) => (
-									<Card
-										key={card.id || card.name}
-										className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
-									>
-										<div className="aspect-[3/4] overflow-hidden">
-											<img
-												src={card.imageUrl}
-												alt={card.name}
-												className="w-full h-full object-cover transition-transform hover:scale-110"
-											/>
-										</div>
-										<div className="p-3">
-											<h3 className="font-medium text-gold truncate">
-												{card.name}
-											</h3>
-											<div className="flex justify-between items-center mt-2">
-												<span className="text-sm text-gray-300">
-													ATK: {card.attack}
-												</span>
-												<span className="font-bold">
-													${card.price}
-												</span>
+						<>
+							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+								{filteredApiCards.length === 0 ? (
+									<div className="col-span-full text-center py-8 text-gray-400">
+										No hay cartas disponibles con estos filtros
+									</div>
+								) : (
+									filteredApiCards.map((card) => (
+										<Card
+											key={card.id || card.name}
+											className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
+										>
+											<div className="aspect-[3/4] overflow-hidden">
+												<img
+													src={card.imageUrl}
+													alt={card.name}
+													className="w-full h-full object-cover transition-transform hover:scale-110"
+												/>
 											</div>
-											<div className="flex justify-between items-center mt-1">
-												<span className="text-xs text-gray-400">
-													{card.attribute}
-												</span>
+											<div className="p-3">
+												<h3 className="font-medium text-gold truncate">
+													{card.name}
+												</h3>
+												<div className="flex justify-between items-center mt-2">
+													<span className="text-sm text-gray-300">
+														ATK: {card.attack}
+													</span>
+													<span className="font-bold">
+														${card.price}
+													</span>
+												</div>
+												<div className="flex justify-between items-center mt-1">
+													<span className="text-xs text-gray-400">
+														{card.attribute}
+													</span>
+												</div>
+												<button
+													className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
+													onClick={() =>
+														cart?.addToCart({
+															...card,
+															category: "card",
+															id: card.id || card.name,
+															image_url: card.imageUrl,
+															kind: card.attribute,
+															stock: 1
+														}, "card")
+													}
+												>
+													Agregar al carrito
+												</button>
 											</div>
-											<button
-												className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
-												onClick={() =>
-													cart?.addToCart({
-														...card,
-														category: "card",
-														id: card.id || card.name,
-														image_url: card.imageUrl,
-														kind: card.attribute,
-														stock: 1
-													}, "card")
+										</Card>
+									))
+								)}
+							</div>
+							
+							{/* Componente de paginación */}
+							{totalPages > 1 && (
+								<div className="mt-8 flex justify-center">
+									<Pagination>
+										<PaginationContent>
+											<PaginationItem>
+												<PaginationPrevious 
+													onClick={() => handlePageChange(currentPage - 1)}
+													className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+												/>
+											</PaginationItem>
+											
+											{/* Páginas numeradas */}
+											{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+												let pageNum;
+												if (totalPages <= 5) {
+													pageNum = i + 1;
+												} else if (currentPage <= 3) {
+													pageNum = i + 1;
+												} else if (currentPage >= totalPages - 2) {
+													pageNum = totalPages - 4 + i;
+												} else {
+													pageNum = currentPage - 2 + i;
 												}
-											>
-												Agregar al carrito
-											</button>
-										</div>
-									</Card>
-								))
+												
+												return (
+													<PaginationItem key={pageNum}>
+														<PaginationLink
+															onClick={() => handlePageChange(pageNum)}
+															isActive={currentPage === pageNum}
+															className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+														>
+															{pageNum}
+														</PaginationLink>
+													</PaginationItem>
+												);
+											})}
+											
+											<PaginationItem>
+												<PaginationNext 
+													onClick={() => handlePageChange(currentPage + 1)}
+													className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+												/>
+											</PaginationItem>
+										</PaginationContent>
+									</Pagination>
+								</div>
 							)}
-						</div>
+						</>
 					)}
 				</TabsContent>
 

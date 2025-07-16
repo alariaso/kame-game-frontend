@@ -176,3 +176,25 @@ export const getCards = async (page: number = 1, itemsPerPage: number = 10): Pro
 
   return makeAuthenticatedRequest<GetCardsResponse>(`/cards?${queryParams.toString()}`)
 }
+
+// 6️⃣ Función para vaciar todo el carrito
+export const clearCart = async (): Promise<ApiResponse<any>> => {
+  return makeAuthenticatedRequest('/cart', {
+    method: 'DELETE',
+  })
+}
+
+// 7️⃣ Función para eliminar un ítem específico del carrito
+export const removeCartItem = async (cardId: number): Promise<ApiResponse<any>> => {
+  return makeAuthenticatedRequest(`/cart/card/${cardId}`, {
+    method: 'DELETE',
+  })
+}
+
+// 8️⃣ Función para actualizar cantidad de cartas (Admin)
+export const updateCardStock = async (cardId: number, quantity: number): Promise<ApiResponse<any>> => {
+  return makeAuthenticatedRequest('/cart', {
+    method: 'PUT',
+    body: JSON.stringify({ cardId, quantity }),
+  })
+}

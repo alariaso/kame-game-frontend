@@ -80,7 +80,7 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 
 	const onSubmit = async (data: FormValues) => {
 		try {
-			// Preparar datos para la API (solo los campos requeridos por el endpoint)
+			// Preparar datos para la API 
 			const cardData = {
 				name: data.name,
 				price: Number(data.price),
