@@ -26,22 +26,86 @@ const Shop: React.FC = () => {
 		packRarity: null,
 	})
 	const [apiCards, setApiCards] = useState<any[]>([])
+	const [filteredCards, setFilteredCards] = useState<any[]>([])
 	const [loading, setLoading] = useState<boolean>(false)
 	const [totalPages, setTotalPages] = useState<number>(1)
 	const [currentPage, setCurrentPage] = useState<number>(1)
+	const [allCards, setAllCards] = useState<any[]>([]) // Para guardar todas las cartas
 	const cart = useContext(CartContext)
+
+	// Función para cargar todas las cartas (necesario para filtros)
+	const loadAllCards = async () => {
+		try {
+			const allCardsData: any[] = []
+			let page = 1
+			let hasMorePages = true
+
+			while (hasMorePages) {
+				const response = await getCards(page, 50) 
+				if (response.error) {
+					throw new Error(response.message)
+				}
+
+				allCardsData.push(...(response.data?.results || []))
+				
+				if (page >= (response.data?.totalPages || 1)) {
+					hasMorePages = false
+				}
+				page++
+			}
+
+			setAllCards(allCardsData)
+			return allCardsData
+		} catch (error) {
+			console.error("Error loading all cards:", error)
+			toast.error("Error al cargar todas las cartas")
+			return []
+		}
+	}
+
+	// Función para aplicar filtros sobre todas las cartas
+	const applyFilters = (cards: any[], search: string, filter: string | null) => {
+		return cards.filter((card) => {
+			const matchesSearch = card.name
+				.toLowerCase()
+				.includes(search.toLowerCase())
+			const matchesFilter = filter
+				? card.attribute === filter
+				: true
+			return matchesSearch && matchesFilter
+		})
+	}
 
 	// Cargar cartas desde la API
 	useEffect(() => {
 		const loadCards = async () => {
+			if (activeTab !== "cards") return
+
 			setLoading(true)
 			try {
-				const response = await getCards(currentPage, 20)
-				if (response.error) {
-					toast.error("Error al cargar las cartas: " + response.message)
+				// Si no hay filtros activos, cargar normalmente por páginas
+				if (!searchTerm && !filters.cardKind) {
+					const response = await getCards(currentPage, 20)
+					if (response.error) {
+						toast.error("Error al cargar las cartas: " + response.message)
+					} else {
+						setApiCards(response.data?.results || [])
+						setFilteredCards(response.data?.results || [])
+						setTotalPages(response.data?.totalPages || 1)
+					}
 				} else {
-					setApiCards(response.data?.results || [])
-					setTotalPages(response.data?.totalPages || 1)
+					// Si hay filtros, necesitamos todas las cartas
+					const allCardsData = allCards.length > 0 ? allCards : await loadAllCards()
+					const filtered = applyFilters(allCardsData, searchTerm, filters.cardKind)
+					
+					// Calcular paginación para resultados filtrados
+					const itemsPerPage = 20
+					const startIndex = (currentPage - 1) * itemsPerPage
+					const endIndex = startIndex + itemsPerPage
+					const paginatedResults = filtered.slice(startIndex, endIndex)
+
+					setFilteredCards(paginatedResults)
+					setTotalPages(Math.ceil(filtered.length / itemsPerPage))
 				}
 			} catch (error) {
 				console.error("Error loading cards:", error)
@@ -50,10 +114,13 @@ const Shop: React.FC = () => {
 			setLoading(false)
 		}
 
-		if (activeTab === "cards") {
-			loadCards()
-		}
-	}, [activeTab, currentPage])
+		loadCards()
+	}, [activeTab, currentPage, searchTerm, filters.cardKind, allCards])
+
+	// Reset página cuando cambian los filtros
+	useEffect(() => {
+		setCurrentPage(1)
+	}, [searchTerm, filters.cardKind])
 
 	// Función para cambiar de página
 	const handlePageChange = (page: number) => {
@@ -184,17 +251,20 @@ const Shop: React.FC = () => {
 				<TabsContent value="cards">
 					{loading ? (
 						<div className="text-center py-8 text-gray-400">
-							Cargando cartas...
+							{searchTerm || filters.cardKind ? "Filtrando cartas..." : "Cargando cartas..."}
 						</div>
 					) : (
 						<>
 							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-								{filteredApiCards.length === 0 ? (
+								{filteredCards.length === 0 ? (
 									<div className="col-span-full text-center py-8 text-gray-400">
-										No hay cartas disponibles con estos filtros
+										{searchTerm || filters.cardKind 
+											? "No se encontraron cartas con estos filtros" 
+											: "No hay cartas disponibles"
+										}
 									</div>
 								) : (
-									filteredApiCards.map((card) => (
+									filteredCards.map((card) => (
 										<Card
 											key={card.id || card.name}
 											className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
@@ -222,6 +292,9 @@ const Shop: React.FC = () => {
 													<span className="text-xs text-gray-400">
 														{card.attribute}
 													</span>
+													<span className="text-xs text-gray-400">
+														Stock: {card.stock}
+													</span>
 												</div>
 												<button
 													className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
@@ -232,11 +305,12 @@ const Shop: React.FC = () => {
 															id: card.id || card.name,
 															image_url: card.imageUrl,
 															kind: card.attribute,
-															stock: 1
+															stock: card.stock
 														}, "card")
 													}
+													disabled={card.stock <= 0}
 												>
-													Agregar al carrito
+													{card.stock <= 0 ? "Sin stock" : "Agregar al carrito"}
 												</button>
 											</div>
 										</Card>
