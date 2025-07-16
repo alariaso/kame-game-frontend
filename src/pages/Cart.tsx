@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import { CartContext } from "@/App"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,6 +13,13 @@ import { CardPack } from "@/types"
 
 const Cart = () => {
 	const cart = useContext(CartContext)
+
+	// Actualizar el carrito cada vez que se abra
+	useEffect(() => {
+		if (cart?.cartOpen) {
+			cart.refreshCart()
+		}
+	}, [cart?.cartOpen])
 
 	if (!cart || cart.cartItems.length === 0) {
 		return (
@@ -38,29 +45,31 @@ const Cart = () => {
 		0
 	)
 
-	// Calcular total real sin descuento (antes llamado subtotal)
-	const totalPrice = cart.cartItems.reduce((acc, item) => {
+	// Calcular subtotal (precio sin descuentos)
+	const subtotal = cart.cartItems.reduce((acc, item) => {
 		if (item.type === "pack") {
+			// Para paquetes, calcular el precio original (sin descuento)
 			const pack = item.itemRef as CardPack
-			const originalPrice = pack.cardCount * 150
+			const originalPrice = item.price / (1 - pack.discount) // Precio original antes del descuento
 			return acc + originalPrice * item.quantity
 		}
+		// Para cartas individuales, usar el precio directo
 		return acc + item.price * item.quantity
 	}, 0)
 
-	// Calcular descuento
+	// Calcular descuento total
 	const discount = cart.cartItems.reduce((acc, item) => {
 		if (item.type === "pack") {
 			const pack = item.itemRef as CardPack
-			const originalPrice = pack.cardCount * 150
+			const originalPrice = item.price / (1 - pack.discount)
 			const discountAmount = originalPrice - item.price
 			return acc + discountAmount * item.quantity
 		}
 		return acc
 	}, 0)
 
-	// Calcular subtotal con descuentos aplicados
-	const subtotal = totalPrice - discount
+	// Precio total después del descuento
+	const totalPrice = subtotal - discount
 
 	return (
 		<div className="container mx-auto py-12 px-4">
@@ -164,12 +173,12 @@ const Cart = () => {
 						<CardContent className="py-4">
 							<div className="flex justify-between items-center mb-2">
 								<span>Subtotal:</span>
-								<span>${subtotal}</span>
+								<span>${Math.round(subtotal)}</span>
 							</div>
 							{discount > 0 && (
 								<div className="flex justify-between items-center mb-2">
 									<span className="text-green-400">Descuento:</span>
-									<span className="text-green-400">-${discount}</span>
+									<span className="text-green-400">-${Math.round(discount)}</span>
 								</div>
 							)}
 						</CardContent>
@@ -177,7 +186,7 @@ const Cart = () => {
 							<div className="flex justify-between items-center w-full mb-4">
 								<span className="font-medium">Total:</span>
 								<span className="font-bold text-gold">
-									${totalPrice}
+									${Math.round(totalPrice)}
 								</span>
 							</div>
 							<Button
