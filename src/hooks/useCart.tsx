@@ -3,6 +3,7 @@ import { useState } from "react"
 import { Card as CardType, CardPack } from "@/types"
 import { useAuth } from "@/context/AuthContext"
 import { toast } from "sonner"
+import { clearCart as clearCartAPI, removeCartItem as removeCartItemAPI } from "@/services/api"
 
 export type CartItem = {
 	id: string
@@ -70,12 +71,48 @@ export const useCart = () => {
 		)
 	}
 
-	const removeCartItem = (id: string) => {
-		setCartItems((prevItems) => prevItems.filter((item) => item.id !== id))
+	const removeCartItem = async (id: string) => {
+		if (!isAuthenticated) {
+			toast.error("Debes iniciar sesión")
+			return
+		}
+
+		try {
+			const response = await removeCartItemAPI(Number(id))
+			
+			if (response.error) {
+				toast.error("Error al eliminar el ítem del carrito")
+				return
+			}
+
+			setCartItems((prevItems) => prevItems.filter((item) => item.id !== id))
+			toast.success("Ítem eliminado del carrito")
+		} catch (error) {
+			console.error("Error removing cart item:", error)
+			toast.error("Error al eliminar el ítem del carrito")
+		}
 	}
 
-	const clearCart = () => {
-		setCartItems([])
+	const clearCart = async () => {
+		if (!isAuthenticated) {
+			toast.error("Debes iniciar sesión")
+			return
+		}
+
+		try {
+			const response = await clearCartAPI()
+			
+			if (response.error) {
+				toast.error("Error al vaciar el carrito")
+				return
+			}
+
+			setCartItems([])
+			toast.success("Carrito vaciado correctamente")
+		} catch (error) {
+			console.error("Error clearing cart:", error)
+			toast.error("Error al vaciar el carrito")
+		}
 	}
 
 	const handleCheckout = () => {
