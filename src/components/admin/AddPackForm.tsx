@@ -20,7 +20,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog"
-import type { Card as CardType } from "@/types"
+import type { Card as CardType, CardPack } from "@/types"
 import { Search, X } from "lucide-react"
 
 const formSchema = z.object({
@@ -41,16 +41,7 @@ type FormValues = z.infer<typeof formSchema>
 interface AddPackFormProps {
 	open: boolean
 	onOpenChange: (open: boolean) => void
-	onAddPack: (packData: {
-		id: string
-		name: string
-		description: string
-		price: number
-		stock: number
-		imageUrl: string
-		cardIds: string[]
-		discount: number
-	}) => void
+	onAddPack: (packData: CardPack) => void
 	cards: CardType[]
 }
 
@@ -81,14 +72,17 @@ const AddPackForm: React.FC<AddPackFormProps> = ({
 			return
 		}
 
-		const packData = {
-			...data,
+		const packData: CardPack = {
 			id: `pack-${Date.now()}`,
+			name: data.name,
+			description: data.description,
 			price: Number(data.price),
 			stock: Number(data.stock),
 			discount: Number(data.discount) / 100,
 			cardIds: selectedCards,
 			cardCount: selectedCards.length,
+			imageUrl: data.imageUrl,
+			rarity: "Común"
 		}
 
 		onAddPack(packData)

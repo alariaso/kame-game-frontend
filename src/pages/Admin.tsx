@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { Plus, Edit, Trash2, ArrowUp, ArrowDown, Search } from "lucide-react"
 import AddCardForm from "@/components/admin/AddCardForm"
 import AddPackForm from "@/components/admin/AddPackForm"
+import { updateCardStock as updateCardStockAPI } from "@/services/api"
 
 // Helper function to calculate package rarity based on cards
 const calculatePackageRarity = (cards: CardType[]): string => {
@@ -71,31 +72,41 @@ const Admin: React.FC = () => {
 		toast.success("Precio actualizado correctamente")
 	}
 
-	// Función para modificar el stock de una carta
-	const updateCardStock = (id: string, change: number) => {
-		setCards(
-			cards.map((card) => {
-				if (card.id === id) {
-					const newStock = Math.max(0, card.stock + change)
-					return { ...card, stock: newStock }
-				}
-				return card
-			})
-		)
+	// Función para modificar el stock de una carta usando la API real
+	const updateCardStock = async (id: string, change: number) => {
+		const card = cards.find(c => c.id === id)
+		if (!card) return
 
-		toast.success("Stock actualizado correctamente")
+		const newStock = Math.max(0, card.stock + change)
+
+		try {
+			const response = await updateCardStockAPI(Number(id), newStock)
+			
+			if (response.error) {
+				toast.error("Error al actualizar el stock")
+				return
+			}
+
+			setCards(
+				cards.map((card) => {
+					if (card.id === id) {
+						return { ...card, stock: newStock }
+					}
+					return card
+				})
+			)
+
+			toast.success("Stock actualizado correctamente")
+		} catch (error) {
+			console.error("Error updating card stock:", error)
+			toast.error("Error al actualizar el stock")
+		}
 	}
 
 	// Función para eliminar una carta
 	const deleteCard = (id: string) => {
 		setCards(cards.filter((card) => card.id !== id))
 		toast.success("Carta eliminada correctamente")
-	}
-
-	// Función para eliminar un paquete
-	const deletePack = (id: string) => {
-		setPacks(packs.filter((pack) => pack.id !== id))
-		toast.success("Paquete eliminada correctamente")
 	}
 
 	// Función para modificar el precio de un paquete
@@ -150,9 +161,7 @@ const Admin: React.FC = () => {
 	}
 
 	// Handler para añadir un nuevo paquete
-	const handleAddPack = (
-		packData: Omit<CardPack, "rarity" | "cardCount">
-	) => {
+	const handleAddPack = (packData: CardPack) => {
 		const packageCards = cards.filter((card) =>
 			packData.cardIds.includes(card.id)
 		)
@@ -431,7 +440,7 @@ const Admin: React.FC = () => {
 							variant="ghost"
 							size="icon"
 							className="h-8 w-8 text-red-500 hover:bg-red-500/10"
-							onClick={() => deletePack(pack.id)}
+							onClick={() => deleteCard(pack.id)}
 						>
 							<Trash2 size={16} />
 						</Button>
@@ -714,6 +723,67 @@ const Admin: React.FC = () => {
 					</TabsContent>
 				</Tabs>
 
+				<div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+					<Card className="bg-black/20 border-gold/10">
+						<CardHeader className="pb-2">
+							<CardTitle className="text-lg text-gold">
+								Total de Cartas
+							</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<p className="text-3xl font-bold">{cards.length}</p>
+						</CardContent>
+					</Card>
+
+					<Card className="bg-black/20 border-gold/10">
+						<CardHeader className="pb-2">
+							<CardTitle className="text-lg text-gold">
+								Total de Paquetes
+							</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<p className="text-3xl font-bold">{packs.length}</p>
+						</CardContent>
+					</Card>
+
+					<Card className="bg-black/20 border-gold/10">
+						<CardHeader className="pb-2">
+							<CardTitle className="text-lg text-gold">
+								Valor del Inventario
+							</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<p className="text-3xl font-bold">
+								$
+								{cards.reduce(
+									(sum, card) =>
+										sum + card.price * card.stock,
+									0
+								) +
+									packs.reduce(
+										(sum, pack) =>
+											sum + pack.price * pack.stock,
+										0
+									)}
+							</p>
+						</CardContent>
+					</Card>
+
+					<Card className="bg-black/20 border-gold/10">
+						<CardHeader className="pb-2">
+							<CardTitle className="text-lg text-gold">
+								Bajo Stock
+							</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<p className="text-3xl font-bold">
+								{cards.filter((card) => card.stock < 5).length +
+									packs.filter((pack) => pack.stock < 5)
+										.length}
+							</p>
+						</CardContent>
+					</Card>
+				</div>
 			</div>
 		</div>
 	)
