@@ -198,3 +198,24 @@ export const updateCardStock = async (cardId: number, quantity: number): Promise
     body: JSON.stringify({ cardId, quantity }),
   })
 }
+
+// 9️⃣ Función para agregar un solo elemento al carrito
+export const addToCart = async (cardId: number): Promise<ApiResponse<any>> => {
+  return makeAuthenticatedRequest('/cart', {
+    method: 'POST',
+    body: JSON.stringify({ cardId }),
+  })
+}
+
+// 🔟 Función para agregar varios elementos al carrito
+export const addMultipleToCart = async (items: { cardId: number; quantity: number }[]): Promise<ApiResponse<any>> => {
+  return makeAuthenticatedRequest('/cart', {
+    method: 'POST',
+    body: JSON.stringify({ items }),
+  })
+}
+
+// 1️⃣1️⃣ Función para obtener el contenido del carrito
+export const getCart = async (): Promise<ApiResponse<any>> => {
+  return makeAuthenticatedRequest('/cart')
+}
