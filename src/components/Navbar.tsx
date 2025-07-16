@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext"
 import { Menu, X, LogOut, User, ShoppingCart as CartIcon } from "lucide-react"
 import UserBalance from "./UserBalance"
 import { CartContext } from "@/App"
-import logo from "@/../public/logo.png" // Adjust the path if needed
+import logo from "/logo.png" // Adjust the path if needed
 
 const Navbar: React.FC = () => {
 	const { user, isAuthenticated, logout, isAdmin } = useAuth()
