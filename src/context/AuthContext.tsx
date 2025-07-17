@@ -312,7 +312,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			const response = await apiService.signUp(username, password)
 
 			if (response.status === 200 || response.status === 201) {
-				toast.success("¡Registro exitoso! Ahora puedes iniciar sesión")
+				toast.success("¡Registro exitoso! Iniciando sesión...")
+				login(username, password)
 				return true
 			} else {
 				// Manejar mensajes específicos del servidor
