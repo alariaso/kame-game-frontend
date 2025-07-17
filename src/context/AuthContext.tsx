@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react"
 import { toast } from "sonner"
-import { Card, CardPack, UserInventory, UserCard } from "@/types"
+import type { Card, CardPack, UserInventory, UserCard } from "@/types"
 import {
 	MOCK_CARDS,
 	MOCK_CARD_PACKS,
@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	}
 
 	// Función para depositar saldo
-	const depositBalance = (amount: number) => {
+	const depositBalance = async (amount: number) => {
 		if (!user) return
 
 		if (amount <= 0) {
@@ -116,10 +116,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 			return
 		}
 
-		const updatedUser = { ...user, balance: user.balance + amount }
-		setUser(updatedUser)
-		toast.success(`Has depositado ${amount} Yugi Pesos`)
-	}
+		try {
+			const response = await apiService.addFunds(amount);
+
+			if (response.status === 200 && response.data) {
+				const updatedUser = {
+					...user,
+					balance: response.data.yugiPesos
+				};
+				setUser(updatedUser);
+				toast.success(`Has depositado ${amount}`);
+			} else {
+				toast.error("Error al depositar fondos");
+			}
+		} catch (error) {
+				console.error("Error depositando fondos: ", error);
+				toast.error("Error al depositar fondos");
+			}
+		}
 
 	// Función para comprar una carta
 	const buyCard = (cardId: string): boolean => {

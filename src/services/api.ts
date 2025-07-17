@@ -145,6 +145,14 @@ export const isAuthenticated = (): boolean => {
   return getAuthToken() !== null
 }
 
+// Funcion para anadir los yugiPesos jeje
+export const addFunds = async (amount: number): Promise<ApiResponse<UserData>> => {
+  return makeAuthenticatedRequest<UserData>('/user/funds', {
+    method: 'PATCH',
+    body: JSON.stringify({amount: amount})
+  });
+}
+
 // Tipos para las nuevas funciones
 export interface CardData {
   name: string
