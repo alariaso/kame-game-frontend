@@ -7,6 +7,7 @@ import {
 	MOCK_USER_INVENTORY,
 } from "@/data/mockData"
 import * as apiService from "@/services/api"
+import { useNavigate } from "react-router-dom"
 
 // Define los tipos de usuario
 type Role = "user" | "admin"
@@ -64,7 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	const refreshUserData = async () => {
 		try {
 			const response = await apiService.getUser()
-			
+
 			if (response.status === 200 && response.data) {
 				const userData = response.data
 				const userObj: User = {
@@ -329,10 +330,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 		}
 	}
 
+	const navigate = useNavigate()
+
 	// Función de logout
 	const logout = () => {
 		apiService.logout()
 		setUser(null)
+		navigate("/")
 		toast.info("Sesión cerrada")
 	}
 
