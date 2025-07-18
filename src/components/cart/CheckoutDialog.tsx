@@ -39,7 +39,13 @@ const CheckoutDialog = ({
 				<AlertDialogTitle>
 					Estos son los productos que vas a comprar
 				</AlertDialogTitle>
-				<div className="flex flex-col gap-2">
+				<div
+					className={`flex flex-col gap-2 ${
+						cartItems.length > 4
+							? "max-h-96 overflow-y-auto pr-2"
+							: ""
+					}`}
+				>
 					{cartItems.map((item) => (
 						<Card key={item.id} className="grid grid-cols-2">
 							<CardHeader className="p-3">
