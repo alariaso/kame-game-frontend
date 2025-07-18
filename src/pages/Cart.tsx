@@ -8,8 +8,10 @@ import {
 	CardTitle,
 	CardFooter,
 } from "@/components/ui/card"
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Plus, Minus, Trash2 } from "lucide-react"
-import { CardPack } from "@/types"
+import type { CardPack } from "@/types"
+import CheckoutDialog from "@/components/cart/CheckoutDialog"
 
 const Cart = () => {
 	const cart = useContext(CartContext)
@@ -85,7 +87,10 @@ const Cart = () => {
 						</CardHeader>
 						<CardContent className="divide-y divide-gold/10">
 							{cart.cartItems.map((item) => (
-								<div key={`${item.id}-${item.type}`} className="flex gap-4 py-4">
+								<div
+									key={`${item.id}-${item.type}`}
+									className="flex gap-4 py-4"
+								>
 									<div className="w-20 h-20 rounded overflow-hidden flex-shrink-0">
 										<img
 											src={item.imageUrl}
@@ -177,8 +182,12 @@ const Cart = () => {
 							</div>
 							{discount > 0 && (
 								<div className="flex justify-between items-center mb-2">
-									<span className="text-green-400">Descuento:</span>
-									<span className="text-green-400">-${Math.round(discount)}</span>
+									<span className="text-green-400">
+										Descuento:
+									</span>
+									<span className="text-green-400">
+										-${Math.round(discount)}
+									</span>
 								</div>
 							)}
 						</CardContent>
@@ -189,12 +198,18 @@ const Cart = () => {
 									${Math.round(totalPrice)}
 								</span>
 							</div>
-							<Button
-								className="w-full bg-gold hover:bg-gold/80 text-black font-medium"
-								onClick={cart.checkout}
-							>
-								Finalizar Compra
-							</Button>
+							<AlertDialog>
+								<AlertDialogTrigger className="w-full">
+									<Button className="w-full bg-gold hover:bg-gold/80 text-black font-medium">
+										Finalizar Compra
+									</Button>
+								</AlertDialogTrigger>
+								<CheckoutDialog
+									cartItems={cart.cartItems}
+									cartCheckout={cart.checkout}
+								/>
+							</AlertDialog>
+
 							<Button
 								variant="outline"
 								className="w-full mt-2 border-gold/20"
