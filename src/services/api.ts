@@ -254,7 +254,22 @@ export const addMultipleToCart = async (
 
 // 1️⃣1️⃣ Función para obtener el contenido del carrito
 export const getCart = async (): Promise<ApiResponse<any>> => {
-  return makeAuthenticatedRequest('/cart')
+	return makeAuthenticatedRequest("/cart")
+}
+
+// 5️⃣ Función para obtener cartas con paginación
+export const getCPacks = async (
+	page: number = 1,
+	itemsPerPage: number = 10
+): Promise<ApiResponse<GetCardsResponse>> => {
+	const queryParams = new URLSearchParams({
+		page: page.toString(),
+		itemsPerPage: itemsPerPage.toString(),
+	})
+
+	return makeAuthenticatedRequest<GetCardsResponse>(
+		`/packs?${queryParams.toString()}`
+	)
 }
 
 // get inventory function
