@@ -17,6 +17,7 @@ export interface User {
 	username: string
 	role: Role
 	balance: number // Saldo en Yugi Pesos
+	isAdmin?: boolean // Indica si es administrador
 }
 
 // Copia local de las cartas y paquetes para manipular el stock
@@ -73,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 					username: userData.name,
 					role: "user", // Se podría obtener del backend
 					balance: userData.yugiPesos,
+					isAdmin: userData.isAdmin || false,
 				}
 				setUser(userObj)
 			} else {
@@ -117,23 +119,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 		}
 
 		try {
-			const response = await apiService.addFunds(amount);
+			const response = await apiService.addFunds(amount)
 
 			if (response.status === 200 && response.data) {
 				const updatedUser = {
 					...user,
-					balance: response.data.yugiPesos
-				};
-				setUser(updatedUser);
-				toast.success(`Has depositado ${amount}`);
+					balance: response.data.yugiPesos,
+				}
+				setUser(updatedUser)
+				toast.success(`Has depositado ${amount}`)
 			} else {
-				toast.error("Error al depositar fondos");
+				toast.error("Error al depositar fondos")
 			}
 		} catch (error) {
-				console.error("Error depositando fondos: ", error);
-				toast.error("Error al depositar fondos");
-			}
+			console.error("Error depositando fondos: ", error)
+			toast.error("Error al depositar fondos")
 		}
+	}
 
 	// Función para comprar una carta
 	const buyCard = (cardId: string): boolean => {
@@ -356,7 +358,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	}
 
 	// Verificar si el usuario es administrador
-	const isAdmin = user?.role === "admin"
+	const isAdmin = user?.isAdmin
 
 	if (loading) {
 		return <div>Cargando...</div> // Puedes crear un componente de loading más elaborado
