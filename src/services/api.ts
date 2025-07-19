@@ -1,3 +1,5 @@
+import type { CardKind } from "@/types"
+
 // Configuración base de la API
 const API_BASE_URL = "http://localhost:3000"
 
@@ -47,12 +49,12 @@ const makeRequest = async <T>(
 	endpoint: string,
 	options: RequestInit = {}
 ): Promise<ApiResponse<T>> => {
-	const url = `${API_BASE_URL}${endpoint}`
+  const url = `${API_BASE_URL}${endpoint}`
 
-	const defaultHeaders = {
-		"Content-Type": "application/json",
-		...options.headers,
-	}
+  const defaultHeaders = {
+    'Content-Type': 'application/json',
+    ...options.headers,
+  }
 
 	try {
 		const response = await fetch(url, {
@@ -84,16 +86,16 @@ const makeAuthenticatedRequest = async <T>(
 	endpoint: string,
 	options: RequestInit = {}
 ): Promise<ApiResponse<T>> => {
-	const token = getAuthToken()
+  const token = getAuthToken()
 
-	if (!token) {
-		return {
-			error: true,
-			data: null,
-			message: "Token de autenticación no encontrado",
-			status: 401,
-		}
-	}
+  if (!token) {
+    return {
+      error: true,
+      data: null,
+      message: 'Token de autenticación no encontrado',
+      status: 401,
+    }
+  }
 
 	const authHeaders = {
 		...options.headers,
@@ -152,13 +154,11 @@ export const isAuthenticated = (): boolean => {
 }
 
 // Funcion para anadir los yugiPesos jeje
-export const addFunds = async (
-	amount: number
-): Promise<ApiResponse<UserData>> => {
-	return makeAuthenticatedRequest<UserData>("/user/funds", {
-		method: "PATCH",
-		body: JSON.stringify({ amount: amount }),
-	})
+export const addFunds = async (amount: number): Promise<ApiResponse<UserData>> => {
+  return makeAuthenticatedRequest<UserData>('/user/funds', {
+    method: 'PATCH',
+    body: JSON.stringify({ amount: amount })
+  });
 }
 
 // Tipos para las nuevas funciones
@@ -171,8 +171,15 @@ export interface CardData {
 }
 
 export interface GetCardsResponse {
-	results: any[]
-	totalPages: number
+  results: any[]
+  totalPages: number
+}
+
+// same type xD
+export interface GetInventoryResponse {
+  name: string
+  results: any[]
+  totalPages: number
 }
 
 // 4️⃣ Función para crear carta
@@ -247,20 +254,27 @@ export const addMultipleToCart = async (
 
 // 1️⃣1️⃣ Función para obtener el contenido del carrito
 export const getCart = async (): Promise<ApiResponse<any>> => {
-	return makeAuthenticatedRequest("/cart")
+  return makeAuthenticatedRequest('/cart')
 }
 
-// 5️⃣ Función para obtener cartas con paginación
-export const getCPacks = async (
-	page: number = 1,
-	itemsPerPage: number = 10
-): Promise<ApiResponse<GetCardsResponse>> => {
-	const queryParams = new URLSearchParams({
-		page: page.toString(),
-		itemsPerPage: itemsPerPage.toString(),
-	})
+// get inventory function
+export const getInventory = async (
+  page: number = 1,
+  itemsPerPage: number = 10,
+  itemName?: string,
+  cardAttribute?: CardKind
+): Promise<ApiResponse<GetInventoryResponse>> => {
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    itemsPerPage: itemsPerPage.toString()
+  })
 
-	return makeAuthenticatedRequest<GetCardsResponse>(
-		`/packs?${queryParams.toString()}`
-	)
+  if (itemName) {
+    queryParams.append('itemName', itemName);
+  }
+  if (cardAttribute) {
+    queryParams.append('cardAttribute', cardAttribute);
+  }
+  
+  return makeAuthenticatedRequest(`/inventory?${queryParams.toString()}`);
 }
