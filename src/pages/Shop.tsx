@@ -11,7 +11,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { CartContext } from "@/App"
-import { getCards } from "@/services/api"
+import { getCards, getCPacks } from "@/services/api"
 import { toast } from "sonner"
 
 type ProductCategory = "Cartas Individuales" | "Paquetes"
@@ -27,10 +27,13 @@ const Shop: React.FC = () => {
 	})
 	const [apiCards, setApiCards] = useState<any[]>([])
 	const [filteredCards, setFilteredCards] = useState<any[]>([])
+	const [apiPacks, setApiPacks] = useState<any[]>([])
+	const [filteredPacks, setFilteredPacks] = useState<any[]>([])
 	const [loading, setLoading] = useState<boolean>(false)
 	const [totalPages, setTotalPages] = useState<number>(1)
 	const [currentPage, setCurrentPage] = useState<number>(1)
 	const [allCards, setAllCards] = useState<any[]>([]) // Para guardar todas las cartas
+	const [allPacks, setAllPacks] = useState<any[]>([])
 	const cart = useContext(CartContext)
 
 	// Función para cargar todas las cartas (necesario para filtros)
@@ -63,6 +66,36 @@ const Shop: React.FC = () => {
 		}
 	}
 
+	// Función para cargar todos los paquetes (necesario para filtros)
+	const loadAllPacks = async () => {
+		try {
+			const allPacksData: any[] = []
+			let page = 1
+			let hasMorePages = true
+
+			while (hasMorePages) {
+				const response = await getCPacks(page, 50)
+				if (response.error) {
+					throw new Error(response.message)
+				}
+
+				allPacksData.push(...(response.data?.results || []))
+				
+				if (page >= (response.data?.totalPages || 1)) {
+					hasMorePages = false
+				}
+				page++
+			}
+
+			setAllPacks(allPacksData)
+			return allPacksData
+		} catch (error) {
+			console.error("Error loading all packs:", error)
+			toast.error("Error al cargar todos los paquetes")
+			return []
+		}
+	}
+
 	// Función para aplicar filtros sobre todas las cartas
 	const applyFilters = (cards: any[], search: string, filter: string | null) => {
 		return cards.filter((card) => {
@@ -71,6 +104,19 @@ const Shop: React.FC = () => {
 				.includes(search.toLowerCase())
 			const matchesFilter = filter
 				? card.attribute === filter
+				: true
+			return matchesSearch && matchesFilter
+		})
+	}
+
+	// Función para aplicar filtros sobre todos los paquetes
+	const applyPackFilters = (packs: any[], search: string, filter: string | null) => {
+		return packs.filter((pack) => {
+			const matchesSearch = pack.name
+				.toLowerCase()
+				.includes(search.toLowerCase())
+			const matchesFilter = filter
+				? pack.rarity === filter
 				: true
 			return matchesSearch && matchesFilter
 		})
@@ -117,10 +163,51 @@ const Shop: React.FC = () => {
 		loadCards()
 	}, [activeTab, currentPage, searchTerm, filters.cardKind, allCards])
 
+	// Cargar paquetes desde la API
+	useEffect(() => {
+		const loadPacks = async () => {
+			if (activeTab !== "packs") return
+
+			setLoading(true)
+			try {
+				// Si no hay filtros activos, cargar normalmente por páginas
+				if (!searchTerm && !filters.packRarity) {
+					const response = await getCPacks(currentPage, 20)
+					if (response.error) {
+						toast.error("Error al cargar los paquetes: " + response.message)
+					} else {
+						setApiPacks(response.data?.results || [])
+						setFilteredPacks(response.data?.results || [])
+						setTotalPages(response.data?.totalPages || 1)
+					}
+				} else {
+					// Si hay filtros, necesitamos todos los paquetes
+					const allPacksData = allPacks.length > 0 ? allPacks : await loadAllPacks()
+					const filtered = applyPackFilters(allPacksData, searchTerm, filters.packRarity)
+					
+					// Calcular paginación para resultados filtrados
+					const itemsPerPage = 20
+					const startIndex = (currentPage - 1) * itemsPerPage
+					const endIndex = startIndex + itemsPerPage
+					const paginatedResults = filtered.slice(startIndex, endIndex)
+
+					setFilteredPacks(paginatedResults)
+					setTotalPages(Math.ceil(filtered.length / itemsPerPage))
+				}
+			} catch (error) {
+				console.error("Error loading packs:", error)
+				toast.error("Error de conexión al cargar los paquetes")
+			}
+			setLoading(false)
+		}
+
+		loadPacks()
+	}, [activeTab, currentPage, searchTerm, filters.packRarity, allPacks])
+
 	// Reset página cuando cambian los filtros
 	useEffect(() => {
 		setCurrentPage(1)
-	}, [searchTerm, filters.cardKind])
+	}, [searchTerm, filters.cardKind, filters.packRarity])
 
 	// Función para cambiar de página
 	const handlePageChange = (page: number) => {
@@ -159,7 +246,7 @@ const Shop: React.FC = () => {
 		},
 	}
 
-	// Filtrar cartas de la API
+	// Filtrar cartas de la API (mantener por compatibilidad con código existente)
 	const filteredApiCards = apiCards.filter((card) => {
 		const matchesSearch = card.name
 			.toLowerCase()
@@ -170,7 +257,8 @@ const Shop: React.FC = () => {
 		return matchesSearch && matchesFilter
 	})
 
-	const availablePacks = getAvailablePacks().filter((pack) => {
+	// Usar los paquetes de la API en lugar de getAvailablePacks()
+	const availablePacks = activeTab === "packs" ? filteredPacks : getAvailablePacks().filter((pack) => {
 		const matchesSearch = pack.name
 			.toLowerCase()
 			.includes(searchTerm.toLowerCase())
@@ -371,59 +459,119 @@ const Shop: React.FC = () => {
 				</TabsContent>
 
 				<TabsContent value="packs">
-					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-						{availablePacks.length === 0 ? (
-							<div className="col-span-full text-center py-8 text-gray-400">
-								No hay paquetes disponibles con estos filtros
-							</div>
-						) : (
-							availablePacks.map((pack) => (
-								<Card
-									key={pack.id}
-									className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
-								>
-									<div className="aspect-video overflow-hidden">
-										<img
-											src={pack.imageUrl}
-											alt={pack.name}
-											className="w-full h-full object-cover transition-transform hover:scale-110"
-										/>
+					{loading ? (
+						<div className="text-center py-8 text-gray-400">
+							{searchTerm || filters.packRarity ? "Filtrando paquetes..." : "Cargando paquetes..."}
+						</div>
+					) : (
+						<>
+							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+								{availablePacks.length === 0 ? (
+									<div className="col-span-full text-center py-8 text-gray-400">
+										{searchTerm || filters.packRarity 
+											? "No se encontraron paquetes con estos filtros" 
+											: "No hay paquetes disponibles"
+										}
 									</div>
-									<div className="p-3">
-										<h3 className="font-medium text-gold">
-											{pack.name}
-										</h3>
-										<p className="text-xs text-gray-400 mt-1">
-											{pack.description}
-										</p>
-										<div className="flex justify-between items-center mt-2">
-											<div className="flex flex-col">
-												<span className="text-sm text-gray-300">
-													Contiene {pack.cardCount}{" "}
-													cartas
-												</span>
-												<span className="text-sm text-gray-300">
-													Stock: {pack.stock}
-												</span>
-											</div>
-											<span className="font-bold">
-												${pack.price}
-											</span>
-										</div>
-										<button
-											className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
-											onClick={() =>
-												cart?.addToCart(pack, "pack")
-											}
-											disabled={pack.stock <= 0}
+								) : (
+									availablePacks.map((pack) => (
+										<Card
+											key={pack.id}
+											className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
 										>
-											Agregar al carrito
-										</button>
-									</div>
-								</Card>
-							))
-						)}
-					</div>
+											<div className="aspect-video overflow-hidden">
+												<img
+													src={pack.imageUrl}
+													alt={pack.name}
+													className="w-full h-full object-cover transition-transform hover:scale-110"
+												/>
+											</div>
+											<div className="p-3">
+												<h3 className="font-medium text-gold">
+													{pack.name}
+												</h3>
+												<p className="text-xs text-gray-400 mt-1">
+													{pack.description}
+												</p>
+												<div className="flex justify-between items-center mt-2">
+													<div className="flex flex-col">
+														<span className="text-sm text-gray-300">
+															Contiene {pack.cardCount || pack.cards_count || 'N/A'}{" "}
+															cartas
+														</span>
+														<span className="text-sm text-gray-300">
+															Stock: {pack.stock}
+														</span>
+													</div>
+													<span className="font-bold">
+														${pack.price}
+													</span>
+												</div>
+												<button
+													className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
+													onClick={() =>
+														cart?.addToCart(pack, "pack")
+													}
+													disabled={pack.stock <= 0}
+												>
+													{pack.stock <= 0 ? "Sin stock" : "Agregar al carrito"}
+												</button>
+											</div>
+										</Card>
+									))
+								)}
+							</div>
+							
+							{/* Componente de paginación para paquetes */}
+							{totalPages > 1 && (
+								<div className="mt-8 flex justify-center">
+									<Pagination>
+										<PaginationContent>
+											<PaginationItem>
+												<PaginationPrevious 
+													onClick={() => handlePageChange(currentPage - 1)}
+													className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+												/>
+											</PaginationItem>
+											
+											{/* Páginas numeradas */}
+											{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+												let pageNum;
+												if (totalPages <= 5) {
+													pageNum = i + 1;
+												} else if (currentPage <= 3) {
+													pageNum = i + 1;
+												} else if (currentPage >= totalPages - 2) {
+													pageNum = totalPages - 4 + i;
+												} else {
+													pageNum = currentPage - 2 + i;
+												}
+												
+												return (
+													<PaginationItem key={pageNum}>
+														<PaginationLink
+															onClick={() => handlePageChange(pageNum)}
+															isActive={currentPage === pageNum}
+															className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+														>
+															{pageNum}
+														</PaginationLink>
+													</PaginationItem>
+												);
+											})}
+											
+											<PaginationItem>
+												<PaginationNext 
+													onClick={() => handlePageChange(currentPage + 1)}
+													className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+												/>
+											</PaginationItem>
+										</PaginationContent>
+									</Pagination>
+								</div>
+							)}
+						</>
+					)}
 				</TabsContent>
 			</Tabs>
 		</div>
