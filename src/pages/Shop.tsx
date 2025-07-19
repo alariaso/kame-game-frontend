@@ -2,13 +2,13 @@ import React, { useState, useContext, useEffect } from "react"
 import { useAuth } from "@/context/AuthContext"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
+import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
 } from "@/components/ui/pagination"
 import { CartContext } from "@/App"
 import { getCards, getCPacks } from "@/services/api"
@@ -44,13 +44,13 @@ const Shop: React.FC = () => {
 			let hasMorePages = true
 
 			while (hasMorePages) {
-				const response = await getCards(page, 50) 
+				const response = await getCards(page, 50)
 				if (response.error) {
 					throw new Error(response.message)
 				}
 
 				allCardsData.push(...(response.data?.results || []))
-				
+
 				if (page >= (response.data?.totalPages || 1)) {
 					hasMorePages = false
 				}
@@ -80,7 +80,7 @@ const Shop: React.FC = () => {
 				}
 
 				allPacksData.push(...(response.data?.results || []))
-				
+
 				if (page >= (response.data?.totalPages || 1)) {
 					hasMorePages = false
 				}
@@ -97,27 +97,31 @@ const Shop: React.FC = () => {
 	}
 
 	// Función para aplicar filtros sobre todas las cartas
-	const applyFilters = (cards: any[], search: string, filter: string | null) => {
+	const applyFilters = (
+		cards: any[],
+		search: string,
+		filter: string | null
+	) => {
 		return cards.filter((card) => {
 			const matchesSearch = card.name
 				.toLowerCase()
 				.includes(search.toLowerCase())
-			const matchesFilter = filter
-				? card.attribute === filter
-				: true
+			const matchesFilter = filter ? card.attribute === filter : true
 			return matchesSearch && matchesFilter
 		})
 	}
 
 	// Función para aplicar filtros sobre todos los paquetes
-	const applyPackFilters = (packs: any[], search: string, filter: string | null) => {
+	const applyPackFilters = (
+		packs: any[],
+		search: string,
+		filter: string | null
+	) => {
 		return packs.filter((pack) => {
 			const matchesSearch = pack.name
 				.toLowerCase()
 				.includes(search.toLowerCase())
-			const matchesFilter = filter
-				? pack.rarity === filter
-				: true
+			const matchesFilter = filter ? pack.rarity === filter : true
 			return matchesSearch && matchesFilter
 		})
 	}
@@ -133,7 +137,9 @@ const Shop: React.FC = () => {
 				if (!searchTerm && !filters.cardKind) {
 					const response = await getCards(currentPage, 20)
 					if (response.error) {
-						toast.error("Error al cargar las cartas: " + response.message)
+						toast.error(
+							"Error al cargar las cartas: " + response.message
+						)
 					} else {
 						setApiCards(response.data?.results || [])
 						setFilteredCards(response.data?.results || [])
@@ -141,14 +147,22 @@ const Shop: React.FC = () => {
 					}
 				} else {
 					// Si hay filtros, necesitamos todas las cartas
-					const allCardsData = allCards.length > 0 ? allCards : await loadAllCards()
-					const filtered = applyFilters(allCardsData, searchTerm, filters.cardKind)
-					
+					const allCardsData =
+						allCards.length > 0 ? allCards : await loadAllCards()
+					const filtered = applyFilters(
+						allCardsData,
+						searchTerm,
+						filters.cardKind
+					)
+
 					// Calcular paginación para resultados filtrados
 					const itemsPerPage = 20
 					const startIndex = (currentPage - 1) * itemsPerPage
 					const endIndex = startIndex + itemsPerPage
-					const paginatedResults = filtered.slice(startIndex, endIndex)
+					const paginatedResults = filtered.slice(
+						startIndex,
+						endIndex
+					)
 
 					setFilteredCards(paginatedResults)
 					setTotalPages(Math.ceil(filtered.length / itemsPerPage))
@@ -174,7 +188,9 @@ const Shop: React.FC = () => {
 				if (!searchTerm && !filters.packRarity) {
 					const response = await getCPacks(currentPage, 20)
 					if (response.error) {
-						toast.error("Error al cargar los paquetes: " + response.message)
+						toast.error(
+							"Error al cargar los paquetes: " + response.message
+						)
 					} else {
 						setApiPacks(response.data?.results || [])
 						setFilteredPacks(response.data?.results || [])
@@ -182,14 +198,22 @@ const Shop: React.FC = () => {
 					}
 				} else {
 					// Si hay filtros, necesitamos todos los paquetes
-					const allPacksData = allPacks.length > 0 ? allPacks : await loadAllPacks()
-					const filtered = applyPackFilters(allPacksData, searchTerm, filters.packRarity)
-					
+					const allPacksData =
+						allPacks.length > 0 ? allPacks : await loadAllPacks()
+					const filtered = applyPackFilters(
+						allPacksData,
+						searchTerm,
+						filters.packRarity
+					)
+
 					// Calcular paginación para resultados filtrados
 					const itemsPerPage = 20
 					const startIndex = (currentPage - 1) * itemsPerPage
 					const endIndex = startIndex + itemsPerPage
-					const paginatedResults = filtered.slice(startIndex, endIndex)
+					const paginatedResults = filtered.slice(
+						startIndex,
+						endIndex
+					)
 
 					setFilteredPacks(paginatedResults)
 					setTotalPages(Math.ceil(filtered.length / itemsPerPage))
@@ -258,15 +282,18 @@ const Shop: React.FC = () => {
 	})
 
 	// Usar los paquetes de la API en lugar de getAvailablePacks()
-	const availablePacks = activeTab === "packs" ? filteredPacks : getAvailablePacks().filter((pack) => {
-		const matchesSearch = pack.name
-			.toLowerCase()
-			.includes(searchTerm.toLowerCase())
-		const matchesFilter = filters.packRarity
-			? pack.rarity === filters.packRarity
-			: true
-		return matchesSearch && matchesFilter
-	})
+	const availablePacks =
+		activeTab === "packs"
+			? filteredPacks
+			: getAvailablePacks().filter((pack) => {
+					const matchesSearch = pack.name
+						.toLowerCase()
+						.includes(searchTerm.toLowerCase())
+					const matchesFilter = filters.packRarity
+						? pack.rarity === filters.packRarity
+						: true
+					return matchesSearch && matchesFilter
+				})
 
 	// manage changes in the filters
 	const handleFilterChange = (filterName: Filter, value: string) => {
@@ -339,17 +366,18 @@ const Shop: React.FC = () => {
 				<TabsContent value="cards">
 					{loading ? (
 						<div className="text-center py-8 text-gray-400">
-							{searchTerm || filters.cardKind ? "Filtrando cartas..." : "Cargando cartas..."}
+							{searchTerm || filters.cardKind
+								? "Filtrando cartas..."
+								: "Cargando cartas..."}
 						</div>
 					) : (
 						<>
 							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
 								{filteredCards.length === 0 ? (
 									<div className="col-span-full text-center py-8 text-gray-400">
-										{searchTerm || filters.cardKind 
-											? "No se encontraron cartas con estos filtros" 
-											: "No hay cartas disponibles"
-										}
+										{searchTerm || filters.cardKind
+											? "No se encontraron cartas con estos filtros"
+											: "No hay cartas disponibles"}
 									</div>
 								) : (
 									filteredCards.map((card) => (
@@ -387,67 +415,117 @@ const Shop: React.FC = () => {
 												<button
 													className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
 													onClick={() =>
-														cart?.addToCart({
-															...card,
-															category: "card",
-															id: card.id || card.name,
-															image_url: card.imageUrl,
-															kind: card.attribute,
-															stock: card.stock
-														}, "card")
+														cart?.addToCart(
+															{
+																...card,
+																category:
+																	"card",
+																id:
+																	card.id ||
+																	card.name,
+																image_url:
+																	card.imageUrl,
+																kind: card.attribute,
+																stock: card.stock,
+															},
+															"card"
+														)
 													}
 													disabled={card.stock <= 0}
 												>
-													{card.stock <= 0 ? "Sin stock" : "Agregar al carrito"}
+													{card.stock <= 0
+														? "Sin stock"
+														: "Agregar al carrito"}
 												</button>
 											</div>
 										</Card>
 									))
 								)}
 							</div>
-							
+
 							{/* Componente de paginación */}
 							{totalPages > 1 && (
 								<div className="mt-8 flex justify-center">
 									<Pagination>
 										<PaginationContent>
 											<PaginationItem>
-												<PaginationPrevious 
-													onClick={() => handlePageChange(currentPage - 1)}
-													className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+												<PaginationPrevious
+													onClick={() =>
+														handlePageChange(
+															currentPage - 1
+														)
+													}
+													className={
+														currentPage === 1
+															? "pointer-events-none opacity-50"
+															: "cursor-pointer hover:bg-gold/10"
+													}
 												/>
 											</PaginationItem>
-											
+
 											{/* Páginas numeradas */}
-											{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-												let pageNum;
-												if (totalPages <= 5) {
-													pageNum = i + 1;
-												} else if (currentPage <= 3) {
-													pageNum = i + 1;
-												} else if (currentPage >= totalPages - 2) {
-													pageNum = totalPages - 4 + i;
-												} else {
-													pageNum = currentPage - 2 + i;
-												}
-												
-												return (
-													<PaginationItem key={pageNum}>
-														<PaginationLink
-															onClick={() => handlePageChange(pageNum)}
-															isActive={currentPage === pageNum}
-															className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+											{Array.from(
+												{
+													length: Math.min(
+														5,
+														totalPages
+													),
+												},
+												(_, i) => {
+													let pageNum
+													if (totalPages <= 5) {
+														pageNum = i + 1
+													} else if (
+														currentPage <= 3
+													) {
+														pageNum = i + 1
+													} else if (
+														currentPage >=
+														totalPages - 2
+													) {
+														pageNum =
+															totalPages - 4 + i
+													} else {
+														pageNum =
+															currentPage - 2 + i
+													}
+
+													return (
+														<PaginationItem
+															key={pageNum}
 														>
-															{pageNum}
-														</PaginationLink>
-													</PaginationItem>
-												);
-											})}
-											
+															<PaginationLink
+																onClick={() =>
+																	handlePageChange(
+																		pageNum
+																	)
+																}
+																isActive={
+																	currentPage ===
+																	pageNum
+																}
+																className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+															>
+																{pageNum}
+															</PaginationLink>
+														</PaginationItem>
+													)
+												}
+											)}
+
 											<PaginationItem>
-												<PaginationNext 
-													onClick={() => handlePageChange(currentPage + 1)}
-													className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+												<PaginationNext
+													onClick={() =>
+														handlePageChange(
+															currentPage + 1
+														)
+													}
+													className={
+														currentPage ===
+														totalPages
+															? "pointer-events-none opacity-50"
+															: "cursor-pointer hover:bg-gold/10"
+													}
 												/>
 											</PaginationItem>
 										</PaginationContent>
@@ -461,17 +539,18 @@ const Shop: React.FC = () => {
 				<TabsContent value="packs">
 					{loading ? (
 						<div className="text-center py-8 text-gray-400">
-							{searchTerm || filters.packRarity ? "Filtrando paquetes..." : "Cargando paquetes..."}
+							{searchTerm || filters.packRarity
+								? "Filtrando paquetes..."
+								: "Cargando paquetes..."}
 						</div>
 					) : (
 						<>
 							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 								{availablePacks.length === 0 ? (
 									<div className="col-span-full text-center py-8 text-gray-400">
-										{searchTerm || filters.packRarity 
-											? "No se encontraron paquetes con estos filtros" 
-											: "No hay paquetes disponibles"
-										}
+										{searchTerm || filters.packRarity
+											? "No se encontraron paquetes con estos filtros"
+											: "No hay paquetes disponibles"}
 									</div>
 								) : (
 									availablePacks.map((pack) => (
@@ -496,7 +575,10 @@ const Shop: React.FC = () => {
 												<div className="flex justify-between items-center mt-2">
 													<div className="flex flex-col">
 														<span className="text-sm text-gray-300">
-															Contiene {pack.cardCount || pack.cards_count || 'N/A'}{" "}
+															Contiene{" "}
+															{pack.cardCount ||
+																pack.cards_count ||
+																"N/A"}{" "}
 															cartas
 														</span>
 														<span className="text-sm text-gray-300">
@@ -510,60 +592,106 @@ const Shop: React.FC = () => {
 												<button
 													className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
 													onClick={() =>
-														cart?.addToCart(pack, "pack")
+														cart?.addToCart(
+															pack,
+															"pack"
+														)
 													}
 													disabled={pack.stock <= 0}
 												>
-													{pack.stock <= 0 ? "Sin stock" : "Agregar al carrito"}
+													{pack.stock <= 0
+														? "Sin stock"
+														: "Agregar al carrito"}
 												</button>
 											</div>
 										</Card>
 									))
 								)}
 							</div>
-							
+
 							{/* Componente de paginación para paquetes */}
 							{totalPages > 1 && (
 								<div className="mt-8 flex justify-center">
 									<Pagination>
 										<PaginationContent>
 											<PaginationItem>
-												<PaginationPrevious 
-													onClick={() => handlePageChange(currentPage - 1)}
-													className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+												<PaginationPrevious
+													onClick={() =>
+														handlePageChange(
+															currentPage - 1
+														)
+													}
+													className={
+														currentPage === 1
+															? "pointer-events-none opacity-50"
+															: "cursor-pointer hover:bg-gold/10"
+													}
 												/>
 											</PaginationItem>
-											
+
 											{/* Páginas numeradas */}
-											{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-												let pageNum;
-												if (totalPages <= 5) {
-													pageNum = i + 1;
-												} else if (currentPage <= 3) {
-													pageNum = i + 1;
-												} else if (currentPage >= totalPages - 2) {
-													pageNum = totalPages - 4 + i;
-												} else {
-													pageNum = currentPage - 2 + i;
-												}
-												
-												return (
-													<PaginationItem key={pageNum}>
-														<PaginationLink
-															onClick={() => handlePageChange(pageNum)}
-															isActive={currentPage === pageNum}
-															className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+											{Array.from(
+												{
+													length: Math.min(
+														5,
+														totalPages
+													),
+												},
+												(_, i) => {
+													let pageNum
+													if (totalPages <= 5) {
+														pageNum = i + 1
+													} else if (
+														currentPage <= 3
+													) {
+														pageNum = i + 1
+													} else if (
+														currentPage >=
+														totalPages - 2
+													) {
+														pageNum =
+															totalPages - 4 + i
+													} else {
+														pageNum =
+															currentPage - 2 + i
+													}
+
+													return (
+														<PaginationItem
+															key={pageNum}
 														>
-															{pageNum}
-														</PaginationLink>
-													</PaginationItem>
-												);
-											})}
-											
+															<PaginationLink
+																onClick={() =>
+																	handlePageChange(
+																		pageNum
+																	)
+																}
+																isActive={
+																	currentPage ===
+																	pageNum
+																}
+																className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+															>
+																{pageNum}
+															</PaginationLink>
+														</PaginationItem>
+													)
+												}
+											)}
+
 											<PaginationItem>
-												<PaginationNext 
-													onClick={() => handlePageChange(currentPage + 1)}
-													className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+												<PaginationNext
+													onClick={() =>
+														handlePageChange(
+															currentPage + 1
+														)
+													}
+													className={
+														currentPage ===
+														totalPages
+															? "pointer-events-none opacity-50"
+															: "cursor-pointer hover:bg-gold/10"
+													}
 												/>
 											</PaginationItem>
 										</PaginationContent>
