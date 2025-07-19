@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from "react"
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import type { UserCard } from "@/types"
-import { Search } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
 import { getInventory } from "@/services/api"
 import { toast } from "sonner"
 import type { CardKind } from "@/types"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 
 const Inventory: React.FC = () => {
 	const [cards, setCards] = useState<any[]>([])
@@ -55,9 +46,15 @@ const Inventory: React.FC = () => {
 	}, [searchTerm, filter, currentPage]);
 
 	useEffect(() => {
-			setCurrentPage(1)
-		}, [searchTerm, filter]);
-	
+		setCurrentPage(1)
+	}, [searchTerm, filter]);
+
+	const handlePageChange = (page: number) => {
+		if (page >= 1 && page <= totalPages) {
+			setCurrentPage(page)
+		}
+	}
+
 	// Renderiza una tarjeta de carta
 	const renderCardItem = (card: any) => {
 		return (
@@ -66,16 +63,16 @@ const Inventory: React.FC = () => {
 				className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
 			>
 				<div className="aspect-[3/4] overflow-hidden">
-				<img
-					src={card.imageUrl}
-					alt={card.name}
-					className="w-full h-full object-cover transition-transform hover:scale-110"
-				/>
+					<img
+						src={card.imageUrl}
+						alt={card.name}
+						className="w-full h-full object-cover transition-transform hover:scale-110"
+					/>
 				</div>
-					<div className="p-3">
-						<h3 className="font-medium text-gold truncate">
-							{card.name}
-						</h3>
+				<div className="p-3">
+					<h3 className="font-medium text-gold truncate">
+						{card.name}
+					</h3>
 					<div className="flex justify-between items-center mt-2">
 						<span className="text-sm text-gray-300">
 							ATK: {card.attack}
@@ -90,8 +87,9 @@ const Inventory: React.FC = () => {
 						</span>
 					</div>
 				</div>
-		</Card>
-	)}
+			</Card>
+		)
+	}
 
 	const kinds = [
 		"DARK",
@@ -110,7 +108,6 @@ const Inventory: React.FC = () => {
 			</h1>
 			<p className="text-gray-400 mb-2">Organiza tu inventario</p>
 
-		{/* search bar and filters */}
 			<div className="mb-6 flex flex-col md:flex-row gap-3">
 				<input
 					type="text"
@@ -128,14 +125,14 @@ const Inventory: React.FC = () => {
 					}}
 					className="px-4 py-2 bg-black/30 border border-gold/20 rounded text-white focus:outline-none focus:ring-1 focus:ring-gold"
 				>
-				<option value="all">
-					Todos los tipos
-				</option>
-				{kinds.map((kind) => (
-					<option key={kind} value={kind}>
-						{kind}
+					<option value="all">
+						Todos los tipos
 					</option>
-				))}
+					{kinds.map((kind) => (
+						<option key={kind} value={kind}>
+							{kind}
+						</option>
+					))}
 				</select>
 			</div>
 
@@ -143,17 +140,68 @@ const Inventory: React.FC = () => {
 				<div className="text-center py12">
 					<p className="text-gray-400">Cargando...</p>
 				</div>
-				) : cards.length > 0 ? (
+			) : cards.length > 0 ? (
+				<>
 					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 						{cards.map(renderCardItem)}
 					</div>
-				) : (
-					<div className="text-center py-12">
-						<p className="text-gray-400">
-							No se encontraron cartas
-						</p>
-					</div>
+
+					{totalPages > 1 && (
+						<div className="mt-8 flex justify-center">
+							<Pagination>
+								<PaginationContent>
+									<PaginationItem>
+										<PaginationPrevious
+											onClick={() => handlePageChange(currentPage - 1)}
+											className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+										/>
+									</PaginationItem>
+
+									{/* Páginas numeradas */}
+									{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+										let pageNum;
+										if (totalPages <= 5) {
+											pageNum = i + 1;
+										} else if (currentPage <= 3) {
+											pageNum = i + 1;
+										} else if (currentPage >= totalPages - 2) {
+											pageNum = totalPages - 4 + i;
+										} else {
+											pageNum = currentPage - 2 + i;
+										}
+
+										return (
+											<PaginationItem key={pageNum}>
+												<PaginationLink
+													onClick={() => handlePageChange(pageNum)}
+													isActive={currentPage === pageNum}
+													className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+												>
+													{pageNum}
+												</PaginationLink>
+											</PaginationItem>
+										);
+									})}
+
+									<PaginationItem>
+										<PaginationNext
+											onClick={() => handlePageChange(currentPage + 1)}
+											className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+										/>
+									</PaginationItem>
+								</PaginationContent>
+							</Pagination>
+						</div>
+					)}
+				</>
+			) : (
+				<div className="text-center py-12">
+					<p className="text-gray-400">
+						No se encontraron cartas
+					</p>
+				</div>
 			)}
+
 		</div>
 	)
 }
