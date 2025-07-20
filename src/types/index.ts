@@ -10,11 +10,19 @@ export interface Card {
 	price: number
 	imageUrl: string
 	stock: number
-	kind: string
+	kind: CardKind
 }
 
 export type CardType = "monster" | "spell" | "trap"
 export type CardRarity = "common" | "rare" | "ultra-rare" | "legendary"
+export type CardKind =
+	| "DARK"
+	| "DIVINE"
+	| "EARTH"
+	| "FIRE"
+	| "LIGHT"
+	| "WATER"
+	| "WIND"
 
 // Tipos para los paquetes
 export interface CardPack {
