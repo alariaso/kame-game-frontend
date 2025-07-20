@@ -1,15 +1,26 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MOCK_CARDS, MOCK_CARD_PACKS } from "@/data/mockData"
+import {
+	Pagination,
+	PaginationContent,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from "@/components/ui/pagination"
 import type { Card as CardType, CardPack, Pack } from "@/types"
 import { toast } from "sonner"
 import { Plus, Edit, Trash2, ArrowUp, ArrowDown, Search } from "lucide-react"
 import AddCardForm from "@/components/admin/AddCardForm"
 import AddPackForm from "@/components/admin/AddPackForm"
-import { updateCardStock as updateCardStockAPI } from "@/services/api"
+import {
+	updateCardStock as updateCardStockAPI,
+	getCards,
+	getCPacks,
+} from "@/services/api"
 
 // Helper function to calculate package rarity based on cards
 const calculatePackageRarity = (cards: CardType[]): string => {
@@ -40,13 +51,83 @@ const calculatePackageRarity = (cards: CardType[]): string => {
 }
 
 const Admin: React.FC = () => {
-	const [cards, setCards] = useState<CardType[]>(MOCK_CARDS)
-	const [packs, setPacks] = useState<CardPack[]>(MOCK_CARD_PACKS)
+	const [cards, setCards] = useState<CardType[]>([])
+	const [packs, setPacks] = useState<CardPack[]>([])
 	const [searchTerm, setSearchTerm] = useState("")
 	const [editingCardId, setEditingCardId] = useState<string | null>(null)
 	const [editingPackId, setEditingPackId] = useState<string | null>(null)
 	const [addCardDialogOpen, setAddCardDialogOpen] = useState(false)
 	const [addPackDialogOpen, setAddPackDialogOpen] = useState(false)
+
+	// New pagination states
+	const [loading, setLoading] = useState<boolean>(false)
+	const [currentPage, setCurrentPage] = useState<number>(1)
+	const [totalPages, setTotalPages] = useState<number>(1)
+	const [activeTab, setActiveTab] = useState<string>("cards")
+
+	// Load cards from API
+	useEffect(() => {
+		const loadCards = async () => {
+			if (activeTab !== "cards") return
+
+			setLoading(true)
+			try {
+				const response = await getCards(currentPage, 10)
+				if (response.error) {
+					toast.error(
+						"Error al cargar las cartas: " + response.message
+					)
+				} else {
+					setCards(response.data?.results || [])
+					setTotalPages(response.data?.totalPages || 1)
+				}
+			} catch (error) {
+				console.error("Error loading cards:", error)
+				toast.error("Error de conexión al cargar las cartas")
+			}
+			setLoading(false)
+		}
+
+		loadCards()
+	}, [activeTab, currentPage])
+
+	// Load packs from API
+	useEffect(() => {
+		const loadPacks = async () => {
+			if (activeTab !== "packs") return
+
+			setLoading(true)
+			try {
+				const response = await getCPacks(currentPage, 10)
+				if (response.error) {
+					toast.error(
+						"Error al cargar los paquetes: " + response.message
+					)
+				} else {
+					setPacks(response.data?.results || [])
+					setTotalPages(response.data?.totalPages || 1)
+				}
+			} catch (error) {
+				console.error("Error loading packs:", error)
+				toast.error("Error de conexión al cargar los paquetes")
+			}
+			setLoading(false)
+		}
+
+		loadPacks()
+	}, [activeTab, currentPage])
+
+	// Reset page when tab changes
+	useEffect(() => {
+		setCurrentPage(1)
+	}, [activeTab])
+
+	// Function to handle page changes
+	const handlePageChange = (page: number) => {
+		if (page >= 1 && page <= totalPages) {
+			setCurrentPage(page)
+		}
+	}
 
 	// Filtrar elementos según la búsqueda
 	const filteredCards = cards.filter((card) =>
@@ -565,7 +646,11 @@ const Admin: React.FC = () => {
 				/>
 
 				{/* Tabs para Cartas y Paquetes */}
-				<Tabs defaultValue="cards" className="w-full">
+				<Tabs
+					defaultValue="cards"
+					className="w-full"
+					onValueChange={(value) => setActiveTab(value)}
+				>
 					<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
 						<TabsList className="bg-black/40 border border-gold/10">
 							<TabsTrigger
@@ -612,48 +697,168 @@ const Admin: React.FC = () => {
 								</Button>
 							</CardHeader>
 							<CardContent>
-								<div className="overflow-x-auto">
-									<table className="w-full">
-										<thead className="bg-black/40 text-left">
-											<tr>
-												<th className="py-3 px-4 font-medium">
-													Carta
-												</th>
-												<th className="py-3 px-4 font-medium">
-													Tipo
-												</th>
-												<th className="py-3 px-4 font-medium">
-													Rareza
-												</th>
-												<th className="py-3 px-4 font-medium">
-													Precio
-												</th>
-												<th className="py-3 px-4 font-medium">
-													Stock
-												</th>
-												<th className="py-3 px-4 font-medium text-right">
-													Acciones
-												</th>
-											</tr>
-										</thead>
-										<tbody>
-											{filteredCards.length > 0 ? (
-												filteredCards.map(renderCardRow)
-											) : (
-												<tr>
-													<td
-														colSpan={6}
-														className="py-6 text-center text-gray-400"
-													>
-														No se encontraron cartas
-														que coincidan con tu
-														búsqueda.
-													</td>
-												</tr>
-											)}
-										</tbody>
-									</table>
-								</div>
+								{loading ? (
+									<div className="text-center py-8 text-gray-400">
+										Cargando cartas...
+									</div>
+								) : (
+									<>
+										<div className="overflow-x-auto">
+											<table className="w-full">
+												<thead className="bg-black/40 text-left">
+													<tr>
+														<th className="py-3 px-4 font-medium">
+															Carta
+														</th>
+														<th className="py-3 px-4 font-medium">
+															Tipo
+														</th>
+														<th className="py-3 px-4 font-medium">
+															Rareza
+														</th>
+														<th className="py-3 px-4 font-medium">
+															Precio
+														</th>
+														<th className="py-3 px-4 font-medium">
+															Stock
+														</th>
+														<th className="py-3 px-4 font-medium text-right">
+															Acciones
+														</th>
+													</tr>
+												</thead>
+												<tbody>
+													{filteredCards.length >
+													0 ? (
+														filteredCards.map(
+															renderCardRow
+														)
+													) : (
+														<tr>
+															<td
+																colSpan={6}
+																className="py-6 text-center text-gray-400"
+															>
+																No se
+																encontraron
+																cartas que
+																coincidan con tu
+																búsqueda.
+															</td>
+														</tr>
+													)}
+												</tbody>
+											</table>
+										</div>
+
+										{/* Pagination for cards */}
+										{totalPages > 1 && (
+											<div className="mt-6 flex justify-center">
+												<Pagination>
+													<PaginationContent>
+														<PaginationItem>
+															<PaginationPrevious
+																onClick={() =>
+																	handlePageChange(
+																		currentPage -
+																			1
+																	)
+																}
+																className={
+																	currentPage ===
+																	1
+																		? "pointer-events-none opacity-50"
+																		: "cursor-pointer hover:bg-gold/10"
+																}
+															/>
+														</PaginationItem>
+
+														{Array.from(
+															{
+																length: Math.min(
+																	5,
+																	totalPages
+																),
+															},
+															(_, i) => {
+																let pageNum
+																if (
+																	totalPages <=
+																	5
+																) {
+																	pageNum =
+																		i + 1
+																} else if (
+																	currentPage <=
+																	3
+																) {
+																	pageNum =
+																		i + 1
+																} else if (
+																	currentPage >=
+																	totalPages -
+																		2
+																) {
+																	pageNum =
+																		totalPages -
+																		4 +
+																		i
+																} else {
+																	pageNum =
+																		currentPage -
+																		2 +
+																		i
+																}
+
+																return (
+																	<PaginationItem
+																		key={
+																			pageNum
+																		}
+																	>
+																		<PaginationLink
+																			onClick={() =>
+																				handlePageChange(
+																					pageNum
+																				)
+																			}
+																			isActive={
+																				currentPage ===
+																				pageNum
+																			}
+																			className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+																		>
+																			{
+																				pageNum
+																			}
+																		</PaginationLink>
+																	</PaginationItem>
+																)
+															}
+														)}
+
+														<PaginationItem>
+															<PaginationNext
+																onClick={() =>
+																	handlePageChange(
+																		currentPage +
+																			1
+																	)
+																}
+																className={
+																	currentPage ===
+																	totalPages
+																		? "pointer-events-none opacity-50"
+																		: "cursor-pointer hover:bg-gold/10"
+																}
+															/>
+														</PaginationItem>
+													</PaginationContent>
+												</Pagination>
+											</div>
+										)}
+									</>
+								)}
 							</CardContent>
 						</Card>
 					</TabsContent>
@@ -673,51 +878,171 @@ const Admin: React.FC = () => {
 								</Button>
 							</CardHeader>
 							<CardContent>
-								<div className="overflow-x-auto">
-									<table className="w-full">
-										<thead className="bg-black/40 text-left">
-											<tr>
-												<th className="py-3 px-4 font-medium">
-													Paquete
-												</th>
-												<th className="py-3 px-4 font-medium">
-													Contenido
-												</th>
-												<th className="py-3 px-4 font-medium">
-													Rareza
-												</th>
-												<th className="py-3 px-4 font-medium">
-													Descuento
-												</th>
-												<th className="py-3 px-4 font-medium">
-													Precio
-												</th>
-												<th className="py-3 px-4 font-medium">
-													Stock
-												</th>
-												<th className="py-3 px-4 font-medium text-right">
-													Acciones
-												</th>
-											</tr>
-										</thead>
-										<tbody>
-											{filteredPacks.length > 0 ? (
-												filteredPacks.map(renderPackRow)
-											) : (
-												<tr>
-													<td
-														colSpan={7}
-														className="py-6 text-center text-gray-400"
-													>
-														No se encontraron
-														paquetes que coincidan
-														con tu búsqueda.
-													</td>
-												</tr>
-											)}
-										</tbody>
-									</table>
-								</div>
+								{loading ? (
+									<div className="text-center py-8 text-gray-400">
+										Cargando paquetes...
+									</div>
+								) : (
+									<>
+										<div className="overflow-x-auto">
+											<table className="w-full">
+												<thead className="bg-black/40 text-left">
+													<tr>
+														<th className="py-3 px-4 font-medium">
+															Paquete
+														</th>
+														<th className="py-3 px-4 font-medium">
+															Contenido
+														</th>
+														<th className="py-3 px-4 font-medium">
+															Rareza
+														</th>
+														<th className="py-3 px-4 font-medium">
+															Descuento
+														</th>
+														<th className="py-3 px-4 font-medium">
+															Precio
+														</th>
+														<th className="py-3 px-4 font-medium">
+															Stock
+														</th>
+														<th className="py-3 px-4 font-medium text-right">
+															Acciones
+														</th>
+													</tr>
+												</thead>
+												<tbody>
+													{filteredPacks.length >
+													0 ? (
+														filteredPacks.map(
+															renderPackRow
+														)
+													) : (
+														<tr>
+															<td
+																colSpan={7}
+																className="py-6 text-center text-gray-400"
+															>
+																No se
+																encontraron
+																paquetes que
+																coincidan con tu
+																búsqueda.
+															</td>
+														</tr>
+													)}
+												</tbody>
+											</table>
+										</div>
+
+										{/* Pagination for packs */}
+										{totalPages > 1 && (
+											<div className="mt-6 flex justify-center">
+												<Pagination>
+													<PaginationContent>
+														<PaginationItem>
+															<PaginationPrevious
+																onClick={() =>
+																	handlePageChange(
+																		currentPage -
+																			1
+																	)
+																}
+																className={
+																	currentPage ===
+																	1
+																		? "pointer-events-none opacity-50"
+																		: "cursor-pointer hover:bg-gold/10"
+																}
+															/>
+														</PaginationItem>
+
+														{Array.from(
+															{
+																length: Math.min(
+																	5,
+																	totalPages
+																),
+															},
+															(_, i) => {
+																let pageNum
+																if (
+																	totalPages <=
+																	5
+																) {
+																	pageNum =
+																		i + 1
+																} else if (
+																	currentPage <=
+																	3
+																) {
+																	pageNum =
+																		i + 1
+																} else if (
+																	currentPage >=
+																	totalPages -
+																		2
+																) {
+																	pageNum =
+																		totalPages -
+																		4 +
+																		i
+																} else {
+																	pageNum =
+																		currentPage -
+																		2 +
+																		i
+																}
+
+																return (
+																	<PaginationItem
+																		key={
+																			pageNum
+																		}
+																	>
+																		<PaginationLink
+																			onClick={() =>
+																				handlePageChange(
+																					pageNum
+																				)
+																			}
+																			isActive={
+																				currentPage ===
+																				pageNum
+																			}
+																			className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+																		>
+																			{
+																				pageNum
+																			}
+																		</PaginationLink>
+																	</PaginationItem>
+																)
+															}
+														)}
+
+														<PaginationItem>
+															<PaginationNext
+																onClick={() =>
+																	handlePageChange(
+																		currentPage +
+																			1
+																	)
+																}
+																className={
+																	currentPage ===
+																	totalPages
+																		? "pointer-events-none opacity-50"
+																		: "cursor-pointer hover:bg-gold/10"
+																}
+															/>
+														</PaginationItem>
+													</PaginationContent>
+												</Pagination>
+											</div>
+										)}
+									</>
+								)}
 							</CardContent>
 						</Card>
 					</TabsContent>
