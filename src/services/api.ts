@@ -239,9 +239,19 @@ export const updateCardStock = async (
 	cardId: number,
 	quantity: number
 ): Promise<ApiResponse<any>> => {
-	return makeAuthenticatedRequest("/cart", {
-		method: "PUT",
-		body: JSON.stringify({ cardId, quantity }),
+	return makeAuthenticatedRequest(`/cards/${cardId}`, {
+		method: "PATCH",
+		body: JSON.stringify({ stock: quantity }),
+	})
+}
+
+export const updateCardPrice = async (
+	cardId: number,
+	price: number
+): Promise<ApiResponse<any>> => {
+	return makeAuthenticatedRequest(`/cards/${cardId}`, {
+		method: "PATCH",
+		body: JSON.stringify({ price: price }),
 	})
 }
 

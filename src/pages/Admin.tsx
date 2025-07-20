@@ -18,6 +18,7 @@ import AddCardForm from "@/components/admin/AddCardForm"
 import AddPackForm from "@/components/admin/AddPackForm"
 import {
 	updateCardStock as updateCardStockAPI,
+	updateCardPrice as updateCardPriceAPI,
 	getCards,
 	getCPacks,
 } from "@/services/api"
@@ -139,18 +140,33 @@ const Admin: React.FC = () => {
 	)
 
 	// Función para modificar el precio de una carta
-	const updateCardPrice = (id: string, change: number) => {
-		setCards(
-			cards.map((card) => {
-				if (card.id === id) {
-					const newPrice = Math.max(0, card.price + change)
-					return { ...card, price: newPrice }
-				}
-				return card
-			})
-		)
+	const updateCardPrice = async (id: string, change: number) => {
+		const newPrice = cards.find((card) => card.id === id)?.price + change
+		try {
+			const response = await updateCardPriceAPI(Number(id), newPrice)
 
-		toast.success("Precio actualizado correctamente")
+			if (response.error) {
+				toast.error("Error al actualizar el precio")
+				return
+			}
+
+			setCards(
+				cards.map((card) => {
+					if (card.id === id) {
+						const newPrice = Math.max(0, card.price + change)
+						return { ...card, price: newPrice }
+					}
+					return card
+				})
+			)
+
+			toast.success("Precio actualizado correctamente")
+
+			toast.success("Stock actualizado correctamente")
+		} catch (error) {
+			console.error("Error updating card stock:", error)
+			toast.error("Error al actualizar el stock")
+		}
 	}
 
 	// Función para modificar el stock de una carta usando la API real
@@ -261,6 +277,8 @@ const Admin: React.FC = () => {
 	const renderCardRow = (card: CardType) => {
 		const isEditing = editingCardId === card.id
 
+		console.log("Rendering card row:", card)
+
 		return (
 			<tr
 				key={card.id}
@@ -284,7 +302,7 @@ const Admin: React.FC = () => {
 					<span
 						className={`inline-block px-2 py-1 rounded-full text-xs ${getTypeColor(card.type)}`}
 					>
-						{formatType(card.type)}
+						{formatType(card.attribute)}
 					</span>
 				</td>
 				<td className="py-3 px-4">
