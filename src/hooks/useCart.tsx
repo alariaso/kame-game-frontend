@@ -1,13 +1,12 @@
-
 import { useState, useEffect } from "react"
 import { Card as CardType, CardPack } from "@/types"
 import { useAuth } from "@/context/AuthContext"
 import { toast } from "sonner"
-import { 
-  clearCart as clearCartAPI, 
-  removeCartItem as removeCartItemAPI,
-  addToCart as addToCartAPI,
-  getCart as getCartAPI
+import {
+	clearCart as clearCartAPI,
+	removeCartItem as removeCartItemAPI,
+	addToCart as addToCartAPI,
+	getCart as getCartAPI,
 } from "@/services/api"
 
 export type CartItem = {
@@ -37,23 +36,28 @@ export const useCart = () => {
 
 		try {
 			const response = await getCartAPI()
-			
+
 			if (response.error) {
 				console.error("Error loading cart:", response.message)
 				return
 			}
 
-			const apiCartItems = response.data?.items || []
-			const formattedItems: CartItem[] = apiCartItems.map((item: any) => ({
-				id: item.cardId?.toString() || item.id?.toString(),
-				name: item.card?.name || item.name || "Carta desconocida",
-				price: item.card?.price || item.price || 0,
-				quantity: item.quantity || 1,
-				imageUrl: item.card?.imageUrl || item.imageUrl || "",
-				type: "card", 
-				itemRef: item.card || item
-			}))
-			
+			const apiCartItems = [
+				...(response.data?.cards || []),
+				...(response.data?.packs || []),
+			]
+			const formattedItems: CartItem[] = apiCartItems.map(
+				(item: any) => ({
+					id: item.cardId?.toString() || item.id?.toString(),
+					name: item.card?.name || item.name || "Carta desconocida",
+					price: item.card?.price || item.price || 0,
+					quantity: item.quantity || 1,
+					imageUrl: item.card?.imageUrl || item.imageUrl || "",
+					type: "card",
+					itemRef: item.card || item,
+				})
+			)
+
 			setCartItems(formattedItems)
 		} catch (error) {
 			console.error("Error loading cart from API:", error)
@@ -71,8 +75,9 @@ export const useCart = () => {
 
 		try {
 			// Usar la API real para agregar al carrito
+
 			const response = await addToCartAPI(Number(item.id))
-			
+
 			if (response.error) {
 				toast.error("Error al agregar al carrito: " + response.message)
 				return
@@ -81,7 +86,8 @@ export const useCart = () => {
 			// Actualizar el estado local
 			setCartItems((prevItems) => {
 				const existingItemIndex = prevItems.findIndex(
-					(cartItem) => cartItem.id === item.id && cartItem.type === itemType
+					(cartItem) =>
+						cartItem.id === item.id && cartItem.type === itemType
 				)
 
 				if (existingItemIndex >= 0) {
@@ -130,13 +136,15 @@ export const useCart = () => {
 
 		try {
 			const response = await removeCartItemAPI(Number(id))
-			
+
 			if (response.error) {
 				toast.error("Error al eliminar el ítem del carrito")
 				return
 			}
 
-			setCartItems((prevItems) => prevItems.filter((item) => item.id !== id))
+			setCartItems((prevItems) =>
+				prevItems.filter((item) => item.id !== id)
+			)
 			toast.success("Ítem eliminado del carrito")
 		} catch (error) {
 			console.error("Error removing cart item:", error)
@@ -152,7 +160,7 @@ export const useCart = () => {
 
 		try {
 			const response = await clearCartAPI()
-			
+
 			if (response.error) {
 				toast.error("Error al vaciar el carrito")
 				return
@@ -210,6 +218,6 @@ export const useCart = () => {
 		removeCartItem,
 		clearCart,
 		checkout: handleCheckout,
-		refreshCart: loadCartFromAPI
+		refreshCart: loadCartFromAPI,
 	}
 }
