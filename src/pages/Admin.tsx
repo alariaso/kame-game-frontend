@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MOCK_CARDS, MOCK_CARD_PACKS } from "@/data/mockData"
-import type { Card as CardType, CardPack } from "@/types"
+import type { Card as CardType, CardPack, Pack } from "@/types"
 import { toast } from "sonner"
 import { Plus, Edit, Trash2, ArrowUp, ArrowDown, Search } from "lucide-react"
 import AddCardForm from "@/components/admin/AddCardForm"
@@ -74,14 +74,14 @@ const Admin: React.FC = () => {
 
 	// Función para modificar el stock de una carta usando la API real
 	const updateCardStock = async (id: string, change: number) => {
-		const card = cards.find(c => c.id === id)
+		const card = cards.find((c) => c.id === id)
 		if (!card) return
 
 		const newStock = Math.max(0, card.stock + change)
 
 		try {
 			const response = await updateCardStockAPI(Number(id), newStock)
-			
+
 			if (response.error) {
 				toast.error("Error al actualizar el stock")
 				return

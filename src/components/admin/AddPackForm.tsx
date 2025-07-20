@@ -1,7 +1,7 @@
-import React, { useState } from "react"
+import React, { useState, useEffect, useRef, useCallback } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { number, z } from "zod"
 import { toast } from "sonner"
 import {
 	Form,
@@ -20,8 +20,9 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog"
-import type { Card as CardType, CardPack } from "@/types"
+import type { Card as CardType, CardPack, Pack } from "@/types"
 import { Search, X } from "lucide-react"
+import { createPack, addCartToPack, getCards } from "@/services/api"
 
 const formSchema = z.object({
 	name: z
@@ -42,17 +43,20 @@ interface AddPackFormProps {
 	open: boolean
 	onOpenChange: (open: boolean) => void
 	onAddPack: (packData: CardPack) => void
-	cards: CardType[]
 }
 
 const AddPackForm: React.FC<AddPackFormProps> = ({
 	open,
 	onOpenChange,
 	onAddPack,
-	cards,
 }) => {
 	const [selectedCards, setSelectedCards] = useState<string[]>([])
 	const [cardSearch, setCardSearch] = useState("")
+	const [cards, setCards] = useState<CardType[]>([])
+	const [loading, setLoading] = useState(false)
+	const [hasMore, setHasMore] = useState(true)
+	const [currentPage, setCurrentPage] = useState(1)
+	const scrollRef = useRef<HTMLDivElement>(null)
 
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -66,31 +70,104 @@ const AddPackForm: React.FC<AddPackFormProps> = ({
 		},
 	})
 
-	const onSubmit = (data: FormValues) => {
+	const fetchCards = useCallback(
+		async (page: number, reset: boolean = false) => {
+			if (loading) return
+
+			setLoading(true)
+			try {
+				const response = await getCards(page, 10)
+				if (response.status === 200 && response.data) {
+					const newCards = response.data.results || []
+					setCards((prevCards) =>
+						reset ? newCards : [...prevCards, ...newCards]
+					)
+					setHasMore(page < response.data.totalPages)
+				}
+			} catch (error) {
+				console.error("Error fetching cards:", error)
+				toast.error("Error al cargar las cartas")
+			} finally {
+				setLoading(false)
+			}
+		},
+		[loading]
+	)
+
+	useEffect(() => {
+		if (open) {
+			setCards([])
+			setCurrentPage(1)
+			setHasMore(true)
+			fetchCards(1, true)
+		}
+	}, [open])
+
+	const handleScroll = useCallback(() => {
+		const scrollContainer = scrollRef.current
+		if (!scrollContainer || loading || !hasMore) return
+
+		const { scrollTop, scrollHeight, clientHeight } = scrollContainer
+		if (scrollTop + clientHeight >= scrollHeight - 5) {
+			setCurrentPage((prevPage) => {
+				const nextPage = prevPage + 1
+				fetchCards(nextPage)
+				return nextPage
+			})
+		}
+	}, [loading, hasMore, fetchCards])
+
+	useEffect(() => {
+		const scrollContainer = scrollRef.current
+		if (scrollContainer) {
+			scrollContainer.addEventListener("scroll", handleScroll)
+			return () =>
+				scrollContainer.removeEventListener("scroll", handleScroll)
+		}
+	}, [handleScroll])
+
+	const onSubmit = async (data: FormValues) => {
 		if (selectedCards.length < 2) {
 			toast.error("Debes seleccionar al menos 2 cartas")
 			return
 		}
 
-		const packData: CardPack = {
-			id: `pack-${Date.now()}`,
-			name: data.name,
-			description: data.description,
-			price: Number(data.price),
-			stock: Number(data.stock),
-			discount: Number(data.discount) / 100,
-			cardIds: selectedCards,
-			cardCount: selectedCards.length,
-			imageUrl: data.imageUrl,
-			rarity: "Común"
-		}
+		try {
+			const packData: Pack = {
+				name: data.name,
+				description: data.description,
+				price: Number(data.price),
+				stock: Number(data.stock),
+				discount: Number(data.discount) / 100,
+				imageUrl: data.imageUrl,
+				rarity: "COMMON",
+			}
 
-		onAddPack(packData)
-		toast.success("Paquete creado exitosamente")
-		form.reset()
-		setSelectedCards([])
-		setCardSearch("")
-		onOpenChange(false)
+			console.log("Selected Cards:", selectedCards)
+
+			const responseCreatedPack = await createPack(packData)
+			const responseAddCards = await addCartToPack(
+				responseCreatedPack.data.id,
+				selectedCards
+			)
+
+			const packItem: CardPack = {
+				...packData,
+				id: responseCreatedPack.data.id,
+				cardIds: selectedCards,
+				cardCount: selectedCards.length,
+			}
+
+			onAddPack(packItem)
+			toast.success("Paquete creado exitosamente")
+			form.reset()
+			setSelectedCards([])
+			setCardSearch("")
+			onOpenChange(false)
+		} catch (error) {
+			console.error("Error creating card:", error)
+			toast.error("Error de conexión al crear la carta")
+		}
 	}
 
 	const filteredCards = cards.filter(
@@ -293,12 +370,15 @@ const AddPackForm: React.FC<AddPackFormProps> = ({
 								/>
 							</div>
 
-							<div className="max-h-60 overflow-y-auto border border-gold/20 rounded">
-								{filteredCards.length === 0 ? (
+							<div
+								ref={scrollRef}
+								className="max-h-60 overflow-y-auto border border-gold/20 rounded"
+							>
+								{filteredCards.length === 0 && !loading ? (
 									<div className="p-4 text-center text-gray-400">
 										{cardSearch
 											? "No se encontraron cartas"
-											: "Busca cartas para añadir"}
+											: "Cargando cartas..."}
 									</div>
 								) : (
 									<ul className="divide-y divide-gold/10">
@@ -329,6 +409,11 @@ const AddPackForm: React.FC<AddPackFormProps> = ({
 												</Button>
 											</li>
 										))}
+										{loading && (
+											<li className="p-4 text-center text-gray-400">
+												Cargando más cartas...
+											</li>
+										)}
 									</ul>
 								)}
 							</div>

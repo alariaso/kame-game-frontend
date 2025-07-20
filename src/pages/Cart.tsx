@@ -199,7 +199,7 @@ const Cart = () => {
 								</span>
 							</div>
 							<AlertDialog>
-								<AlertDialogTrigger className="w-full">
+								<AlertDialogTrigger className="w-full" asChild>
 									<Button className="w-full bg-gold hover:bg-gold/80 text-black font-medium">
 										Finalizar Compra
 									</Button>

@@ -38,6 +38,16 @@ export interface CardPack {
 	discount: number
 }
 
+export interface Pack {
+	name: string
+	price: number
+	imageUrl: string
+	rarity: "COMMON" | "RAR" | "SUPER RARE" | "ULTRA RARE"
+	discount?: number // Descuento opcional
+	stock: number
+	description: string
+}
+
 // Tipos para el usuario
 export interface UserInventory {
 	cards: UserCard[]
