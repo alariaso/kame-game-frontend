@@ -344,3 +344,14 @@ export const buyCart = async (): Promise<ApiResponse<any>> => {
 		method: "GET",
 	})
 }
+
+// get random cards
+export const getRandomCards = async (num?: number): Promise<ApiResponse<any[]>> => {
+	if (num) {
+		const queryParams = new URLSearchParams({
+			num: num.toString()
+		});
+		return makeRequest(`/cards/random?${queryParams.toString()}`)
+	}
+	return makeRequest(`/cards/random`)
+}
