@@ -2,19 +2,19 @@
 export interface Card {
 	id: string
 	name: string
-	description: string
-	type: CardType
-	rarity: CardRarity
-	atk?: number
-	def?: number
+	// description: string not in db
+	// type: CardType not in db
+	// rarity: CardRarity not in db
+	atk: number
+	// def?: number
 	price: number
 	imageUrl: string
 	stock: number
-	kind: CardKind
+	kind: CardKind // attribute
 }
 
-export type CardType = "monster" | "spell" | "trap"
-export type CardRarity = "common" | "rare" | "ultra-rare" | "legendary"
+// export type CardType = "monster" | "spell" | "trap" only monsters
+// export type CardRarity = "common" | "rare" | "ultra-rare" | "legendary" not
 export type CardKind =
 	| "DARK"
 	| "DIVINE"
@@ -23,6 +23,8 @@ export type CardKind =
 	| "LIGHT"
 	| "WATER"
 	| "WIND"
+
+export type PackRarity = "COMMON" | "RARE" | "SUPER RARE" | "ULTRA RARE"
 
 // Tipos para los paquetes
 export interface CardPack {
@@ -39,10 +41,11 @@ export interface CardPack {
 }
 
 export interface Pack {
+	id: string
 	name: string
 	price: number
 	imageUrl: string
-	rarity: "COMMON" | "RAR" | "SUPER RARE" | "ULTRA RARE"
+	rarity: PackRarity
 	discount?: number // Descuento opcional
 	stock: number
 	description: string
@@ -51,14 +54,17 @@ export interface Pack {
 // Tipos para el usuario
 export interface UserInventory {
 	cards: UserCard[]
-	decks: Deck[]
+	// decks: Deck[] not
 }
 
 export interface UserCard {
 	id: string
-	cardId: string
+	// cardId: string
+	name: string
+	atk: number
+	imageUrl: string
+	kind: CardKind // attribute
 	quantity: number
-	card: Card
 }
 
 export interface Deck {
@@ -77,7 +83,7 @@ export interface BattleResult {
 
 // Estructura para los mazos en batalla
 export interface BattleDeck {
-	cards: Card[]
+	cards: UserCard[] // solo cartas de inventario, que dolor de cabeza eso asi
 	selectedCardIndex: number | null
 	playedCardIndices?: number[]
 }
