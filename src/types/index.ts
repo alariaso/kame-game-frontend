@@ -5,12 +5,12 @@ export interface Card {
 	// description: string not in db
 	// type: CardType not in db
 	// rarity: CardRarity not in db
-	atk: number
+	attack: number
 	// def?: number
 	price: number
 	imageUrl: string
 	stock: number
-	kind: CardKind // attribute
+	attribute: CardKind // attribute
 }
 
 // export type CardType = "monster" | "spell" | "trap" only monsters
@@ -59,11 +59,11 @@ export interface UserInventory {
 
 export interface UserCard {
 	id: string
-	// cardId: string
+	cardId: string
 	name: string
-	atk: number
+	attack: number
 	imageUrl: string
-	kind: CardKind // attribute
+	attribute: CardKind // attribute
 	quantity: number
 }
 
@@ -82,8 +82,13 @@ export interface BattleResult {
 }
 
 // Estructura para los mazos en batalla
-export interface BattleDeck {
-	cards: UserCard[] // solo cartas de inventario, que dolor de cabeza eso asi
+export interface UserDeck {
+	cards: UserCard[]
+	selectedCardIndex: number | null
+	playedCardIndices?: number[]
+}
+export interface AiDeck {
+	cards: Card[]
 	selectedCardIndex: number | null
 	playedCardIndices?: number[]
 }
