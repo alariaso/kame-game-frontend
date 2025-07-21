@@ -177,7 +177,7 @@ export interface Pack {
 	name: string
 	price: number
 	imageUrl: string
-	rarity: "COMMON" | "RAR" | "SUPER RARE" | "ULTRA RARE"
+	rarity: "COMMON" | "RARE" | "SUPER RARE" | "ULTRA RARE"
 	discount?: number // Descuento opcional
 }
 
@@ -201,6 +201,11 @@ export const createCard = async (
 		method: "POST",
 		body: JSON.stringify(cardData),
 	})
+}
+
+// one card
+export const getCard = async (id: string): Promise<ApiResponse<any>> => {
+	return makeRequest(`/cards/${id}`);
 }
 
 // 5️⃣ Función para obtener cartas con paginación
@@ -278,6 +283,11 @@ export const getCart = async (): Promise<ApiResponse<any>> => {
 	return makeAuthenticatedRequest("/cart")
 }
 
+// buy cart
+export const buyCart = async (): Promise<ApiResponse<any>> => {
+	return makeAuthenticatedRequest("/cart/buy");
+}
+
 export const addCartToPack = async (
 	PackId: number,
 	CardsId: number[]
@@ -346,7 +356,7 @@ export const buyCart = async (): Promise<ApiResponse<any>> => {
 }
 
 // get random cards
-export const getRandomCards = async (num?: number): Promise<ApiResponse<any[]>> => {
+export const getRandomCards = async (num?: number): Promise<ApiResponse<{results: any[]}>> => {
 	if (num) {
 		const queryParams = new URLSearchParams({
 			num: num.toString()
