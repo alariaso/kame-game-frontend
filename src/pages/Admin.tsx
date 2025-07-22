@@ -395,7 +395,6 @@ const Admin: React.FC = () => {
 	// Renderiza fila de la tabla de paquetes
 	const renderPackRow = (pack: CardPack) => {
 		const isEditing = editingPackId === pack.id
-
 		console.log("Rendering pack row:", pack)
 
 		return (
