@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Card as CardType, CardPack } from "@/types"
+import type { Card as CardType, CardPack } from "@/types"
 import { useAuth } from "@/context/AuthContext"
 import { toast } from "sonner"
 import {
@@ -23,7 +23,7 @@ export type CartItem = {
 export const useCart = () => {
 	const [cartItems, setCartItems] = useState<CartItem[]>([])
 	const [cartOpen, setCartOpen] = useState(false)
-	const { isAuthenticated, buyCard, buyPack } = useAuth()
+	const { isAuthenticated, refreshUserData } = useAuth()
 
 	// Cargar carrito desde la API real al inicializar
 	useEffect(() => {
@@ -211,6 +211,7 @@ export const useCart = () => {
 			// Compra exitosa
 			toast.success("¡Compra realizada con éxito!")
 			
+			refreshUserData();
 			// Limpiar el carrito localmente y cerrar el modal
 			setCartItems([])
 			setCartOpen(false)

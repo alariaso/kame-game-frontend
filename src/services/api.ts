@@ -218,7 +218,7 @@ export const getCards = async (
 		itemsPerPage: itemsPerPage.toString(),
 	})
 
-	return makeAuthenticatedRequest<GetCardsResponse>(
+	return makeRequest<GetCardsResponse>(
 		`/cards?${queryParams.toString()}`
 	)
 }
@@ -283,11 +283,6 @@ export const getCart = async (): Promise<ApiResponse<any>> => {
 	return makeAuthenticatedRequest("/cart")
 }
 
-// buy cart
-export const buyCart = async (): Promise<ApiResponse<any>> => {
-	return makeAuthenticatedRequest("/cart/buy");
-}
-
 export const addCartToPack = async (
 	PackId: number,
 	CardsId: number[]
@@ -315,7 +310,7 @@ export const getCPacks = async (
 		itemsPerPage: itemsPerPage.toString(),
 	})
 
-	return makeAuthenticatedRequest<GetCardsResponse>(
+	return makeRequest<GetCardsResponse>(
 		`/packs?${queryParams.toString()}`
 	)
 }

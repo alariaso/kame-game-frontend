@@ -25,7 +25,7 @@ const Inventory: React.FC = () => {
 			try {
 				const response = await getInventory(
 					currentPage,
-					10,
+					12,
 					searchTerm || undefined,
 					filter || undefined
 				)

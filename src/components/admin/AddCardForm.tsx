@@ -34,15 +34,7 @@ const formSchema = z.object({
 	name: z
 		.string()
 		.min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
-	description: z
-		.string()
-		.min(10, {
-			message: "La descripción debe tener al menos 10 caracteres",
-		}),
-	type: z.enum(["monster", "spell", "trap"] as const),
-	rarity: z.enum(["common", "rare", "ultra-rare", "legendary"] as const),
-	atk: z.string().optional(),
-	def: z.string().optional(),
+	attack: z.string().optional(),
 	price: z.string().min(1, { message: "El precio es requerido" }),
 	imageUrl: z.string().url({ message: "Debe ser una URL válida" }),
 	stock: z.string().min(1, { message: "El stock es requerido" }),
@@ -66,11 +58,7 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
 			name: "",
-			description: "",
-			type: "monster",
-			rarity: "common",
-			atk: "",
-			def: "",
+			attack: "",
 			price: "",
 			imageUrl: "",
 			stock: "1",
@@ -86,7 +74,7 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 				price: Number(data.price),
 				imageUrl: data.imageUrl,
 				attribute: data.attribute,
-				attack: Number(data.atk) || 0,
+				attack: Number(data.attack) || 0,
 			}
 
 			// Llamar a la API real
@@ -102,10 +90,7 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 					...data,
 					price: Number(data.price),
 					stock: Number(data.stock),
-					...(data.type === "monster" && {
-						atk: Number(data.atk),
-						def: Number(data.def),
-					}),
+					atk: Number(data.attack),
 					id: crypto.randomUUID(),
 				}
 				onAddCard(localCardData)
@@ -119,7 +104,6 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 		}
 	}
 
-	const cardType = form.watch("type")
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -155,38 +139,6 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 
 							<FormField
 								control={form.control}
-								name="type"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Tipo</FormLabel>
-										<Select
-											onValueChange={field.onChange}
-											defaultValue={field.value}
-										>
-											<FormControl>
-												<SelectTrigger className="bg-black/30 border-gold/20">
-													<SelectValue placeholder="Seleccionar tipo" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent className="bg-background border-gold/30">
-												<SelectItem value="monster">
-													Monstruo
-												</SelectItem>
-												<SelectItem value="spell">
-													Hechizo
-												</SelectItem>
-												<SelectItem value="trap">
-													Trampa
-												</SelectItem>
-											</SelectContent>
-										</Select>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
 								name="attribute"
 								render={({ field }) => (
 									<FormItem>
@@ -214,47 +166,9 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 									</FormItem>
 								)}
 							/>
-
-							<FormField
-								control={form.control}
-								name="rarity"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Rareza</FormLabel>
-										<Select
-											onValueChange={field.onChange}
-											defaultValue={field.value}
-										>
-											<FormControl>
-												<SelectTrigger className="bg-black/30 border-gold/20">
-													<SelectValue placeholder="Seleccionar rareza" />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent className="bg-background border-gold/30">
-												<SelectItem value="common">
-													Común
-												</SelectItem>
-												<SelectItem value="rare">
-													Rara
-												</SelectItem>
-												<SelectItem value="ultra-rare">
-													Ultra Rara
-												</SelectItem>
-												<SelectItem value="legendary">
-													Legendaria
-												</SelectItem>
-											</SelectContent>
-										</Select>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							{cardType === "monster" && (
-								<>
 									<FormField
 										control={form.control}
-										name="atk"
+										name="attack"
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>Ataque</FormLabel>
@@ -269,26 +183,6 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 											</FormItem>
 										)}
 									/>
-
-									<FormField
-										control={form.control}
-										name="def"
-										render={({ field }) => (
-											<FormItem>
-												<FormLabel>Defensa</FormLabel>
-												<FormControl>
-													<Input
-														type="number"
-														placeholder="Puntos de defensa"
-														{...field}
-													/>
-												</FormControl>
-												<FormMessage />
-											</FormItem>
-										)}
-									/>
-								</>
-							)}
 
 							<FormField
 								control={form.control}
@@ -336,24 +230,6 @@ const AddCardForm: React.FC<AddCardFormProps> = ({
 									<FormControl>
 										<Input
 											placeholder="URL de la imagen de la carta"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name="description"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Descripción</FormLabel>
-									<FormControl>
-										<Textarea
-											placeholder="Descripción de la carta"
-											className="resize-none min-h-[100px] bg-black/30 border-gold/20"
 											{...field}
 										/>
 									</FormControl>

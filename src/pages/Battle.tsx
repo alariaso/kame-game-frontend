@@ -16,6 +16,7 @@ import BattleCardSelection from "@/components/battles/BattleCardSelection"
 import BattleArena from "@/components/battles/BattleArena"
 import BattleResult from "@/components/battles/BattleResults"
 import { getInventory, getRandomCards } from "@/services/api"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 
 const Battles: React.FC = () => {
 	// Battle stages
@@ -63,6 +64,12 @@ const Battles: React.FC = () => {
 	const [totalPages, setTotalPages] = useState<number>(1);
 	const [currentPage, setCurrentPage] = useState<number>(1);
 
+	const handlePageChange = (page: number) => {
+		if (page >= 1 && page <= totalPages) {
+			setCurrentPage(page)
+		}
+	}
+	
 	useEffect(() => {
 		const loadInventory = async () => {
 			setLoading(true);
@@ -97,6 +104,7 @@ const Battles: React.FC = () => {
 
 		loadInventory();
 	}, [searchTerm, filter, currentPage]);
+
 	// Function to determine winner based on exact attribute matchups
 	const determineWinner = (playerCard: UserCard, aiCard: CardType): { winner: "player" | "ai" | "draw", reason: string } => {
 		const playerKind = playerCard.attribute
@@ -345,6 +353,7 @@ const Battles: React.FC = () => {
 				</div>
 
 				{/* Card Selection Stage */}
+				<>
 				{stage === STAGES.SELECTION && (
 					<BattleCardSelection
 						userCards={userCards}
@@ -352,7 +361,77 @@ const Battles: React.FC = () => {
 						setSelectedCards={setSelectedCards}
 						onConfirm={prepareBattle}
 					/>
-				)}
+				)
+				}
+				{loading ? (
+				<div className="text-center py-12">
+					<p className="text-gray-400">Cargando inventario...</p>
+				</div>
+			) : userCards.length > 0 ? (
+				<>
+					{totalPages > 1 && (
+						<div className="mt-8 flex justify-center">
+							<Pagination>
+								<PaginationContent>
+									<PaginationItem>
+										<PaginationPrevious
+											onClick={() => handlePageChange(currentPage - 1)}
+											className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+										/>
+									</PaginationItem>
+
+									{/* Páginas numeradas */}
+									{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+										let pageNum;
+										if (totalPages <= 5) {
+											pageNum = i + 1;
+										} else if (currentPage <= 3) {
+											pageNum = i + 1;
+										} else if (currentPage >= totalPages - 2) {
+											pageNum = totalPages - 4 + i;
+										} else {
+											pageNum = currentPage - 2 + i;
+										}
+
+										return (
+											<PaginationItem key={pageNum}>
+												<PaginationLink
+													onClick={() => handlePageChange(pageNum)}
+													isActive={currentPage === pageNum}
+													className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+												>
+													{pageNum}
+												</PaginationLink>
+											</PaginationItem>
+										);
+									})}
+
+									<PaginationItem>
+										<PaginationNext
+											onClick={() => handlePageChange(currentPage + 1)}
+											className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+										/>
+									</PaginationItem>
+								</PaginationContent>
+							</Pagination>
+						</div>
+					)}
+				</>
+			) : (
+				<div className="text-center py-12">
+					<p className="text-gray-400">
+						{searchTerm || filter 
+							? "No se encontraron cartas en tu inventario con estos filtros" 
+							: "No tienes cartas en tu inventario"}
+					</p>
+					{!searchTerm && !filter && (
+						<p className="text-gray-500 mt-2">
+							¡Ve a la tienda para comprar tus primeras cartas!
+						</p>
+					)}
+				</div>
+			)}
+				</>
 
 				{/* Prepare Stage - Show both decks and start button */}
 				{stage === STAGES.PREPARE && playerDeck && aiDeck && (

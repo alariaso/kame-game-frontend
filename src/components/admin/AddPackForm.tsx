@@ -133,22 +133,24 @@ const AddPackForm: React.FC<AddPackFormProps> = ({
 		}
 
 		try {
+			const valueDiscount = Number(data.discount) / 100 | 0;
 			const packData: Pack = {
 				name: data.name,
 				description: data.description,
 				price: Number(data.price),
 				stock: Number(data.stock),
-				discount: Number(data.discount) / 100,
+				discount: valueDiscount,
 				imageUrl: data.imageUrl,
 				rarity: "COMMON",
 			}
 
 			console.log("Selected Cards:", selectedCards)
 
+			const cardIds = selectedCards.map((el) => Number(el));
 			const responseCreatedPack = await createPack(packData)
 			const responseAddCards = await addCartToPack(
 				responseCreatedPack.data.id,
-				selectedCards
+				cardIds
 			)
 
 			const packItem: CardPack = {

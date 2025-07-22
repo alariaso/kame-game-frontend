@@ -38,7 +38,7 @@ const calculatePackageRarity = (cards: CardType[]): string => {
 
 	// Calculate average rarity
 	const total = cards.reduce(
-		(sum, card) => sum + rarityValues[card.rarity],
+		(sum, card) => sum + card.price/1000,
 		0
 	)
 	const average = total / cards.length
@@ -230,7 +230,7 @@ const Admin: React.FC = () => {
 							...pack,
 							discount: Math.min(
 								1,
-								Math.max(0, pack.discount + change)
+								Math.max(0, (pack.discount ? pack.discount : 0) + change)
 							),
 						}
 					: pack
@@ -301,16 +301,9 @@ const Admin: React.FC = () => {
 				</td>
 				<td className="py-3 px-4">
 					<span
-						className={`inline-block px-2 py-1 rounded-full text-xs ${getTypeColor(card.type)}`}
+						className={`inline-block px-2 py-1 rounded-full text-xs ${getTypeColor(card.attribute)}`}
 					>
 						{formatType(card.attribute)}
-					</span>
-				</td>
-				<td className="py-3 px-4">
-					<span
-						className={`inline-block px-2 py-1 rounded-full text-xs ${getRarityColor(card.rarity)}`}
-					>
-						{formatRarity(card.rarity)}
 					</span>
 				</td>
 				<td className="py-3 px-4">
@@ -660,7 +653,7 @@ const Admin: React.FC = () => {
 					open={addPackDialogOpen}
 					onOpenChange={setAddPackDialogOpen}
 					onAddPack={handleAddPack}
-					cards={cards}
+					//cards={cards}
 				/>
 
 				{/* Tabs para Cartas y Paquetes */}
@@ -730,9 +723,6 @@ const Admin: React.FC = () => {
 														</th>
 														<th className="py-3 px-4 font-medium">
 															Tipo
-														</th>
-														<th className="py-3 px-4 font-medium">
-															Rareza
 														</th>
 														<th className="py-3 px-4 font-medium">
 															Precio

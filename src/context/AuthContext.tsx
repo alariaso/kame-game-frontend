@@ -181,7 +181,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 				id: `inv-${Date.now()}`,
 				cardId: card.id,
 				quantity: 1,
-				card: card,
+				name: card.name,
+				attack: card.attack,
+				imageUrl: card.imageUrl,
+				attribute: card.attribute
 			}
 			updatedInventory = {
 				...userInventory,
@@ -240,7 +243,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 					id: `inv-${Date.now()}-${card.id}`,
 					cardId: card.id,
 					quantity: 1,
-					card: card,
+					name: card.name,
+					attack: card.attack,
+					imageUrl: card.imageUrl,
+					attribute: card.attribute,
 				}
 				updatedInventory.cards = [
 					...updatedInventory.cards,

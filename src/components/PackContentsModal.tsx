@@ -45,7 +45,7 @@ const PackContentsModal: React.FC<PackContentsModalProps> = ({
 					// Si tiene una propiedad results, usar esa
 					const cardsData = Array.isArray(response.data) 
 						? response.data 
-						: response.data?.results || response.data?.cards || []
+						: response.data?.results || response.data || []
 					
 					console.log("Cards data extracted:", cardsData)
 					setCards(cardsData)

@@ -8,7 +8,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Card as CardType, CardPack } from "@/types"
+import type { Card as CardType, CardPack } from "@/types"
 import { useAuth } from "@/context/AuthContext"
 import { toast } from "sonner"
 

@@ -37,11 +37,10 @@ export interface CardPack {
 	stock: number
 	rarity: string
 	cardIds: string[]
-	discount: number
+	discount?: number
 }
 
 export interface Pack {
-	id: string
 	name: string
 	price: number
 	imageUrl: string
