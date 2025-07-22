@@ -21,6 +21,7 @@ import {
 	updateCardPrice as updateCardPriceAPI,
 	getCards,
 	getCPacks,
+	getCardsOfPack,
 } from "@/services/api"
 
 // Helper function to calculate package rarity based on cards
@@ -395,6 +396,8 @@ const Admin: React.FC = () => {
 	const renderPackRow = (pack: CardPack) => {
 		const isEditing = editingPackId === pack.id
 
+		console.log("Rendering pack row:", pack)
+
 		return (
 			<tr
 				key={pack.id}
@@ -414,9 +417,7 @@ const Admin: React.FC = () => {
 						</span>
 					</div>
 				</td>
-				<td className="py-3 px-4">
-					<span>{pack.cardCount} cartas</span>
-				</td>
+				{/* <td className="py-3 px-4"><span>cartas</span></td> */}
 				<td className="py-3 px-4">
 					<span
 						className={`inline-block px-2 py-1 rounded-full text-xs ${getPackRarityColor(pack.rarity)}`}
@@ -909,9 +910,9 @@ const Admin: React.FC = () => {
 														<th className="py-3 px-4 font-medium">
 															Paquete
 														</th>
-														<th className="py-3 px-4 font-medium">
+														{/* <th className="py-3 px-4 font-medium">
 															Contenido
-														</th>
+														</th> */}
 														<th className="py-3 px-4 font-medium">
 															Rareza
 														</th>

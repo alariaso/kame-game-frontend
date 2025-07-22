@@ -310,6 +310,12 @@ export const getCPacks = async (
 	)
 }
 
+export const getCardsOfPack = async (
+	idPack: number
+): Promise<ApiResponse<GetCardsResponse>> => {
+	return makeAuthenticatedRequest<GetCardsResponse>(`/packs/${idPack}/cards`)
+}
+
 // get inventory function
 export const getInventory = async (
 	page: number = 1,
