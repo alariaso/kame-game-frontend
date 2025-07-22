@@ -13,12 +13,12 @@ import {
 import { CartContext } from "@/App"
 import { getCards, getCPacks } from "@/services/api"
 import { toast } from "sonner"
-import PackContentsModal from "@/components/PackContentsModal"
 
 type ProductCategory = "Cartas Individuales" | "Paquetes"
 type Filter = "cardKind" | "packRarity"
 
 const Shop: React.FC = () => {
+	// Eliminamos cualquier referencia a getAvailablePacks() mock
 	const [activeTab, setActiveTab] = useState<string>("cards")
 	const [searchTerm, setSearchTerm] = useState<string>("")
 	const [filters, setFilters] = useState<Record<Filter, string | null>>({
@@ -32,9 +32,6 @@ const Shop: React.FC = () => {
 	const [currentPage, setCurrentPage] = useState<number>(1)
 	const [allCards, setAllCards] = useState<any[]>([])
 	const [allPacks, setAllPacks] = useState<any[]>([])
-	const [isPackModalOpen, setIsPackModalOpen] = useState(false)
-	const [selectedPackId, setSelectedPackId] = useState<number | null>(null)
-	const [selectedPackName, setSelectedPackName] = useState("")
 	const cart = useContext(CartContext)
 
 	// Función para cargar todas las cartas desde la API real
@@ -142,7 +139,9 @@ const Shop: React.FC = () => {
 				if (!searchTerm && !filters.cardKind) {
 					const response = await getCards(currentPage, 20)
 					if (response.error) {
-						toast.error("Error al cargar las cartas: " + response.message)
+						toast.error(
+							"Error al cargar las cartas: " + response.message
+						)
 						setFilteredCards([])
 					} else {
 						setFilteredCards(response.data?.results || [])
@@ -150,14 +149,22 @@ const Shop: React.FC = () => {
 					}
 				} else {
 					// Si hay filtros, necesitamos todas las cartas
-					const allCardsData = allCards.length > 0 ? allCards : await loadAllCards()
-					const filtered = applyFilters(allCardsData, searchTerm, filters.cardKind)
+					const allCardsData =
+						allCards.length > 0 ? allCards : await loadAllCards()
+					const filtered = applyFilters(
+						allCardsData,
+						searchTerm,
+						filters.cardKind
+					)
 
 					// Calcular paginación para resultados filtrados
 					const itemsPerPage = 20
 					const startIndex = (currentPage - 1) * itemsPerPage
 					const endIndex = startIndex + itemsPerPage
-					const paginatedResults = filtered.slice(startIndex, endIndex)
+					const paginatedResults = filtered.slice(
+						startIndex,
+						endIndex
+					)
 
 					setFilteredCards(paginatedResults)
 					setTotalPages(Math.ceil(filtered.length / itemsPerPage))
@@ -184,7 +191,9 @@ const Shop: React.FC = () => {
 				if (!searchTerm && !filters.packRarity) {
 					const response = await getCPacks(currentPage, 20)
 					if (response.error) {
-						toast.error("Error al cargar los paquetes: " + response.message)
+						toast.error(
+							"Error al cargar los paquetes: " + response.message
+						)
 						setFilteredPacks([])
 					} else {
 						setFilteredPacks(response.data?.results || [])
@@ -192,14 +201,22 @@ const Shop: React.FC = () => {
 					}
 				} else {
 					// Si hay filtros, necesitamos todos los paquetes
-					const allPacksData = allPacks.length > 0 ? allPacks : await loadAllPacks()
-					const filtered = applyPackFilters(allPacksData, searchTerm, filters.packRarity)
+					const allPacksData =
+						allPacks.length > 0 ? allPacks : await loadAllPacks()
+					const filtered = applyPackFilters(
+						allPacksData,
+						searchTerm,
+						filters.packRarity
+					)
 
 					// Calcular paginación para resultados filtrados
 					const itemsPerPage = 20
 					const startIndex = (currentPage - 1) * itemsPerPage
 					const endIndex = startIndex + itemsPerPage
-					const paginatedResults = filtered.slice(startIndex, endIndex)
+					const paginatedResults = filtered.slice(
+						startIndex,
+						endIndex
+					)
 
 					setFilteredPacks(paginatedResults)
 					setTotalPages(Math.ceil(filtered.length / itemsPerPage))
@@ -263,13 +280,6 @@ const Shop: React.FC = () => {
 			...prev,
 			[filterName]: value === "all" ? null : value,
 		}))
-	}
-
-	const handlePackClick = (pack: any) => {
-		console.log("Pack clicked:", pack)
-		setSelectedPackId(pack.id)
-		setSelectedPackName(pack.name)
-		setIsPackModalOpen(true)
 	}
 
 	return (
@@ -387,9 +397,13 @@ const Shop: React.FC = () => {
 														cart?.addToCart(
 															{
 																...card,
-																category: "card",
-																id: card.id || card.name,
-																image_url: card.imageUrl,
+																category:
+																	"card",
+																id:
+																	card.id ||
+																	card.name,
+																image_url:
+																	card.imageUrl,
 																kind: card.attribute,
 																stock: card.stock,
 															},
@@ -414,7 +428,11 @@ const Shop: React.FC = () => {
 										<PaginationContent>
 											<PaginationItem>
 												<PaginationPrevious
-													onClick={() => handlePageChange(currentPage - 1)}
+													onClick={() =>
+														handlePageChange(
+															currentPage - 1
+														)
+													}
 													className={
 														currentPage === 1
 															? "pointer-events-none opacity-50"
@@ -423,36 +441,65 @@ const Shop: React.FC = () => {
 												/>
 											</PaginationItem>
 
-											{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-												let pageNum
-												if (totalPages <= 5) {
-													pageNum = i + 1
-												} else if (currentPage <= 3) {
-													pageNum = i + 1
-												} else if (currentPage >= totalPages - 2) {
-													pageNum = totalPages - 4 + i
-												} else {
-													pageNum = currentPage - 2 + i
-												}
+											{Array.from(
+												{
+													length: Math.min(
+														5,
+														totalPages
+													),
+												},
+												(_, i) => {
+													let pageNum
+													if (totalPages <= 5) {
+														pageNum = i + 1
+													} else if (
+														currentPage <= 3
+													) {
+														pageNum = i + 1
+													} else if (
+														currentPage >=
+														totalPages - 2
+													) {
+														pageNum =
+															totalPages - 4 + i
+													} else {
+														pageNum =
+															currentPage - 2 + i
+													}
 
-												return (
-													<PaginationItem key={pageNum}>
-														<PaginationLink
-															onClick={() => handlePageChange(pageNum)}
-															isActive={currentPage === pageNum}
-															className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+													return (
+														<PaginationItem
+															key={pageNum}
 														>
-															{pageNum}
-														</PaginationLink>
-													</PaginationItem>
-												)
-											})}
+															<PaginationLink
+																onClick={() =>
+																	handlePageChange(
+																		pageNum
+																	)
+																}
+																isActive={
+																	currentPage ===
+																	pageNum
+																}
+																className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+															>
+																{pageNum}
+															</PaginationLink>
+														</PaginationItem>
+													)
+												}
+											)}
 
 											<PaginationItem>
 												<PaginationNext
-													onClick={() => handlePageChange(currentPage + 1)}
+													onClick={() =>
+														handlePageChange(
+															currentPage + 1
+														)
+													}
 													className={
-														currentPage === totalPages
+														currentPage ===
+														totalPages
 															? "pointer-events-none opacity-50"
 															: "cursor-pointer hover:bg-gold/10"
 													}
@@ -486,8 +533,7 @@ const Shop: React.FC = () => {
 									filteredPacks.map((pack) => (
 										<Card
 											key={pack.id}
-											className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20 cursor-pointer"
-											onClick={() => handlePackClick(pack)}
+											className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
 										>
 											<div className="aspect-video overflow-hidden">
 												<img
@@ -506,7 +552,11 @@ const Shop: React.FC = () => {
 												<div className="flex justify-between items-center mt-2">
 													<div className="flex flex-col">
 														<span className="text-sm text-gray-300">
-															Contiene {pack.cardCount || pack.cards_count || "N/A"} cartas
+															Contiene{" "}
+															{pack.cards
+																.length ||
+																"N/A"}{" "}
+															cartas
 														</span>
 														<span className="text-sm text-gray-300">
 															Stock: {pack.stock}
@@ -518,10 +568,12 @@ const Shop: React.FC = () => {
 												</div>
 												<button
 													className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
-													onClick={(e) => {
-														e.stopPropagation()
-														cart?.addToCart(pack, "pack")
-													}}
+													onClick={() =>
+														cart?.addToCart(
+															pack,
+															"pack"
+														)
+													}
 													disabled={pack.stock <= 0}
 												>
 													{pack.stock <= 0
@@ -540,7 +592,11 @@ const Shop: React.FC = () => {
 										<PaginationContent>
 											<PaginationItem>
 												<PaginationPrevious
-													onClick={() => handlePageChange(currentPage - 1)}
+													onClick={() =>
+														handlePageChange(
+															currentPage - 1
+														)
+													}
 													className={
 														currentPage === 1
 															? "pointer-events-none opacity-50"
@@ -549,36 +605,65 @@ const Shop: React.FC = () => {
 												/>
 											</PaginationItem>
 
-											{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-												let pageNum
-												if (totalPages <= 5) {
-													pageNum = i + 1
-												} else if (currentPage <= 3) {
-													pageNum = i + 1
-												} else if (currentPage >= totalPages - 2) {
-													pageNum = totalPages - 4 + i
-												} else {
-													pageNum = currentPage - 2 + i
-												}
+											{Array.from(
+												{
+													length: Math.min(
+														5,
+														totalPages
+													),
+												},
+												(_, i) => {
+													let pageNum
+													if (totalPages <= 5) {
+														pageNum = i + 1
+													} else if (
+														currentPage <= 3
+													) {
+														pageNum = i + 1
+													} else if (
+														currentPage >=
+														totalPages - 2
+													) {
+														pageNum =
+															totalPages - 4 + i
+													} else {
+														pageNum =
+															currentPage - 2 + i
+													}
 
-												return (
-													<PaginationItem key={pageNum}>
-														<PaginationLink
-															onClick={() => handlePageChange(pageNum)}
-															isActive={currentPage === pageNum}
-															className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+													return (
+														<PaginationItem
+															key={pageNum}
 														>
-															{pageNum}
-														</PaginationLink>
-													</PaginationItem>
-												)
-											})}
+															<PaginationLink
+																onClick={() =>
+																	handlePageChange(
+																		pageNum
+																	)
+																}
+																isActive={
+																	currentPage ===
+																	pageNum
+																}
+																className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+															>
+																{pageNum}
+															</PaginationLink>
+														</PaginationItem>
+													)
+												}
+											)}
 
 											<PaginationItem>
 												<PaginationNext
-													onClick={() => handlePageChange(currentPage + 1)}
+													onClick={() =>
+														handlePageChange(
+															currentPage + 1
+														)
+													}
 													className={
-														currentPage === totalPages
+														currentPage ===
+														totalPages
 															? "pointer-events-none opacity-50"
 															: "cursor-pointer hover:bg-gold/10"
 													}
@@ -592,13 +677,6 @@ const Shop: React.FC = () => {
 					)}
 				</TabsContent>
 			</Tabs>
-
-			<PackContentsModal
-				isOpen={isPackModalOpen}
-				onClose={() => setIsPackModalOpen(false)}
-				packId={selectedPackId}
-				packName={selectedPackName}
-			/>
 		</div>
 	)
 }
