@@ -353,85 +353,87 @@ const Battles: React.FC = () => {
 				</div>
 
 				{/* Card Selection Stage */}
-				<>
 				{stage === STAGES.SELECTION && (
+					<>
 					<BattleCardSelection
 						userCards={userCards}
 						selectedCards={selectedCards}
 						setSelectedCards={setSelectedCards}
 						onConfirm={prepareBattle}
 					/>
-				)
-				}
+				
+				
 				{loading ? (
-				<div className="text-center py-12">
-					<p className="text-gray-400">Cargando inventario...</p>
-				</div>
-			) : userCards.length > 0 ? (
-				<>
-					{totalPages > 1 && (
-						<div className="mt-8 flex justify-center">
-							<Pagination>
-								<PaginationContent>
-									<PaginationItem>
-										<PaginationPrevious
-											onClick={() => handlePageChange(currentPage - 1)}
-											className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
-										/>
-									</PaginationItem>
+                        <div className="text-center py-12">
+                            <p className="text-gray-400">Cargando inventario...</p>
+                        </div>
+                    ) : userCards.length > 0 ? (
+                        <>
+                            {totalPages > 1 && (
+                                <div className="mt-8 flex justify-center">
+                                    <Pagination>
+                                        <PaginationContent>
+                                            <PaginationItem>
+                                                <PaginationPrevious
+                                                    onClick={() => handlePageChange(currentPage - 1)}
+                                                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+                                                />
+                                            </PaginationItem>
 
-									{/* Páginas numeradas */}
-									{Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-										let pageNum;
-										if (totalPages <= 5) {
-											pageNum = i + 1;
-										} else if (currentPage <= 3) {
-											pageNum = i + 1;
-										} else if (currentPage >= totalPages - 2) {
-											pageNum = totalPages - 4 + i;
-										} else {
-											pageNum = currentPage - 2 + i;
-										}
+                                            {/* Páginas numeradas */}
+                                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                                let pageNum;
+                                                if (totalPages <= 5) {
+                                                    pageNum = i + 1;
+                                                } else if (currentPage <= 3) {
+                                                    pageNum = i + 1;
+                                                } else if (currentPage >= totalPages - 2) {
+                                                    pageNum = totalPages - 4 + i;
+                                                } else {
+                                                    pageNum = currentPage - 2 + i;
+                                                }
 
-										return (
-											<PaginationItem key={pageNum}>
-												<PaginationLink
-													onClick={() => handlePageChange(pageNum)}
-													isActive={currentPage === pageNum}
-													className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
-												>
-													{pageNum}
-												</PaginationLink>
-											</PaginationItem>
-										);
-									})}
+                                                return (
+                                                    <PaginationItem key={pageNum}>
+                                                        <PaginationLink
+                                                            onClick={() => handlePageChange(pageNum)}
+                                                            isActive={currentPage === pageNum}
+                                                            className="cursor-pointer hover:bg-gold/10 data-[state=active]:bg-gold data-[state=active]:text-black"
+                                                        >
+                                                            {pageNum}
+                                                        </PaginationLink>
+                                                    </PaginationItem>
+                                                );
+                                            })}
 
-									<PaginationItem>
-										<PaginationNext
-											onClick={() => handlePageChange(currentPage + 1)}
-											className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
-										/>
-									</PaginationItem>
-								</PaginationContent>
-							</Pagination>
-						</div>
-					)}
+                                            <PaginationItem>
+                                                <PaginationNext
+                                                    onClick={() => handlePageChange(currentPage + 1)}
+                                                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer hover:bg-gold/10"}
+                                                />
+                                            </PaginationItem>
+                                        </PaginationContent>
+                                    </Pagination>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className="text-center py-12">
+                            <p className="text-gray-400">
+                                {searchTerm || filter 
+                                    ? "No se encontraron cartas en tu inventario con estos filtros" 
+                                    : "No tienes cartas en tu inventario"}
+                            </p>
+                            {!searchTerm && !filter && (
+                                <p className="text-gray-500 mt-2">
+                                    ¡Ve a la tienda para comprar tus primeras cartas!
+                                </p>
+                            )}
+                        </div>
+                    )}
 				</>
-			) : (
-				<div className="text-center py-12">
-					<p className="text-gray-400">
-						{searchTerm || filter 
-							? "No se encontraron cartas en tu inventario con estos filtros" 
-							: "No tienes cartas en tu inventario"}
-					</p>
-					{!searchTerm && !filter && (
-						<p className="text-gray-500 mt-2">
-							¡Ve a la tienda para comprar tus primeras cartas!
-						</p>
-					)}
-				</div>
-			)}
-				</>
+				)}
+				
 
 				{/* Prepare Stage - Show both decks and start button */}
 				{stage === STAGES.PREPARE && playerDeck && aiDeck && (
