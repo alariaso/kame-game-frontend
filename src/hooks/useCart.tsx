@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react"
 import { Card as CardType, CardPack } from "@/types"
 import { useAuth } from "@/context/AuthContext"
@@ -24,7 +25,7 @@ export const useCart = () => {
 	const [cartOpen, setCartOpen] = useState(false)
 	const { isAuthenticated, buyCard, buyPack } = useAuth()
 
-	// Cargar carrito desde la API al inicializar
+	// Cargar carrito desde la API real al inicializar
 	useEffect(() => {
 		if (isAuthenticated) {
 			loadCartFromAPI()
@@ -35,32 +36,38 @@ export const useCart = () => {
 		if (!isAuthenticated) return
 
 		try {
+			console.log("Loading cart from API...")
 			const response = await getCartAPI()
 
 			if (response.error) {
 				console.error("Error loading cart:", response.message)
+				toast.error("Error al cargar el carrito: " + response.message)
+				setCartItems([])
 				return
 			}
 
+			// Procesar los datos reales del carrito desde la API
 			const apiCartItems = [
 				...(response.data?.cards || []),
 				...(response.data?.packs || []),
 			]
-			const formattedItems: CartItem[] = apiCartItems.map(
-				(item: any) => ({
-					id: item.cardId?.toString() || item.id?.toString(),
-					name: item.card?.name || item.name || "Carta desconocida",
-					price: item.card?.price || item.price || 0,
-					quantity: item.quantity || 1,
-					imageUrl: item.card?.imageUrl || item.imageUrl || "",
-					type: "card",
-					itemRef: item.card || item,
-				})
-			)
+
+			const formattedItems: CartItem[] = apiCartItems.map((item: any) => ({
+				id: item.cardId?.toString() || item.id?.toString(),
+				name: item.card?.name || item.name || "Producto desconocido",
+				price: item.card?.price || item.price || 0,
+				quantity: item.quantity || 1,
+				imageUrl: item.card?.imageUrl || item.imageUrl || "",
+				type: item.card ? "card" : "pack",
+				itemRef: item.card || item,
+			}))
 
 			setCartItems(formattedItems)
+			console.log("Cart loaded successfully:", formattedItems)
 		} catch (error) {
 			console.error("Error loading cart from API:", error)
+			toast.error("Error de conexión al cargar el carrito")
+			setCartItems([])
 		}
 	}
 
@@ -74,8 +81,7 @@ export const useCart = () => {
 		}
 
 		try {
-			// Usar la API real para agregar al carrito
-
+			console.log("Adding to cart:", item.id, itemType)
 			const response = await addToCartAPI(Number(item.id))
 
 			if (response.error) {
@@ -83,30 +89,8 @@ export const useCart = () => {
 				return
 			}
 
-			// Actualizar el estado local
-			setCartItems((prevItems) => {
-				const existingItemIndex = prevItems.findIndex(
-					(cartItem) =>
-						cartItem.id === item.id && cartItem.type === itemType
-				)
-
-				if (existingItemIndex >= 0) {
-					const updatedItems = [...prevItems]
-					updatedItems[existingItemIndex].quantity += 1
-					return updatedItems
-				} else {
-					const newItem: CartItem = {
-						id: item.id,
-						name: item.name,
-						price: item.price,
-						quantity: 1,
-						imageUrl: item.imageUrl,
-						type: itemType,
-						itemRef: item,
-					}
-					return [...prevItems, newItem]
-				}
-			})
+			// Recargar el carrito desde la API para obtener el estado actualizado
+			await loadCartFromAPI()
 
 			toast.success(
 				`${itemType === "card" ? "Carta" : "Paquete"} agregado al carrito`
@@ -119,6 +103,8 @@ export const useCart = () => {
 	}
 
 	const updateCartItemQuantity = (id: string, change: number) => {
+		// Actualización temporal local, luego sincronizar con API
+		// TODO: Implementar endpoint para actualizar cantidad específica
 		setCartItems((prevItems) =>
 			prevItems.map((item) =>
 				item.id === id
@@ -135,16 +121,16 @@ export const useCart = () => {
 		}
 
 		try {
+			console.log("Removing cart item:", id)
 			const response = await removeCartItemAPI(Number(id))
 
 			if (response.error) {
-				toast.error("Error al eliminar el ítem del carrito")
+				toast.error("Error al eliminar el ítem del carrito: " + response.message)
 				return
 			}
 
-			setCartItems((prevItems) =>
-				prevItems.filter((item) => item.id !== id)
-			)
+			// Recargar el carrito desde la API para obtener el estado actualizado
+			await loadCartFromAPI()
 			toast.success("Ítem eliminado del carrito")
 		} catch (error) {
 			console.error("Error removing cart item:", error)
@@ -159,10 +145,11 @@ export const useCart = () => {
 		}
 
 		try {
+			console.log("Clearing cart...")
 			const response = await clearCartAPI()
 
 			if (response.error) {
-				toast.error("Error al vaciar el carrito")
+				toast.error("Error al vaciar el carrito: " + response.message)
 				return
 			}
 
@@ -180,9 +167,10 @@ export const useCart = () => {
 			return
 		}
 
+		// TODO: Implementar checkout real con API
+		// Por ahora usamos la lógica existente del contexto de autenticación
 		let allPurchasesSuccessful = true
 
-		// Procesar cada ítem en el carrito
 		for (const item of cartItems) {
 			const { id, quantity, type } = item
 

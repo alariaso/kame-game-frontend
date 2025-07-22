@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { getInventory } from "@/services/api"
@@ -13,9 +14,9 @@ const Inventory: React.FC = () => {
 	const [totalPages, setTotalPages] = useState<number>(1)
 	const [currentPage, setCurrentPage] = useState<number>(1)
 
-	// load the user inventory cards applying all the active filters
+	// Cargar el inventario del usuario desde la API real
 	useEffect(() => {
-		const loadCards = async () => {
+		const loadInventory = async () => {
 			setLoading(true);
 
 			try {
@@ -27,22 +28,26 @@ const Inventory: React.FC = () => {
 				)
 
 				if (response.error) {
-					toast("Error loading the cards");
+					console.error("Error loading inventory:", response.message);
+					toast.error("Error al cargar el inventario: " + response.message);
 					setCards([]);
+					setTotalPages(1);
 				} else {
+					// Usar los datos reales de la API
 					setCards(response.data?.results || []);
-					setTotalPages(response.data?.totalPages || 1)
+					setTotalPages(response.data?.totalPages || 1);
 				}
 			} catch (err) {
-				console.error("Error loading the cards: ", err);
-				toast("Error loading the cards");
+				console.error("Error loading inventory: ", err);
+				toast.error("Error de conexión al cargar el inventario");
 				setCards([]);
+				setTotalPages(1);
 			}
 
 			setLoading(false);
 		}
 
-		loadCards();
+		loadInventory();
 	}, [searchTerm, filter, currentPage]);
 
 	useEffect(() => {
@@ -55,7 +60,7 @@ const Inventory: React.FC = () => {
 		}
 	}
 
-	// Renderiza una tarjeta de carta
+	// Renderiza una tarjeta de carta del inventario real
 	const renderCardItem = (card: any) => {
 		return (
 			<Card
@@ -137,8 +142,8 @@ const Inventory: React.FC = () => {
 			</div>
 
 			{loading ? (
-				<div className="text-center py12">
-					<p className="text-gray-400">Cargando...</p>
+				<div className="text-center py-12">
+					<p className="text-gray-400">Cargando inventario...</p>
 				</div>
 			) : cards.length > 0 ? (
 				<>
@@ -197,11 +202,17 @@ const Inventory: React.FC = () => {
 			) : (
 				<div className="text-center py-12">
 					<p className="text-gray-400">
-						No se encontraron cartas
+						{searchTerm || filter 
+							? "No se encontraron cartas en tu inventario con estos filtros" 
+							: "No tienes cartas en tu inventario"}
 					</p>
+					{!searchTerm && !filter && (
+						<p className="text-gray-500 mt-2">
+							¡Ve a la tienda para comprar tus primeras cartas!
+						</p>
+					)}
 				</div>
 			)}
-
 		</div>
 	)
 }
