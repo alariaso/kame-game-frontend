@@ -8,12 +8,12 @@ import {
 	CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { BattleDeck } from "@/types"
+import type { UserDeck, AiDeck } from "@/types"
 import { Shield, Star, Check, X, Swords } from "lucide-react"
 
 interface BattleArenaProps {
-	playerDeck: BattleDeck
-	aiDeck: BattleDeck
+	playerDeck: UserDeck
+	aiDeck: AiDeck
 	currentRound: number
 	roundsWon: { player: number; ai: number }
 	roundResult: {
@@ -66,7 +66,7 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 	}
 
 	// Helper to determine if a card is played
-	const isCardPlayed = (deck: BattleDeck, index: number): boolean => {
+	const isCardPlayed = (deck: UserDeck | AiDeck, index: number): boolean => {
 		return deck.playedCardIndices?.includes(index) || false
 	}
 
@@ -190,13 +190,13 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 										<p
 											className={`text-sm font-medium ${getTypeColor(roundResult.playerCard.type)}`}
 										>
-											{roundResult.playerCard.type.toUpperCase()}
-											{roundResult.playerCard.type ===
-												"monster" && (
+											{/*roundResult.playerCard.type.toUpperCase()*/}
+											{/*roundResult.playerCard.type ===
+												"monster" &&*/ (
 												<span className="text-gray-300">
 													{" "}
 													(ATK:{" "}
-													{roundResult.playerCard.atk}
+													{roundResult.playerCard.attack}
 													)
 												</span>
 											)}
@@ -245,13 +245,13 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 										<p
 											className={`text-sm font-medium ${getTypeColor(roundResult.aiCard.type)}`}
 										>
-											{roundResult.aiCard.type.toUpperCase()}
+											{/*roundResult.aiCard.type.toUpperCase()}
 											{roundResult.aiCard.type ===
-												"monster" && (
+												"monster" && */(
 												<span className="text-gray-300">
 													{" "}
 													(ATK:{" "}
-													{roundResult.aiCard.atk})
+													{roundResult.aiCard.attack})
 												</span>
 											)}
 										</p>
@@ -301,19 +301,21 @@ const BattleArena: React.FC<BattleArenaProps> = ({
 											<p className="text-xs mt-1 truncate">
 												{card.name}
 											</p>
-											<p
+											{/*<p
 												className={`text-xs ${getTypeColor(card.type)} font-medium`}
 											>
 												{card.type.toUpperCase()}
-												{card.type === "monster" &&
-													` (ATK: ${card.atk})`}
+												{card.type === "monster" && */}
+											<p className="text-xs mt-1 truncate">
+												{`(ATK: ${card.attack})`}
 											</p>
-											<p className={`text-xs ${getAttributeColor(card.kind)} font-medium`}>
-												{card.kind}
+											<p className={`text-xs ${getAttributeColor(card.attribute)} font-medium`}>
+												{card.attribute}
 											</p>
 										</div>
 									)
-								})}
+								})
+							}
 							</div>
 
 							<div className="mt-6 border-t border-gold/20 pt-6">

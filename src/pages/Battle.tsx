@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
 	Card,
@@ -8,13 +8,14 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card"
-import { MOCK_CARDS, MOCK_USER_INVENTORY } from "@/data/mockData"
+// import { MOCK_CARDS, MOCK_USER_INVENTORY } from "@/data/mockData"
 import { toast } from "sonner"
 import { Swords } from "lucide-react"
-import type { BattleDeck, Card as CardType } from "@/types"
+import type { UserDeck, AiDeck, Card as CardType, UserCard, CardKind } from "@/types"
 import BattleCardSelection from "@/components/battles/BattleCardSelection"
 import BattleArena from "@/components/battles/BattleArena"
 import BattleResult from "@/components/battles/BattleResults"
+import { getInventory, getRandomCards } from "@/services/api"
 
 const Battles: React.FC = () => {
 	// Battle stages
@@ -36,12 +37,12 @@ const Battles: React.FC = () => {
 	const [battleInProgress, setBattleInProgress] = useState(false)
 
 	// Battle-specific states
-	const [playerDeck, setPlayerDeck] = useState<BattleDeck | null>(null)
-	const [aiDeck, setAiDeck] = useState<BattleDeck | null>(null)
+	const [playerDeck, setPlayerDeck] = useState<UserDeck | null>(null)
+	const [aiDeck, setAiDeck] = useState<AiDeck | null>(null)
 	const [currentRound, setCurrentRound] = useState(0)
 	const [roundsWon, setRoundsWon] = useState({ player: 0, ai: 0 })
 	const [roundResult, setRoundResult] = useState<{
-		playerCard: CardType | null
+		playerCard: UserCard | null
 		aiCard: CardType | null
 		winner: "player" | "ai" | "draw" | null
 		reason: string
@@ -49,16 +50,57 @@ const Battles: React.FC = () => {
 
 	// Store last played cards for tiebreaker
 	const [lastPlayedCards, setLastPlayedCards] = useState<{
-		playerCard: CardType | null
+		playerCard: UserCard | null
 		aiCard: CardType | null
 	}>({ playerCard: null, aiCard: null })
 
-	const userCards = MOCK_USER_INVENTORY.cards
+	// const userCards = MOCK_USER_INVENTORY.cards
 
+	const [userCards, setUserCards] = useState<UserCard[]>([]);
+	const [loading, setLoading] = useState(false);
+	const [searchTerm, setSearchTerm] = useState("");
+	const [filter, setFilter] = useState<CardKind | null>(null);
+	const [totalPages, setTotalPages] = useState<number>(1);
+	const [currentPage, setCurrentPage] = useState<number>(1);
+
+	useEffect(() => {
+		const loadInventory = async () => {
+			setLoading(true);
+
+			try {
+				const response = await getInventory(
+					currentPage,
+					10,
+					searchTerm || undefined,
+					filter || undefined
+				)
+
+				if (response.error) {
+					console.error("Error loading inventory:", response.message);
+					toast.error("Error al cargar el inventario: " + response.message);
+					setUserCards([]);
+					setTotalPages(1);
+				} else {
+					// Usar los datos reales de la API
+					setUserCards(response.data?.results || []);
+					setTotalPages(response.data?.totalPages || 1);
+				}
+			} catch (err) {
+				console.error("Error loading inventory: ", err);
+				toast.error("Error de conexión al cargar el inventario");
+				setUserCards([]);
+				setTotalPages(1);
+			}
+
+			setLoading(false);
+		}
+
+		loadInventory();
+	}, [searchTerm, filter, currentPage]);
 	// Function to determine winner based on exact attribute matchups
-	const determineWinner = (playerCard: CardType, aiCard: CardType): { winner: "player" | "ai" | "draw", reason: string } => {
-		const playerKind = playerCard.kind
-		const aiKind = aiCard.kind
+	const determineWinner = (playerCard: UserCard, aiCard: CardType): { winner: "player" | "ai" | "draw", reason: string } => {
+		const playerKind = playerCard.attribute
+		const aiKind = aiCard.attribute
 
 		// If same attribute, it's a draw
 		if (playerKind === aiKind) {
@@ -91,14 +133,14 @@ const Battles: React.FC = () => {
 	}
 
 	// Prepare player deck from selected cards
-	const prepareBattle = () => {
+	const prepareBattle = async () => {
 		// Get user's selected cards
 		const playerCards = selectedCards
 			.map((id) => {
 				const userCard = userCards.find((uc) => uc.id === id)
-				return userCard ? userCard.card : null
+				return userCard ? userCard : null
 			})
-			.filter(Boolean) as CardType[]
+			.filter(Boolean) as UserCard[]
 
 		setPlayerDeck({
 			cards: playerCards,
@@ -106,22 +148,28 @@ const Battles: React.FC = () => {
 		})
 
 		// Select 5 random cards for AI
-		const allCards = [...MOCK_CARDS]
-		const aiCards: CardType[] = []
+		try {
+			const response = await getRandomCards(5);
+			if (response.error) {
+				console.error("error loading ai cards");
+				toast.error("Error loading the game");
+				return;
+			}
 
-		for (let i = 0; i < 5; i++) {
-			const randomIndex = Math.floor(Math.random() * allCards.length)
-			aiCards.push(allCards[randomIndex])
-			allCards.splice(randomIndex, 1)
+
+			setAiDeck({
+				cards: response.data.results,
+				selectedCardIndex: null,
+			})
+			
+			setStage(STAGES.PREPARE);
+			toast.success("¡Cartas seleccionadas! Prepárate para el duelo.");
+		} catch (err) {
+			console.error("error loading the ai cards", err);
+			toast.error("Error loading the game");
 		}
 
-		setAiDeck({
-			cards: aiCards,
-			selectedCardIndex: null,
-		})
 
-		setStage(STAGES.PREPARE)
-		toast.success("¡Cartas seleccionadas! Prepárate para el duelo.")
 	}
 
 	// Start a new round
@@ -241,8 +289,8 @@ const Battles: React.FC = () => {
 				finalWinner = "ai"
 			} else {
 				// Tiebreaker: compare attack of last played cards
-				const playerAtk = playerCard.atk || 0
-				const aiAtk = aiCard.atk || 0
+				const playerAtk = playerCard.attack || 0
+				const aiAtk = aiCard.attack || 0
 				
 				if (playerAtk > aiAtk) {
 					finalWinner = "player"

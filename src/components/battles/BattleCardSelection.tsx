@@ -1,6 +1,6 @@
 import React from "react"
 import { Button } from "@/components/ui/button"
-import { UserCard } from "@/types"
+import type { UserCard } from "@/types"
 import { toast } from "sonner"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
@@ -23,13 +23,13 @@ const BattleCardSelection: React.FC<BattleCardSelectionProps> = ({
 
 	// Filtrar cartas según la búsqueda y el filtro activo
 	const filteredCards = userCards.filter((userCard) => {
-		const card = userCard.card
+		const card = userCard
 		const matchesSearch =
-			card.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			card.description.toLowerCase().includes(searchTerm.toLowerCase())
+			card.name.toLowerCase().includes(searchTerm.toLowerCase())
+			//card.description.toLowerCase().includes(searchTerm.toLowerCase())
 
 		const matchesFilter =
-			activeFilter === "all" || card.type === activeFilter
+			activeFilter === "all" || card.attribute === activeFilter
 
 		return matchesSearch && matchesFilter
 	})
@@ -135,7 +135,7 @@ const BattleCardSelection: React.FC<BattleCardSelectionProps> = ({
 
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
 				{filteredCards.map((userCard) => {
-					const card = userCard.card
+					const card = userCard
 					const isSelected = selectedCards.includes(userCard.id)
 
 					return (
@@ -157,16 +157,16 @@ const BattleCardSelection: React.FC<BattleCardSelectionProps> = ({
 								<h3 className="text-sm font-medium text-white">
 									{card.name}
 								</h3>
-								{card.type === "monster" && (
+								{//card.type === "monster" && 
+								(
 									<div className="flex justify-between mt-2 text-xs text-gray-300">
-										<span>ATK: {card.atk}</span>
-										<span>DEF: {card.def}</span>
+										<span>ATK: {card.attack}</span>
 									</div>
 								)}
 								<span
-									className={`text-xs px-2 py-1 rounded-full mt-2 ${getRarityColor(card.rarity)} self-start`}
+									className={`text-xs px-2 py-1 rounded-full mt-2 self-start`}
 								>
-									{card.type}
+									{card.attribute}
 								</span>
 							</div>
 							{isSelected && (
