@@ -266,6 +266,7 @@ const Shop: React.FC = () => {
 	}
 
 	const handlePackClick = (pack: any) => {
+		console.log("Pack clicked:", pack)
 		setSelectedPackId(pack.id)
 		setSelectedPackName(pack.name)
 		setIsPackModalOpen(true)

@@ -66,6 +66,7 @@ const Inventory: React.FC = () => {
 	const handlePackClick = (item: any) => {
 		// Solo abrir modal si es un paquete
 		if (item.category === "pack" || item.type === "pack") {
+			console.log("Pack clicked in inventory:", item)
 			setSelectedPackId(item.id)
 			setSelectedPackName(item.name)
 			setIsPackModalOpen(true)

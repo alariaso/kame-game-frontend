@@ -9,7 +9,6 @@ import {
 import { Card } from "@/components/ui/card"
 import { getCardsOfPack } from "@/services/api"
 import { toast } from "sonner"
-import { X } from "lucide-react"
 
 interface PackContentsModalProps {
 	isOpen: boolean
@@ -33,12 +32,23 @@ const PackContentsModal: React.FC<PackContentsModalProps> = ({
 
 			setLoading(true)
 			try {
+				console.log("Loading pack contents for pack ID:", packId)
 				const response = await getCardsOfPack(packId)
+				console.log("Pack contents response:", response)
+				
 				if (response.error) {
 					toast.error("Error al cargar el contenido del paquete: " + response.message)
 					setCards([])
 				} else {
-					setCards(response.data?.results || [])
+					// La API devuelve los datos directamente en response.data
+					// Si response.data es un array, usarlo directamente
+					// Si tiene una propiedad results, usar esa
+					const cardsData = Array.isArray(response.data) 
+						? response.data 
+						: response.data?.results || response.data?.cards || []
+					
+					console.log("Cards data extracted:", cardsData)
+					setCards(cardsData)
 				}
 			} catch (error) {
 				console.error("Error loading pack contents:", error)
@@ -74,7 +84,7 @@ const PackContentsModal: React.FC<PackContentsModalProps> = ({
 							>
 								<div className="aspect-[3/4] overflow-hidden">
 									<img
-										src={card.imageUrl}
+										src={card.imageUrl || card.image_url}
 										alt={card.name}
 										className="w-full h-full object-cover"
 									/>
@@ -88,7 +98,7 @@ const PackContentsModal: React.FC<PackContentsModalProps> = ({
 											ATK: {card.attack}
 										</span>
 										<span className="text-xs text-gray-400">
-											{card.attribute}
+											{card.attribute || card.kind}
 										</span>
 									</div>
 								</div>
