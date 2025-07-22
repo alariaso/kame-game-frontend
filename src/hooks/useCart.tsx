@@ -52,18 +52,24 @@ export const useCart = () => {
 				...(response.data?.packs || []),
 			]
 
-			const formattedItems: CartItem[] = apiCartItems.map((item: any) => ({
-				id: item.cardId?.toString() || item.id?.toString(),
-				name: item.card?.name || item.name || "Producto desconocido",
-				price: item.card?.price || item.price || 0,
-				quantity: item.quantity || 1,
-				imageUrl: item.card?.imageUrl || item.imageUrl || "",
-				type: item.card ? "card" : "pack",
-				itemRef: item.card || item,
-			}))
+			const formattedItems: CartItem[] = apiCartItems.map((item: any) => {
+				// Asegurar que el precio sea siempre un número válido
+				const price = Number(item.card?.price || item.price || 0)
+				const quantity = Number(item.quantity || 1)
+				
+				return {
+					id: item.cardId?.toString() || item.id?.toString(),
+					name: item.card?.name || item.name || "Producto desconocido",
+					price: isNaN(price) ? 0 : price,
+					quantity: isNaN(quantity) ? 1 : quantity,
+					imageUrl: item.card?.imageUrl || item.imageUrl || "",
+					type: item.card ? "card" : "pack",
+					itemRef: item.card || item,
+				}
+			})
 
-			setCartItems(formattedItems)
 			console.log("Cart loaded successfully:", formattedItems)
+			setCartItems(formattedItems)
 		} catch (error) {
 			console.error("Error loading cart from API:", error)
 			toast.error("Error de conexión al cargar el carrito")
@@ -104,7 +110,6 @@ export const useCart = () => {
 
 	const updateCartItemQuantity = (id: string, change: number) => {
 		// Actualización temporal local, luego sincronizar con API
-		// TODO: Implementar endpoint para actualizar cantidad específica
 		setCartItems((prevItems) =>
 			prevItems.map((item) =>
 				item.id === id
@@ -167,8 +172,17 @@ export const useCart = () => {
 			return
 		}
 
-		// TODO: Implementar checkout real con API
-		// Por ahora usamos la lógica existente del contexto de autenticación
+		// Validar que tenemos items con precios válidos antes de proceder
+		const hasValidItems = cartItems.length > 0 && cartItems.every(item => 
+			!isNaN(item.price) && item.price > 0 && !isNaN(item.quantity) && item.quantity > 0
+		)
+
+		if (!hasValidItems) {
+			toast.error("Error: Los productos en el carrito no tienen precios válidos")
+			return
+		}
+
+		// Procesar la compra usando la lógica existente del contexto de autenticación
 		let allPurchasesSuccessful = true
 
 		for (const item of cartItems) {

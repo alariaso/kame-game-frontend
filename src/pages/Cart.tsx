@@ -1,3 +1,4 @@
+
 import React, { useContext, useEffect } from "react"
 import { CartContext } from "@/App"
 import { Button } from "@/components/ui/button"
@@ -47,25 +48,41 @@ const Cart = () => {
 		0
 	)
 
-	// Calcular subtotal (precio sin descuentos)
+	// Calcular subtotal con validación de precios
 	const subtotal = cart.cartItems.reduce((acc, item) => {
-		if (item.type === "pack") {
-			// Para paquetes, calcular el precio original (sin descuento)
-			const pack = item.itemRef as CardPack
-			const originalPrice = item.price / (1 - pack.discount) // Precio original antes del descuento
-			return acc + originalPrice * item.quantity
+		const price = Number(item.price)
+		const quantity = Number(item.quantity)
+		
+		// Solo agregar al subtotal si los valores son números válidos
+		if (!isNaN(price) && !isNaN(quantity) && price > 0 && quantity > 0) {
+			if (item.type === "pack") {
+				// Para paquetes, calcular el precio original (sin descuento)
+				const pack = item.itemRef as CardPack
+				const discount = Number(pack.discount) || 0
+				if (!isNaN(discount) && discount > 0 && discount < 1) {
+					const originalPrice = price / (1 - discount)
+					return acc + originalPrice * quantity
+				}
+			}
+			// Para cartas individuales o paquetes sin descuento, usar el precio directo
+			return acc + price * quantity
 		}
-		// Para cartas individuales, usar el precio directo
-		return acc + item.price * item.quantity
+		return acc
 	}, 0)
 
 	// Calcular descuento total
 	const discount = cart.cartItems.reduce((acc, item) => {
-		if (item.type === "pack") {
+		const price = Number(item.price)
+		const quantity = Number(item.quantity)
+		
+		if (!isNaN(price) && !isNaN(quantity) && price > 0 && quantity > 0 && item.type === "pack") {
 			const pack = item.itemRef as CardPack
-			const originalPrice = item.price / (1 - pack.discount)
-			const discountAmount = originalPrice - item.price
-			return acc + discountAmount * item.quantity
+			const discountRate = Number(pack.discount) || 0
+			if (!isNaN(discountRate) && discountRate > 0 && discountRate < 1) {
+				const originalPrice = price / (1 - discountRate)
+				const discountAmount = originalPrice - price
+				return acc + discountAmount * quantity
+			}
 		}
 		return acc
 	}, 0)
@@ -105,7 +122,7 @@ const Cart = () => {
 										<p className="text-sm text-gray-400">
 											{item.type === "card"
 												? "Carta"
-												: `Paquete (${(item.itemRef as CardPack).cardCount} cartas)`}
+												: `Paquete (${(item.itemRef as CardPack).cardCount || 0} cartas)`}
 										</p>
 										{item.type === "pack" && (
 											<p className="text-xs text-green-400">
@@ -114,7 +131,7 @@ const Cart = () => {
 										)}
 										<div className="flex justify-between items-center mt-2">
 											<span className="font-medium">
-												${item.price}
+												${Number(item.price) || 0}
 											</span>
 											<div className="flex items-center gap-2">
 												<Button
@@ -178,7 +195,7 @@ const Cart = () => {
 						<CardContent className="py-4">
 							<div className="flex justify-between items-center mb-2">
 								<span>Subtotal:</span>
-								<span>${Math.round(subtotal)}</span>
+								<span>${Math.round(subtotal) || 0}</span>
 							</div>
 							{discount > 0 && (
 								<div className="flex justify-between items-center mb-2">
@@ -195,7 +212,7 @@ const Cart = () => {
 							<div className="flex justify-between items-center w-full mb-4">
 								<span className="font-medium">Total:</span>
 								<span className="font-bold text-gold">
-									${Math.round(totalPrice)}
+									${Math.round(totalPrice) || 0}
 								</span>
 							</div>
 							<AlertDialog>
