@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from "react"
 import { Card } from "@/components/ui/card"
 import { getInventory } from "@/services/api"
 import { toast } from "sonner"
 import type { CardKind } from "@/types"
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
+import PackContentsModal from "@/components/PackContentsModal"
 
 const Inventory: React.FC = () => {
 	const [cards, setCards] = useState<any[]>([])
@@ -13,6 +13,9 @@ const Inventory: React.FC = () => {
 	const [loading, setLoading] = useState(false);
 	const [totalPages, setTotalPages] = useState<number>(1)
 	const [currentPage, setCurrentPage] = useState<number>(1)
+	const [isPackModalOpen, setIsPackModalOpen] = useState(false)
+	const [selectedPackId, setSelectedPackId] = useState<number | null>(null)
+	const [selectedPackName, setSelectedPackName] = useState("")
 
 	// Cargar el inventario del usuario desde la API real
 	useEffect(() => {
@@ -60,12 +63,24 @@ const Inventory: React.FC = () => {
 		}
 	}
 
+	const handlePackClick = (item: any) => {
+		// Solo abrir modal si es un paquete
+		if (item.category === "pack" || item.type === "pack") {
+			setSelectedPackId(item.id)
+			setSelectedPackName(item.name)
+			setIsPackModalOpen(true)
+		}
+	}
+
 	// Renderiza una tarjeta de carta del inventario real
 	const renderCardItem = (card: any) => {
+		const isPack = card.category === "pack" || card.type === "pack"
+		
 		return (
 			<Card
 				key={card.id || card.name}
-				className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
+				className={`overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20 ${isPack ? 'cursor-pointer' : ''}`}
+				onClick={() => isPack && handlePackClick(card)}
 			>
 				<div className="aspect-[3/4] overflow-hidden">
 					<img
@@ -213,6 +228,13 @@ const Inventory: React.FC = () => {
 					)}
 				</div>
 			)}
+
+			<PackContentsModal
+				isOpen={isPackModalOpen}
+				onClose={() => setIsPackModalOpen(false)}
+				packId={selectedPackId}
+				packName={selectedPackName}
+			/>
 		</div>
 	)
 }

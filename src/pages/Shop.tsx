@@ -13,12 +13,12 @@ import {
 import { CartContext } from "@/App"
 import { getCards, getCPacks } from "@/services/api"
 import { toast } from "sonner"
+import PackContentsModal from "@/components/PackContentsModal"
 
 type ProductCategory = "Cartas Individuales" | "Paquetes"
 type Filter = "cardKind" | "packRarity"
 
 const Shop: React.FC = () => {
-	// Eliminamos cualquier referencia a getAvailablePacks() mock
 	const [activeTab, setActiveTab] = useState<string>("cards")
 	const [searchTerm, setSearchTerm] = useState<string>("")
 	const [filters, setFilters] = useState<Record<Filter, string | null>>({
@@ -32,6 +32,9 @@ const Shop: React.FC = () => {
 	const [currentPage, setCurrentPage] = useState<number>(1)
 	const [allCards, setAllCards] = useState<any[]>([])
 	const [allPacks, setAllPacks] = useState<any[]>([])
+	const [isPackModalOpen, setIsPackModalOpen] = useState(false)
+	const [selectedPackId, setSelectedPackId] = useState<number | null>(null)
+	const [selectedPackName, setSelectedPackName] = useState("")
 	const cart = useContext(CartContext)
 
 	// Función para cargar todas las cartas desde la API real
@@ -262,6 +265,12 @@ const Shop: React.FC = () => {
 		}))
 	}
 
+	const handlePackClick = (pack: any) => {
+		setSelectedPackId(pack.id)
+		setSelectedPackName(pack.name)
+		setIsPackModalOpen(true)
+	}
+
 	return (
 		<div className="container mx-auto py-6 px-4 sm:px-6">
 			<h1 className="text-2xl sm:text-3xl font-bold text-gold mb-6">
@@ -476,7 +485,8 @@ const Shop: React.FC = () => {
 									filteredPacks.map((pack) => (
 										<Card
 											key={pack.id}
-											className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20"
+											className="overflow-hidden bg-black/40 border-gold/30 transition-all hover:shadow-md hover:shadow-gold/20 cursor-pointer"
+											onClick={() => handlePackClick(pack)}
 										>
 											<div className="aspect-video overflow-hidden">
 												<img
@@ -507,7 +517,10 @@ const Shop: React.FC = () => {
 												</div>
 												<button
 													className="w-full mt-3 py-1.5 px-3 bg-gold hover:bg-gold/80 text-black text-sm font-semibold rounded-sm transition-colors"
-													onClick={() => cart?.addToCart(pack, "pack")}
+													onClick={(e) => {
+														e.stopPropagation()
+														cart?.addToCart(pack, "pack")
+													}}
 													disabled={pack.stock <= 0}
 												>
 													{pack.stock <= 0
@@ -578,6 +591,13 @@ const Shop: React.FC = () => {
 					)}
 				</TabsContent>
 			</Tabs>
+
+			<PackContentsModal
+				isOpen={isPackModalOpen}
+				onClose={() => setIsPackModalOpen(false)}
+				packId={selectedPackId}
+				packName={selectedPackName}
+			/>
 		</div>
 	)
 }
