@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react"
 import { Card as CardType, CardPack } from "@/types"
 import { useAuth } from "@/context/AuthContext"
@@ -8,6 +7,7 @@ import {
 	removeCartItem as removeCartItemAPI,
 	addToCart as addToCartAPI,
 	getCart as getCartAPI,
+	buyCart as buyCartAPI,
 } from "@/services/api"
 
 export type CartItem = {
@@ -166,15 +166,21 @@ export const useCart = () => {
 		}
 	}
 
-	const handleCheckout = () => {
+	const handleCheckout = async () => {
 		if (!isAuthenticated) {
 			toast.error("Debes iniciar sesión para comprar")
 			return
 		}
 
-		// Validar que tenemos items con precios válidos antes de proceder
-		const hasValidItems = cartItems.length > 0 && cartItems.every(item => 
-			!isNaN(item.price) && item.price > 0 && !isNaN(item.quantity) && item.quantity > 0
+		// Validar que tenemos items válidos antes de proceder
+		if (cartItems.length === 0) {
+			toast.error("El carrito está vacío")
+			return
+		}
+
+		const hasValidItems = cartItems.every(item => 
+			!isNaN(Number(item.price)) && Number(item.price) > 0 && 
+			!isNaN(Number(item.quantity)) && Number(item.quantity) > 0
 		)
 
 		if (!hasValidItems) {
@@ -182,32 +188,39 @@ export const useCart = () => {
 			return
 		}
 
-		// Procesar la compra usando la lógica existente del contexto de autenticación
-		let allPurchasesSuccessful = true
+		try {
+			console.log("Processing cart purchase...")
+			const response = await buyCartAPI()
 
-		for (const item of cartItems) {
-			const { id, quantity, type } = item
-
-			for (let i = 0; i < quantity; i++) {
-				const success = type === "card" ? buyCard(id) : buyPack(id)
-
-				if (!success) {
-					allPurchasesSuccessful = false
-					break
+			if (response.error) {
+				// Manejar diferentes tipos de errores del servidor
+				const errorMessage = response.message || "Error desconocido al procesar la compra"
+				
+				if (errorMessage.includes("cart is empty")) {
+					toast.error("El carrito está vacío, no hay nada que comprar")
+				} else if (errorMessage.includes("don't have enough balance")) {
+					toast.error(`No tienes suficiente saldo. ${errorMessage}`)
+				} else if (errorMessage.includes("don't have enough stock")) {
+					toast.error("Algunas cartas en tu carrito no tienen suficiente stock disponible")
+				} else {
+					toast.error(`Error al procesar la compra: ${errorMessage}`)
 				}
+				return
 			}
 
-			if (!allPurchasesSuccessful) break
-		}
-
-		if (allPurchasesSuccessful) {
-			toast.success("Compra realizada con éxito")
-			clearCart()
+			// Compra exitosa
+			toast.success("¡Compra realizada con éxito!")
+			
+			// Limpiar el carrito localmente y cerrar el modal
+			setCartItems([])
 			setCartOpen(false)
-		} else {
-			toast.error(
-				"Error al procesar la compra. Verifica tu saldo o el stock disponible."
-			)
+			
+			// Recargar el carrito desde la API para asegurar sincronización
+			await loadCartFromAPI()
+			
+		} catch (error) {
+			console.error("Error during checkout:", error)
+			toast.error("Error de conexión al procesar la compra")
 		}
 	}
 

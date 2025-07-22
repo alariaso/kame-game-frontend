@@ -337,3 +337,10 @@ export const getInventory = async (
 
 	return makeAuthenticatedRequest(`/inventory?${queryParams.toString()}`)
 }
+
+// 1️⃣2️⃣ Función para procesar la compra del carrito
+export const buyCart = async (): Promise<ApiResponse<any>> => {
+	return makeAuthenticatedRequest("/cart/buy", {
+		method: "GET",
+	})
+}
